@@ -1,0 +1,2453 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>迁移学习</title>
+    <meta name="description" content="Introduction to Transfer Learning and Pretrained Models (ELMo, BERT, GPT).">
+
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="canonical" href="http://lena-voita.github.io/nlp_course/transfer_learning.html">
+
+    <!-- diff from head.html begin -->
+    <link rel="mask-icon" href="../resources/lectures/ico/course_logo.png">
+    <link rel="alternate icon" class="js-site-favicon" type="image/png"
+        href="../resources/lectures/ico/course_logo.png">
+    <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="../resources/lectures/ico/course_logo.png">
+    <!-- diff from head.html end -->
+
+    <!--<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>-->
+
+
+</head>
+
+
+<!--style>
+p {
+  text-align: justify;
+}
+</style-->
+
+<body>
+
+    <header class="site-header">
+
+        <div class="wrapper">
+
+            <div id="title-image" style="display:inline">
+                <img class="site-img" src="../img/ico/logo.jpeg" />
+            </div>
+
+            <div id="title-texts" style="display:inline">
+                <a class="site-title" href="https://github.com/MLNLP-World" target="_blank">MLNLP</a>
+            </div>
+
+            <nav class="site-nav">
+                <a href="#" class="menu-icon">
+                    <svg viewBox="0 0 18 15">
+                        <path fill="#424242"
+                            d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z" />
+                        <path fill="#424242"
+                            d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z" />
+                        <path fill="#424242"
+                            d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z" />
+                    </svg>
+                </a>
+
+                <div class="trigger">
+                    <a class="page-link" href="https://lena-voita.github.io/" target="_blank">原作者：Lena Voita</a>
+                    <a class="page-link" href="https://lena-voita.github.io/nlp_course/transfer_learning.html"
+                        target="_blank">原始英文版本</a>
+                    <a class="page-link" href="../about.html" target="_blank">关于我们</a>
+
+                </div>
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <!-- the next two lines are inserted once per page even if there are several shtukovinas,
+ the rest is one-per-shtukovina; read more: https://flickity.metafizzy.co/options.html -->
+    <link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css" media="screen">
+    <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
+
+    <!-- MathJax -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <style>
+        .demo_sidebar {
+            margin: 0;
+            padding: 0;
+            background-color: white;
+
+            position: relative;
+            height: auto;
+            width: 290px;
+        }
+
+        .demo_sidebar_text {
+            font-size: 18px;
+        }
+
+        .demo_sidebar_comment {
+            font-size: 15px;
+            margin-left: 10px;
+            font-family: "Comic Neue", "Arial";
+
+        }
+
+
+        .demo_sidebar a {
+            display: block;
+            color: black;
+            padding: 8px;
+            text-decoration: none;
+
+        }
+
+        .demo_sidebar a li {
+            margin-left: 5px;
+            padding: 0px;
+        }
+
+
+        .demo_sidebar a:hover {
+            box-shadow: 0 3px 6px #6e8f27, 0 1px 1px #6e8f27;
+        }
+
+        .demo_sidebar a:hover:not(.active) {
+            background-color: #f3f3f3;
+        }
+
+        .demo_sidebar .main_components {
+            background-color: #f3f3f3;
+        }
+
+        .demo_sidebar .extra_components {
+            background-color: #eaeaea;
+        }
+
+
+        #demo_sidebar_research_thinking:hover {
+            box-shadow: 0 3px 6px #a68305, 0 1px 1px #a68305;
+
+        }
+
+
+        #demo_sidebar_related_papers:hover {
+            box-shadow: 0 3px 6px #8a4972, 0 1px 1px #8a4972;
+        }
+
+
+        #demo_sidebar_fun:hover {
+            box-shadow: 0 3px 6px #377b94, 0 1px 1px #377b94;
+        }
+    </style>
+
+
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Josefin+Sans&display=swap');
+        @import url("https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap");
+        @import url("https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap");
+
+
+        #main_page_content {
+            margin-left: 300px;
+            padding: 30px;
+            padding-left: 70px;
+            text-align: justify;
+        }
+
+        .sidebar {
+            margin: 0;
+            padding: 0;
+            width: 270px;
+            background-color: #fafafa;
+            position: fixed;
+            height: 100%;
+            overflow: auto;
+            z-index: 1;
+        }
+
+        .sidebar a,
+        .dropdown-btn {
+            display: block;
+            color: black;
+            padding: 8px;
+            text-decoration: none;
+            border-right: 5px solid #b7db67;
+        }
+
+
+        .sidebar a li {
+            margin-left: 10px;
+            padding: 0px;
+        }
+
+        .dropdown-container {
+            display: none;
+            background-color: #f4f4f4;
+        }
+
+        .active_caret .fa-caret-down {
+            color: #b7db67;
+            font-size: 30px;
+        }
+
+        .fa-caret-down {
+            float: right;
+            padding-right: 8px;
+        }
+
+        .sidebar a.active {
+            background-color: #e3e3e3;
+            color: black;
+        }
+
+        .sidebar a:hover {
+            box-shadow: 0 3px 6px #6e8f27, 0 1px 1px #6e8f27;
+        }
+
+        .sidebar a:hover:not(.active) {
+            background-color: #f3f3f3;
+        }
+
+        .sidebar .extra_components {
+            background-color: #eaeaea;
+        }
+
+        #sidebar_analysis {
+            padding: 10px;
+        }
+
+        #sidebar_research_thinking {
+            padding: 10px;
+            border-right: 5px solid #fad400;
+        }
+
+        #sidebar_research_thinking:hover {
+            box-shadow: 0 3px 6px #a68305, 0 1px 1px #a68305;
+
+        }
+
+
+        #sidebar_related_papers {
+            padding: 10px;
+            border-right: 5px solid #d192ba;
+        }
+
+        #sidebar_related_papers:hover {
+            box-shadow: 0 3px 6px #8a4972, 0 1px 1px #8a4972;
+        }
+
+
+        #sidebar_fun {
+            padding: 10px;
+            border-right: 5px solid #6fb7d1;
+        }
+
+        #sidebar_fun:hover {
+            box-shadow: 0 3px 6px #377b94, 0 1px 1px #377b94;
+        }
+
+
+        .sidebar_ico {
+            float: right;
+            height: 20;
+        }
+
+        div.content {
+            margin-left: 200px;
+            padding: 1px 16px;
+            height: 1000px;
+        }
+
+        #sidebar_small {
+            width: 60px;
+        }
+
+
+        @media screen and (max-width: 1000px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            #main_page_content {
+                margin-left: 200px;
+                padding-left: 50px;
+            }
+
+            #for_you_in_sidebar {
+                display: none;
+            }
+
+        }
+
+
+        @media screen and (max-width: 800px) {
+
+            div.content {
+                margin-left: 0;
+            }
+
+            #main_page_content {
+                margin-left: 80px;
+                padding: 15px;
+            }
+
+            #demo_sidebar {}
+        }
+
+
+        .softmax_tau_bokeh {
+            font-size: 16px;
+        }
+
+
+        .card_with_ico {
+            position: relative;
+            padding: 10px;
+            margin: 10px;
+        }
+
+        .card_with_ico p {
+            padding: 10px;
+        }
+
+        .card_with_ico ul {
+            padding: 10px;
+        }
+
+        .card_with_ico .text_box_green {
+            border: 1px solid #d8e8b5;
+            border-radius: 5px;
+            margin-left: 30px;
+        }
+
+        .card_with_ico .text_box_pink {
+            border: 1px solid #dec8d6;
+            border-radius: 5px;
+            margin-left: 30px;
+        }
+
+        .card_with_ico .text_box_yellow {
+            border: 1px solid #f0e4a5;
+            border-radius: 5px;
+            margin-left: 30px;
+        }
+
+        .card_with_ico .ico {
+            float: left;
+            width: 25px;
+        }
+
+
+        .text_box_green {
+            border: 1px solid #d8e8b5;
+            border-radius: 5px;
+            display: table;
+            margin-left: 20px;
+        }
+
+        .text_box_green p {
+            padding: 10px;
+            padding-bottom: 0px;
+        }
+
+
+        .green_left_thought {
+            border-left: 5px solid #b7db67;
+            margin: 10px;
+            margin-left: 20px;
+            padding: 0px;
+            background-color: #fafcf5;
+        }
+
+        .green_left_thought p {
+
+            margin-left: 10px;
+            padding: 5px;
+        }
+
+
+        .box_green_left {
+            border-left: 2px solid #79a123;
+            margin-left: 10px;
+            padding: 10px;
+        }
+
+        .box_green_right {
+            border-right: 2px solid #79a123;
+            margin-right: 10px;
+            padding: 10px;
+        }
+
+        .box_violet_right {
+            border-right: 2px solid #67468f;
+            margin-right: 10px;
+            padding: 10px;
+        }
+
+        .box_pink_left {
+            border-left: 2px solid #7a3160;
+            margin-left: 5px;
+            padding: 10px;
+        }
+
+        .box_yellow_left {
+            border-left: 2px solid #d6b000;
+            margin-left: 5px;
+            padding: 10px;
+        }
+
+        .box_blue_left {
+            border-left: 2px solid #0278a1;
+            margin-left: 5px;
+            padding: 10px;
+        }
+
+        .paper_title {
+            text-align: center;
+            padding: 5px;
+            padding-top: 0px;
+            font-size: 16px;
+
+        }
+
+        .paper_authors {
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        p {
+            text-align: justify;
+        }
+
+
+        .greenCard {
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 1px;
+            margin: 10px 5px;
+            padding: 3px;
+            display: grid;
+            grid-template-rows: auto auto;
+        }
+
+        #thumbnail_green {
+            box-shadow: 0 2px 4px #6e8f27, 0 1px 1px #6e8f27;
+        }
+
+        #thumbnail_green:hover {
+            box-shadow: 0 6px 12px #6e8f27, 0 4px 4px #6e8f27;
+        }
+
+        #thumbnail_violet {
+            box-shadow: 0 2px 4px #655578, 0 1px 1px #655578;
+        }
+
+        #thumbnail_violet:hover {
+            box-shadow: 0 6px 12px #655578, 0 4px 4px #655578;
+        }
+
+        #thumbnail_paper {
+            box-shadow: 0 2px 4px #ab859e, 0 1px 1px #ab859e;
+        }
+
+        #thumbnail_paper:hover {
+            box-shadow: 0 6px 12px #ab859e, 0 4px 4px #ab859e;
+        }
+
+
+        #thumbnail_blue {
+            box-shadow: 0 2px 4px #377b94, 0 1px 1px;
+        }
+
+        #thumbnail_blue:hover {
+            box-shadow: 0 6px 12px #377b94, 0 4px 4px #377b94;
+        }
+
+        .paperCard {
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 1px;
+            margin: 10px 5px;
+            padding: 3px;
+            display: grid;
+            grid-template-rows: auto auto;
+        }
+
+        .paperIntro {
+            display: grid;
+            grid-template-columns: 70% 30%;
+        }
+
+        .showMePaper {
+            box-shadow: 0 2px 4px #a68305, 0 2px 1px #a68305;
+        }
+
+        .showMePaper:hover {
+            box-shadow: 0 3px 6px #ab859e, 0 4px 4px #ab859e;
+        }
+
+
+        .cardContent {
+            padding: 10px;
+        }
+
+        .center {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .conf_name {
+            float: right;
+            font-family: sans-serif;
+            font-size: 13px;
+            margin-bottom: 0px;
+            background-color: #f7edf4;
+            border: 1px solid #d1a1c3;
+            border-radius: 1px;
+            padding: 0px 4px 0px 4px;
+        }
+
+
+        .paper_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #cf99be;
+            border: 1px solid #8c2b6e;
+            border-radius: 50%;
+        }
+
+        .research_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #ffda00;
+            border: 1px solid #998300;
+            border-radius: 50%;
+        }
+
+        .fun_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #68c7e8;
+            border: 1px solid #0278a1;
+            border-radius: 50%;
+        }
+
+        .green_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #b7db67;
+            border: 1px solid #598005;
+            border-radius: 50%;
+        }
+
+        .violet_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #b59fcf;
+            border: 1px solid #67468f;
+            border-radius: 50%;
+        }
+
+        .data_text {
+            font-family: "Comic Neue", "Arial";
+        }
+
+
+        .researchCard {
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 1px;
+            margin: 10px 5px;
+            padding: 3px;
+            display: grid;
+            grid-template-rows: auto auto;
+        }
+
+        .researchIntro {
+            display: grid;
+            grid-template-columns: 70% 30%;
+        }
+
+        #thumbnail_research {
+            box-shadow: 0 2px 4px #a68305, 0 1px 1px #a68305;
+        }
+
+        #thumbnail_research:hover {
+            box-shadow: 0 6px 12px #a68305, 0 4px 4px #a68305;
+        }
+
+        .research_title {
+            text-align: center;
+            padding: 5px;
+            font-size: 18px;
+            font-family: "Comic Neue", "Arial";
+            background-color: #fafaf5;
+
+
+        }
+
+        .research_tag {
+            float: right;
+            font-family: sans-serif;
+            font-size: 13px;
+            margin-bottom: 0px;
+            background-color: #f5f0d5;
+            border: 1px solid #fad400;
+            border-radius: 1px;
+            padding: 0px 4px 0px 4px;
+        }
+
+        .research_question {
+            font-weight: bold;
+            font-size: 18px;
+            background-color: #fff4b3;
+            margin-right: 15px;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
+        .research_summary {
+            padding: 5px;
+            font-size: 18px;
+            font-family: "Comic Neue", "Arial";
+            background-color: #fafaf5;
+            margin-left: 10px;
+        }
+
+
+        .text_table td,
+        .text_table th {
+            text-align: center;
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-top: 2px;
+            padding-bottom: 2px;
+        }
+    </style>
+
+    <!--##################################################-->
+
+    <div>
+        <div class="sidebar" id="sidebar">
+            <a href="javascript:void(0)" id="close_sidebar_btn" onclick="closeNav()"
+                style="text-align:center;font-size:30px;padding:0px;">⇤</a>
+            <a class="active" href="../nlp_course.html" style="font-weight: bold;">
+                <img height="18" class='sidebar_ico' src="../resources/lectures/ico/course_logo.png"
+                    style="margin-right: 8px;margin-left: 8px;margin-top: 4px;" />
+                NLP Course <font color="#92bf32" id="for_you_in_sidebar">| 专属定制</font></a>
+            <a href="#main_content" style="font-weight: bold;">迁移学习</a>
+
+            <a href="#intro">什么是迁移学习？</a>
+            <a href="#word_embeddings">回顾：词嵌入</a>
+
+            <div class="dropdown-scope">
+                <a class="dropdown-btn">预训练语言模型
+                    <i class="fa fa-caret-down"></i>
+                </a>
+                <div class="dropdown-container">
+                    <a href="#pretrained_models"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        词语 ↦ 在语境中的词语</a>
+                    <a href="#cove"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        CoVe</a>
+                    <a href="#elmo"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        ELMo</a>
+                    <a href="#great_idea2"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        任务特定模型 ↦ 统一模型</a>
+                    <a href="#gpt"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        GPT</a>
+                    <a href="#bert"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        BERT</a>
+
+                </div>
+            </div>
+
+
+            <!--<a href="#benchmarks">Benchmarks</a>-->
+
+            <a href="#adapters">适配器：参数高效迁移</a>
+            <a href="#benchmarks">Benchmarks</a>
+
+            <a href="#analysis_interpretability" id="sidebar_analysis">分析与解释 <img height="25"
+                    src="../resources/lectures/ico/analysis_empty.png" class="sidebar_ico" /></a>
+            <div class="extra_components">
+                <a href="#research_thinking" id="sidebar_research_thinking">研究思考 <img height="30"
+                        src="../resources/lectures/ico/bulb_empty.png" class="sidebar_ico" /></a>
+                <!--<hr color="#b7db67">-->
+
+                <a href="#related_papers" id="sidebar_related_papers">相关论文 <img height="22"
+                        src="../resources/lectures/ico/book_empty.png" class="sidebar_ico" /></a>
+                <!--<hr color="#b7db67">-->
+
+                <a href="#have_fun" id="sidebar_fun">Have Fun! <img height="30"
+                        src="../resources/lectures/ico/fun_empty.png" class="sidebar_ico" /></a>
+            </div>
+        </div>
+
+
+        <div class="sidebar" id="sidebar_small">
+
+            <a class="active" onclick="openNav()" style="text-align:center;">☰</a>
+            <a href="../nlp_course.html">
+                <img height="20" src="../resources/lectures/ico/course_logo.png"
+                    style="margin-right: 8px;margin-left: 8px;" /></a>
+            <a href="#main_page_content" style="text-align:center; font-size:20px;color:#7ca81e"> <i
+                    class="fa fa-home"></i></a>
+
+            <a href="#analysis_interpretability" id="sidebar_analysis"> <img height="25"
+                    src="../resources/lectures/ico/analysis_empty.png" /></a>
+            <div class="extra_components">
+                <a href="#research_thinking" id="sidebar_research_thinking"><img height="30"
+                        src="../resources/lectures/ico/bulb_empty.png" /></a>
+                <!--<hr color="#b7db67">-->
+
+                <a href="#related_papers" id="sidebar_related_papers"><img height="22"
+                        src="../resources/lectures/ico/book_empty.png" /></a>
+                <!--<hr color="#b7db67">-->
+
+                <a href="#have_fun" id="sidebar_fun"><img height="30"
+                        src="../resources/lectures/ico/fun_empty.png" /></a>
+            </div>
+        </div>
+
+
+        <script>
+            function openNav() {
+                document.getElementById("sidebar").style.display = "block";
+                document.getElementById("sidebar_small").style.display = "none";
+                document.getElementById("close_sidebar_btn").style.display = "block";
+            }
+
+            function closeNav() {
+                document.getElementById("sidebar").style.display = "none";
+                document.getElementById("sidebar_small").style.display = "block";
+                document.getElementById("close_sidebar_btn").style.display = "none";
+            }
+
+        </script>
+
+
+        <script>
+            function onResize() {
+                if (window.innerWidth >= 800) {
+                    document.getElementById("sidebar").style.display = "block";
+                    document.getElementById("sidebar_small").style.display = "none";
+                    document.getElementById("close_sidebar_btn").style.display = "none";
+                } else {
+                    document.getElementById("sidebar").style.display = "none";
+                    document.getElementById("sidebar_small").style.display = "block";
+                }
+            }
+
+            window.onresize = onResize;
+            onResize();
+        </script>
+
+        <script>
+            /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
+            var dropdown = document.getElementsByClassName("dropdown-btn");
+            var i;
+
+            for (i = 0; i < dropdown.length; i++) {
+                dropdown[i].addEventListener("click", function (event) {
+                    this.classList.toggle("active_caret");
+                    var dropdownButton = event.target || event.srcElement;
+                    while (dropdownButton.className != "dropdown-scope")
+                        dropdownButton = dropdownButton.parentElement;
+                    var dropdownContent = dropdownButton.getElementsByClassName("dropdown-container")[0];
+
+                    if (dropdownContent.style.display === "block") {
+                        dropdownContent.style.display = "none";
+                    } else {
+                        dropdownContent.style.display = "block";
+                    }
+                });
+            }
+        </script>
+
+
+        <div class="wrapper" id="main_page_content">
+            <div class="header">
+                <h1>迁移学习简介 <a
+                        href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=(Introduction%20to)%20Transfer%20Learning"
+                        style="font-size:9px;" target="_blank">(英文原文)</a></h1>
+            </div>
+
+
+            <div class="main_content" id="main_content">
+
+                <p class="data_text">
+                    <font color="black">
+                        译者：<a href="" target="_blank">覃立波</a> 校对：<a href="https://cartus.github.io/"
+                            target=" _blank">郭志江</a>
+                    </font>
+                </p>
+
+                <div id="intro">
+
+                    <p class="data_text">
+                        <font color="#888"><u>编者按</u>:
+                            迁移学习内容繁多：因此，我无法在一个课程内容中将它全部涵盖。在这里，我将尝试给出一般的迁移思想，并将呈现它目前正在流行的一些方式。
+                        </font>
+                    </p>
+
+                    <p>
+                        目前，<b>迁移学习</b>可以算是是研究和行业中最受欢迎的NLP领域。大多数人可能已经听过ELMo，BERT等技术，
+                        在这个课程之后，你会明白为什么它们如此受欢迎！
+                    </p>
+
+                    <h2>从一个模型迁移知识到另一个模型 <a
+                            href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=%22Transfer%22%20Knowledge%20from%20One%20Model%20to%20Another"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+
+                    <p>
+                        迁移学习的一般思想是将知识从一个任务/模型转移到另一个任务/模型。例如，在你感兴趣的任务中，没有大量数据（例如，分类），并且仅使用这些数据很难训练得到良好的模型。相反，你可以很容易的获得大量其它任务的数据
+                        （例如，对于语言建模，你不需要标注任何标签，只需要最原始的纯文本）。
+                    </p>
+                    <center>
+                        <img src="../resources/lectures/transfer/intro/idea-min.png"
+                            style="max-width:80%; margin-bottom:20px;" />
+                    </center>
+                    <p>
+                        在这种情况下，你可以将知识从你不感兴趣的任务（我们称之为<b>源任务</b>）转移到你关心的任务上去，即<b>目标任务
+                        </b>。
+                    </p>
+
+                    <h2>NLP领域中迁移学习的分类 <a
+                            href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=A%20Taxonomy%20for%20Transfer%20Learning%20in%20NLP"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+                    <p>
+                        在<a href="https://ruder.io/state-of-transfer-learning-in-nlp/" target="_blank">Sebastian
+                            Ruder的博客文章</a>中有几种类型的迁移。两种大类是<b>直推式</b>和<b>归纳式</b>迁移学习：它们将源任务和目标任务间任务和标签相同的迁移定义为<b>直推式</b>迁移学习，将任务和标签不相同的迁移定义为<b>归纳式</b>迁移学习。
+                    </p>
+
+                    <p style="text-align: center; display: block;
+            margin-bottom:20px; max-width:100%;">
+                        <img src="../resources/lectures/transfer/intro/taxonomy-min.png"
+                            style="max-width:90%; margin-bottom:20px;" />
+                        <br />
+                        <span style="font-size: small;">分类来源于
+                            <a href="https://ruder.io/state-of-transfer-learning-in-nlp/" target="_blank">Sebastian
+                                Ruder's blog post</a>.</span>
+                    </p>
+                    <p>在本节内容中，我们主要介绍归纳式迁移学习（Inductive learning），它有不同的任务，以及它的子类别，这些任务是按顺序学习的。
+
+                    </p>
+                    <p class="data_text">
+                        <font color="#888"><u>编者按</u>: 我通常不愿意这样说，但在这里，我相信可以这么说，时序迁移学习是目前最受欢迎的研究领域之一。
+
+                        </font>
+                    </p>
+
+                    <h2>我们将会看到什么？ <a
+                            href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=What%20we%27ll%20be%20looking%20at"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+                    <p>在本节内容中，我们聚焦于辅助模型的建模以及如何在建模端迁移知识
+                    </p>
+                    <center>
+                        <img src="../resources/lectures/transfer/intro/our_questions-min.png"
+                            style="max-width:80%; margin-bottom:20px;" />
+                    </center>
+                    <!--<p>There are a lot of other questions, <font color="red">link to where I mention this later</font></p>-->
+
+                </div>
+
+                <div id="word_embeddings">
+
+                    <h1>最简单的迁移：词嵌入（Word Embedding）<a
+                            href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=The%20Simplest%20Transfer%3A%20Word%20Embeddings"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h1>
+
+                    <p>
+                        当我们介绍<a href="./text_classification.html"
+                            target="_blank">文本分类</a>的时候，我们已经讨论了预训练词嵌入是如何起作用的。让我们回顾这一部分。
+
+                    </p>
+
+                    <h3>
+                        <b><u>回顾</u>：文本分类中的词嵌入 <a
+                                href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Recap%3A%20Embeddings%20in%20Text%20Classification"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></b>
+
+                    </h3>
+                    <img src="../resources/lectures/text_clf/practical_tips/embeddings_what_to_do-min.png"
+                        style="max-width:60%; margin-bottom:20px;margin-left:20px;float:right;" />
+                    <p>词嵌入作为网络的输入。你有三种选择如何为模型获取这些表示：
+                    </p>
+                    <ul>
+                        <li>作为模型的一部分从头训练
+                        </li>
+                        <li>选取预训练嵌入（Word2Vec，GloVe，等）并将它们固定（将它们用作静态的嵌入）
+                        </li>
+                        <li>用预训练的词嵌入作为初始化，并和最终的模型一起被训练（”微调模式“）
+                        </li>
+                    </ul>
+
+                    <p>
+                        让我们通过查看模型可以使用的数据来考虑这些选择。分类的训练数据往往是任务相关的，标记数据通常很难得到。因此，这种语料库可能不是巨大的，或不是多样的，或两者。相反，用于训练词嵌入的标注数据不需要被标注，只需要纯文本就足够了。因此，这些数据集可能是巨大和多样的。
+
+                    </p>
+                    <img src="../resources/lectures/text_clf/practical_tips/data_types-min.png"
+                        style="max-width:100%; margin-bottom:20px;" />
+
+                    <p>现在让我们考虑模型将知道什么，具体取决于我们如何使用词嵌入。如果词嵌入是从头开始训练，则该模型将仅“知道”分类标注数据，这可能不足以学习单词之间的关系。但如果我们使用预训练的词嵌入，他们（以及整个模型）将会了解一个巨大的语料库，从而学到很多关于这个世界的知识。为了使这些词嵌入适配于特定于任务的数据，可以通过和整个网络一起训练的方式来微调（fine-tune）这些词嵌入，这可以带来性能（尽管不是特别巨大）的提升。
+
+                    </p>
+
+                    <img src="../resources/lectures/text_clf/practical_tips/embs_what_to_do_with_data-min.png"
+                        style="max-width:100%; margin-bottom:20px;" />
+                    <p>
+                        当我们使用预训练词嵌入时，这就是<b>迁移学习</b>的一个例子：通过词嵌入，我们可以将大规模未标注训练数据的知识“迁移”到任务特定的模型中。
+
+
+                    </p>
+
+                    <h3>
+                        <b>通过词嵌入进行迁移 <a
+                                href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Transfer%20Through%20Word%20Embeddings"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></b>
+                    </h3>
+                    <p>我们刚刚阐述了在特定任务模型中使用预训练词嵌入的主要思想：
+                    </p>
+                    <div class="green_left_thought" style="font-size:18px;">
+                        <p class="data_text">
+                            通过词嵌入，我们可以将大规模的训练数据知识“转移”到我们的任务特定模型中。
+
+                        </p>
+                    </div>
+
+                    <p>在一个模型中，这种迁移是通过将随机初始化的词嵌入替换为预训练的词嵌入来实现的（同样，将权重从预训练的词嵌入复制到我们自己的模型中）。
+
+                    </p>
+
+                    <center>
+                        <img src="../resources/lectures/transfer/word_emb/transfer_scheme-min.png"
+                            style="max-width:90%; margin-bottom:20px;" />
+                    </center>
+                    <p>
+                        请注意，<b>我们不会</b>更改模型：模型保持完全相同。但我们稍后会看到，情况并非总是如此。
+
+                    </p>
+
+
+                </div>
+
+                <div id="pretrained_models">
+
+                    <h1>预训练模型 <a
+                            href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=be%20the%20case.-,Pretrained%20Models,-The%20idea%20of"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h1>
+
+                    <p>我们为词嵌入建立的知识迁移概念是通用的，无论（你的迁移对象是）词嵌入还是预训练模型。我的意思是，字面上是一样的：你可以用“单词嵌入”代替你模型的名字！
+
+                    </p>
+
+                    <div class="green_left_thought" style="font-size:18px;">
+                        <p class="data_text">
+                            通过插入你的模型（<strong>_insert_your_model_</strong>），我们将训练数据的知识“转移”到特定于任务的模型中。
+
+                        </p>
+                    </div>
+
+
+                    <h3><u>两个伟大的想法</u> <a
+                            href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=task%2Dspecific%20model.-,The%20Two%20Great%20Ideas,-In%20this%20part"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h3>
+
+                    <p>
+                        在这部分，我们将看到4个模型：CoVe，ELMo，GPT，BERT。请注意，现在这些模型存在许多变化：从非常小的修改（例如，训练数据和/或设置）到相当突出的修改（例如，不同的训练目标）。然而，粗略地说，从单词嵌入到当前最先进的模型的转换可以解释为两个想法。
+
+                    </p>
+
+
+                    <center>
+                        <img src="../resources/lectures/transfer/cove/great_ideas-min.png"
+                            style="max-width:90%; margin-bottom:20px;" />
+                    </center>
+
+                    <p>这两个伟大的想法：
+                    </p>
+                    <ul>
+                        <li>
+                            <b>编码的内容</b>：从单词到上下文单词内容
+                            <br>
+                            （从Word2Vec /GLoVE/etc。到CoVe / ELMo）;
+                        </li>
+                        <li>
+                            <b>下游任务的使用方法</b>:
+                            从仅仅替换词嵌入到替换整个任务特定的模型
+                            <br>
+                            （从CoVe / ELMo到GPT / BERT的过渡）。
+                        </li>
+                    </ul>
+
+                    <p>现在，我将解释这些想法以及相应的模型。
+                    </p>
+
+
+                    <div id="words_to_words_in_context">
+
+                        <h2><u>伟大的想法1：</u>从单词到上下文 <a
+                                href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Great%20Idea%201%3A%20From%20Words%20to%20Words%2Din%2DContext"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h2>
+
+                        <p>正如我们刚才看到的，通过学习向量表示的知识转移早在预训练模型之前就存在了：在最简单的情况下，通过单词表示。让迁移更有效（因此更受欢迎）的是一个非常简单的想法：
+
+
+                        </p>
+                        <div class="green_left_thought" style="font-size:18px;">
+                            <p class="data_text">我们可以学会表示单词以及它们<strong>所使用的上下文</strong>来学习单词。
+                            </p>
+                        </div>
+
+                        <h3>好的。那我们该如何做？ <a
+                                href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Well%2C%20okay.%20But%20how%20do%20we%20do%20this%3F"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h3>
+                        <p>记得我们训练的神经语言模型吗？你需要与训练单词词嵌入相同类型的数据去训练这样的模型：自然语言中的纯文本（例如，维基百科文本，你想要的任何内容）。请注意，为此，你不需要任何的标注标签！
+
+                        </p>
+
+                        <p>
+                            在模型中，语言模型也为每个单词构建向量表示，但这些向量不仅代表单词，还代表<b>上下文</b>中的单词。
+
+                        </p>
+
+                        <center>
+                            <img src="../resources/lectures/transfer/words_to_context-min.png"
+                                style="max-width:90%; margin-bottom:20px;" />
+                        </center>
+
+                        <p>
+                            例如，让我们看一个句子，<span class="data_text"><strong>“我看到垫子上有一只猫”</strong></span>，里面有一个单词<span
+                                class="data_text"><strong>猫（cat）</strong></span>。
+                            如果我们使用单词嵌入，<span class="data_text"><strong>猫（cat）</strong></span>的向量将包含关于<span
+                                class="data_text"><strong>猫（cat）</strong></span>的一般概念的信息：这可以是你能想象到的任何种类的<span
+                                class="data_text"><strong>猫（cat）</strong></span>。
+                            但是如果我们从语言模型中的某个地方为猫取一个向量，这就不再只是猫了！
+                            由于语言模型阅读了上下文，这只<span class="data_text"><strong>猫（cat）</strong></span>的向量表示将知道我看到的<span
+                                class="data_text"><strong>猫（cat）</strong></span>是坐在垫子上的那只。
+
+                        </p>
+
+
+                        <h3><u>迁移</u>：用表示代替单词嵌入 <a
+                                href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Transfer%3A%20Put%20Representations%20Instead%20of%20Word%20Embeddings"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></h3>
+
+
+                        <p>
+                            我们将看到两个模型，它们首先实现了用上下文编码单词的想法：<a href="#cove">CoVe</a>和<a
+                                href="elmo">ELMo</a>。它们的表达方式用于下游任务的方式几乎与单词嵌入的方式相同：通常，你只需要放置表示而不是单词嵌入（之前放置的位置，例如GloVe）。就这样！
+
+                        </p>
+                        <center>
+                            <img src="../resources/lectures/transfer/elmo/transfer_scheme-min.png"
+                                style="max-width:90%; margin-bottom:20px;" />
+                        </center>
+
+                        <p>请注意，这里每个任务都有一个特定于任务的模型，这些特定于任务的模型可能会有很大的不同。改变的是我们在将单词输入这些特定任务模型之前对其进行编码的方式。
+
+                        </p>
+                        <p class="data_text">
+                            <font color="#888"><u>编者按</u>:
+                                在最初的论文中，作者对任务特定模型提出了一些修改。然而，这些都是相当小的，粗略地说可以忽略。重要的是，CoVe和ELMo不是代表单个单词，而是代表上下文中的单词。
+
+                            </font>
+                        </p>
+
+
+                        <h3><u>现在，剩下的</u> 就是具体说明 <a
+                                href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Now%2C%20all%20that%27s%20left%20is%20to%20specify"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+
+                        </h3>
+                        <ul>
+                            <li>这是插图中的<span class="data_text"><strong>一些模型</strong></span>，</li>
+                            <li>从该模型中获取哪些表示。</li>
+                            <!--<li>how to use these representations for specific tasks.</li>-->
+                        </ul>
+
+
+                    </div>
+
+
+                    <div id="cove">
+
+                        <h2><u>CoVe</u>：从机器翻译中学习上下文单词表示 <a
+                                href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=CoVe%3A%20Contextualized%20Word%20Vectors%20Learned%20in%20Translation"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h2>
+
+                        <p>
+                            CoVe代表“上下文向量”，首先在NeurIPS 2017年的<a href="https://arxiv.org/pdf/1708.00107.pdf"
+                                target="_blank">Learned
+                                in Translation: Contextualized Word
+                                Vectors</a>一文中被提出。作者首次提出学习如何不仅对单个单词进行编码，而且对单词及其上下文进行编码。
+
+                        </p>
+
+
+                        <h3><u>模型训练</u>：神经机器翻译（长短时记忆网络LSTMs和注意力） <a
+                                href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Model%20Training%3A%20Neural%20Machine%20Translation%20(LSTMs%20and%20Attention)"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h3>
+
+                        <img src="../resources/lectures/transfer/cove/mt_model-min.png"
+                            style="max-width:50%; margin-left:20px; float: right;" />
+
+                        <p>
+                            为了能在句子/段落的上下文中对单词进行编码，CoVe训练NMT系统并使用其编码器。主要的假设是，为了翻译一个句子，NMT编码器需要学习“理解”源句子。因此，编码器的向量表示包含有关单词上下文的信息。
+
+                        </p>
+
+                        <p>
+                            在形式上，作者训练一个带有注意力机制的LSTM翻译模型（例如，<a
+                                href="./seq2seq_and_attention.html#attention_bahdanau_luong"
+                                target="_blank">我们在上一节课中看到的Bahdanau模型</a>）。由于最终我们希望使用经过训练的编码器来处理英语句子（不是因为我们只关心英语，而是因为下游任务的大多数数据集都是英语），NMT系统必须从英语翻译成其他语言（例如德语）。
+
+                        </p>
+                        <br>
+
+                        <h4><u>双向编码器</u>：了解双向上下文 <a
+                                href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Bidirectional%20Encoder%3A%20Knows%20Both%20Left%20and%20Right%20Contexts"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></h4>
+
+                        <img src="../resources/lectures/transfer/cove/bidirectional-min.png"
+                            style="max-width:65%; margin-left:20px; float: right;" />
+
+                        <p>注意，在这个NMT模型中，编码器是双向的：它连接前向和后向LSTM的输出。因此，编码器输出包含关于单词的左上下文和右上下文的信息。
+
+                        </p>
+                        <br>
+                        <h3><u>获取表示</u>：连接GloVe和Cove向量 <a
+                                href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Getting%20Representations%3A%20Concatenate%20GloVe%20and%20Cove%20Vectors"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></h3>
+
+                        <img src="../resources/lectures/transfer/cove/concat_glove_cove-min.png"
+                            style="max-width:40%; margin-left:20px; float: right;" />
+
+                        <p>
+                            一旦NMT模型训练完之后，我们只需要它的编码器。对于给定的文本，编码器输出CoVe向量。对于下游任务，作者建议拼接Glove（代表单个单词）和CoVe（上下文中编码的单词）向量。其思想是，这些向量编码不同种类的信息，它们的组合可能是有用的。
+
+
+                        </p>
+
+                        <br>
+                        <div style="display:grid;grid-template-columns: 50% 50%;">
+                            <div>
+                                <h3><u>结果</u>：提升效果显著 <a
+                                        href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Results%3A%20The%20Improvements%20are%20Prominent"
+                                        style="font-size:9px;" target="_blank">(英文原文)</a></h3>
+                                <p>仅仅通过使用CoVe向量和Glove，作者在许多下游任务上取得了显著的改进：如文本分类、自然语言推理和问答。</p>
+                            </div>
+                            <div>
+                                <p style="text-align: center; display: block;
+            margin-bottom:20px; max-width:90%; float:right;">
+                                    <img src="../resources/lectures/transfer/cove/results-min.png"
+                                        style="max-width:90%; margin-bottom:20px;" />
+                                    <br />
+                                    <span style="font-size: small;">
+                                        图片来源于
+                                        <a href="https://arxiv.org/pdf/1708.00107.pdf" target="_blank">原始 CoVe
+                                            论文</a>。</font></span>
+                                </p>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+
+                    <div id="elmo">
+
+                        <h2><u>ELMo</u>：语言模型中的词嵌入 <a
+                                href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=ELMo%3A%20Embeddings%20from%20Language%20Models"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+
+                        <p>
+                            ELMo模型是由<a href="https://arxiv.org/pdf/1802.05365.pdf" target="_blank">Deep contextualized
+                                word
+                                representations</a>提出。与CoVe不同，ELMo使用的表示不是来自NMT模型，而是来自语言模型。仅仅通过使用LM中的嵌入来替换单词嵌入（Glove），他们在问答、共指消解、情感分析、命名实体识别等任务上获得了巨大的改进。顺便说一句，这篇论文在2018年NAACL上获得了最佳论文奖！
+
+                        </p>
+                        <p>现在让我们详细了解一下ELMo。</p>
+
+
+                        <h3><u>模型训练</u>: 基于字符CNN的双向LSTM语言模型 <a
+                                href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Model%20Training%3A%20Forward%20and%20Backward%20LSTM%2DLMs%20on%20top%20of%20char%2DCNN"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h3>
+
+                        <p>该模型非常简单，由两层LSTM语言模型组成：前向和后向。这两个模型的使用使得每个单词可以同时具有两个上下文：左上下文和右上下文。
+                        </p>
+
+                        <center>
+                            <img src="../resources/lectures/transfer/elmo/training-min.png"
+                                style="max-width:90%; margin-bottom:20px;" />
+                        </center>
+
+                        <p>同样有趣的是，作者如何获得初始单词表示（然后将其输入LSTM）。让我们回忆一下，在标准单词嵌入层中，我们为词汇表中的每个单词训练一个唯一的向量。在这种情况下，
+
+                        </p>
+                        <ul>
+                            <li>
+                                单词嵌入不知道它们由哪些字符组成（例如，它们很难区分<span class="data_text"><strong>represent</strong></span>、
+                                <span class="data_text"><strong>represents</strong></span>和
+                                <span class="data_text"><strong>represented</strong></span>在
+                                <span class="data_text"><strong>representation</strong></span>这些单词在写法上是相近的）
+                            </li>
+                        </ul>
+                        <p>
+                            为了解决这些问题，作者将单词表示为字符级网络的输出。正如我们从图中看到的，这个CNN非常简单，由我们之前见过的组件组成：卷积、全局池化、高速公路连接和线性层。通过这种方式，单词表征知道它们的字符构成，我们甚至可以表示那些我们在训练中从未见过的单词。
+
+                        </p>
+
+
+                        <h3><u>获取表示</u>: 不同层的表示加权求和 <a
+                                href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Getting%20Representations%3A%20Weight%20Representations%20from%20Different%20Layers"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></h3>
+
+                        <p>
+                        </p>
+                        <img src="../resources/lectures/transfer/elmo/bidirectional_explain-min.png"
+                            style="max-width:40%; margin-left:20px; float:right;" />
+                        <p>一旦模型被训练，我们就可以使用它来获得单词表示。为此，对于每个单词，我们结合了前向和后向LSTM对应层的表示。通过连接这些前向和后向向量，我们构建了一个“知道”左右上下文的单词表示。
+
+                        </p>
+
+                        <p>总体而言，ELMo表示有三个层：
+
+                        </p>
+                        <ul>
+                            <li>
+                                <b>第0层（嵌入）</b> - 字符级CNN的输出；
+                            </li>
+                            <li>
+                                <b>第1层</b> - 前向和后向LSTM第1层的拼接表示；
+                            </li>
+                            <li>
+                                <b>第2层</b> - 前向和后向LSTM的第2层拼接表示。
+                            </li>
+                        </ul>
+
+                        <center>
+                            <img src="../resources/lectures/transfer/elmo/gather_layers-min.png"
+                                style="max-width:100%; margin-bottom:20px;" />
+                        </center>
+
+                        <h4>
+                            <b>每层包含不同的信息→ 把它们结合起来 <a
+                                    href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Layers%20contain%20different%20information%20%E2%86%92%20combine%20them"
+                                    style="font-size:9px;" target="_blank">(英文原文)</a></b>
+                        </h4>
+                        <p>每一层都编码不同类型的信息：第0层-仅单词级别，第1层和第2层-上下文中的单词。与第1层和第2层相比，第2层可能包含更多高层信息：这些表示来自相应LMs的更高层。
+
+                        </p>
+                        <p>由于不同的下游任务需要不同类型的信息，ELMo使用任务特定的权重来组合来自三层的表示。这些标量是从每个下游任务自动学习得到。最终的单词表示为所有层表示的加权和。
+
+                        </p>
+
+
+                    </div>
+
+
+                    <div id="great_idea2">
+
+                        <h2><u>伟大的想法2</u>: 拒绝特定任务模式 <a
+                                href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Great%20Idea%202%3A%20Refuse%20From%20Task%2DSpecific%20Models"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h2>
+
+                        <p>
+                            接下来我们将看到的两类模型是<a href="#gpt">GPT</a>和<a href="#bert">BERT</a>，它们在用于下游任务的方式上与之前的方法非常不同：
+                        </p>
+                        <div class="green_left_thought" style="font-size:18px;">
+                            <p class="data_text">CoVe/ELMo replace word embeddings,
+                                but GPT/BERT replace entire models.
+                                CoVe/ELMo替代了单词嵌入，但GPT/BERT则替代了<strong>整个模型</strong>。
+                            </p>
+                        </div>
+
+
+                        <h3><u>之前</u>: 每个下游任务都有特定模型架构 <a
+                                href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Before%3A%20Specific%20model%20architecture%20for%20each%20downstream%20task"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h3>
+
+                        <p>
+                            请注意，ELMo/CoVe表示主要用于替换嵌入层，而任务特定的模型结构则保持不变。这意味着，例如，对于共指消解，必须使用为这项任务设计的特定模型，对于词性标注——使用其他一些模型，用于问答——另一个非常独特的模型，等等。对于每项任务，研究人员需要不断改进特定于任务的模型架构。
+
+                        </p>
+
+                        <h3><u>之后</u>: 单一模型则可针对所有任务进行微调 <a
+                                href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=After%3A%20Single%20model%20which%20can%20be%20fine%2Dtuned%20for%20all%20tasks"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h3>
+
+                        <img src="../resources/lectures/transfer/bert/before_after-min.png"
+                            style="max-width:55%; margin-left:20px; margin-bottom:20px; float:right;" />
+
+                        <p>
+
+                            与以前的模型相比，GPT/BERT并不是作为单词嵌入的替代品，而是作为<b>任务特定模型</b>的替代品。
+                            在这种新设置中，首先使用大量未标记的数据（纯文本）对模型进行预训练。然后，在每个下游任务上对该模型进行微调。
+                            重要的是，在微调过程中，你只需使用任务感知的输入转换（即以某种方式提供数据），<b>而不是</b>修改整个模型结构。
+
+                        </p>
+
+
+                    </div>
+
+
+                    <div id="gpt">
+
+                        <h2><u>GPT</u>: 针对语言理解的生成式预训练 <a
+                                href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=GPT%3A%20Generative%20Pre%2DTraining%20for%20Language%20Understanding"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h2>
+
+
+                        <!--<p>Remember our first great idea? We wanted to teach some kind of a model
+                        to process texts and make this model to encode a token's context. What is important, is that
+                        we wanted to do this by
+                        using unlabeled data (i.e., plain texts) because such data is easy to get.
+                        For this, the left-to-right language modeling objective (used in ELMo) is the standard thing to do:
+                        the language modeling task is complicated enough to teach a model to learn something about
+                        language.
+                    </p>
+                    <p>Well, replacing LSTMs with Transformer and still using left-to-right language modeling pretraining
+                        seems a reasonable thing to do (you'd get GPT which we'll see in a couple of minutes).
+                        But! Note that BERT stands for "Bidirectional
+                        <b>Encoder</b> Representations from Transformer",
+                        <b>not decoder</b>!
+                        <font color="red">CHECK IF THIS IS CORRECT AFTER FINALIZING THE GPT SECTION</font>
+                    </p>
+                    -->
+
+
+                        <h3><u>预训练</u> ：从左到右的Transformer语言模型 <a
+                                href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Pre%2DTraining%3A%20Left%2Dto%2Dright%20Transformer%20Language%20Model"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h3>
+
+
+                        <img src="../resources/lectures/transfer/gpt/training.gif"
+                            style="max-width:30%; margin-left:20px; margin-bottom:20px; float:right;" />
+
+                        <p>GPT是一种基于Transformer的自回归语言模型（从左到右）。该结构是一个12层的Transformer解码器（没有解码器与编码器之间的注意力）。
+
+                        </p>
+
+                        <p>
+                            形式上，如果\(y_1, \dots, y_n\)是一个训练序列，在第\(t\) 时刻模型的预测概率分布为 \(p^{(t)} = p(\ast|y_1, \dots,
+                            y_{t-1})\)。模型使用交叉熵损失函数进行训练，整个序列的损失为：
+                        </p>
+                        \[L_{xent}=-\sum\limits_{t=1}^n\log(p(y_t| y_{\mbox{<}t})).\] <p class="data_text">
+                            <font color="#888">
+                                <u>编者按</u>:
+                                有关从左到右语言建模和/或Transformer模型的更多详细信息，请参阅<a href="./language_modeling.html"
+                                    target="_blank">语言建模</a>和<a href="./seq2seq_and_attention.html"
+                                    target="_blank">Seq2seq及注意力</a>。
+                            </font>
+                            </p>
+
+
+                            <h3><u>微调:</u> 将GPT用于下游任务 <a
+                                    href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Fine%2DTuning%3A%20Using%20GPT%20for%20Downstream%20Tasks"
+                                    style="font-size:9px;" target="_blank">(英文原文)</a>
+                            </h3>
+
+                            <p>微调损失包括任务特定损失和语言模型的损失：
+                            </p>
+                            \[L = L_{xent} + \lambda \cdot L_{task}.\]
+
+                            <p>在微调阶段，除了最后的线性层，模型架构保持不变。每个任务的输入格式的变化请看下图：
+
+
+                            </p>
+
+
+                            <p style="text-align: center; display: block;
+            margin-bottom:20px; max-width:100%;">
+                                <img src="../resources/lectures/transfer/gpt/input_transformations-min.png"
+                                    style="max-width:100%; margin-bottom:20px;" />
+                                <br />
+                                <span style="font-size: small;">
+                                    图片来源于
+                                    <a href="https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf"
+                                        target="_blank">原始 GPT 论文</a>.</font></span>
+                            </p>
+
+
+                            <h4 style="font-size:18px;">
+                                <b><u>单句分类任务</u></b> <a
+                                    href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=GPT%20paper.-,Single%20sentence%20classification,-To%20classify%20individual"
+                                    style="font-size:9px;" target="_blank">(英文原文)</a>
+                            </h4>
+                            <p>单句分类任务要对单个句子进行分类，只需在训练中输入数据，并根据最后一个输入标记的最终表示预测标签即可。
+
+
+                            </p>
+
+                            <p> 任务示例：
+                            </p>
+                            <ul>
+                                <li>
+                                    <b>SST-2</b> ：二元情感分类（我们在<a href="./text_classification.html#dataset_examples"
+                                        target="_blank">文本分类</a>中介绍过）；
+                                </li>
+                                <li>
+                                    <b>CoLA （语言可接受性语料库）</b> ：
+                                    代表一个句子在语言学上是否可接受。
+                                </li>
+                            </ul>
+
+
+                            <h4 style="font-size:18px;">
+                                <b><u>句子对分类</u></b> <a
+                                    href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Sentence%20pairs%20classification"
+                                    style="font-size:9px;" target="_blank">(英文原文)</a>
+                            </h4>
+                            <p>
+                                要对句子对进行分类，则使用特殊的标记分隔符（例如<span
+                                    class="data_text"><strong>delim</strong></span>）来填充这两个片段。然后，根据最后一个输入标记的最终表示来预测最终的标签即可。
+
+                            </p>
+
+                            <p>任务示例：
+                            </p>
+                            <ul>
+                                <li>
+                                    <b>SNLI</b>：
+                                    蕴含分类。给出一对句子，判断两句话关系为<span class="data_text"><strong>蕴含</strong></span>、<span
+                                        class="data_text"><strong>矛盾</strong></span>还是<span
+                                        class="data_text"><strong>中性</strong></span>；
+
+                                </li>
+                                <li>
+                                    <b>QQP (Quora Question Pairs)</b> ：
+                                    给出两个问题，判断它们在语义上是否等价；
+
+                                </li>
+                                <li>
+                                    <b>STS-B</b> ：
+                                    给定两个句子，返回从1到5的相似性得分。
+
+                                </li>
+                            </ul>
+
+
+                            <h4 style="font-size:18px;">
+                                <b><u>问答与常识推理</u></b> <a
+                                    href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Question%20answering%20and%20commonsense%20reasoning"
+                                    style="font-size:9px;" target="_blank">(英文原文)</a>
+                            </h4>
+
+                            <p>
+                                在这些任务中，我们会得到一个上下文文档\(z\)、一个问题\(q\)和一组可能的答案\(\{a_k\}\)。
+                                我们连接文档和问题，在<span class="data_text"><strong>delim</strong></span>标记后添加可能的答案。
+                                对于每个可能的答案，使用GPT模型独立处理相应的序列；然后通过softmax层进行规范化，然后再可能的答案上生成输出分布。
+
+                            </p>
+
+                            <p>任务示例：
+                            </p>
+                            <ul>
+                                <li>
+                                    <b><a href="https://www.aclweb.org/anthology/D17-1082/" target="_blank">RACE</a></b>
+                                    ： 阅读理解。给出一篇文章、一个问题和几个答案选项，选择正确的一个。
+
+                                </li>
+
+                                <li>
+                                    <b><a href="https://www.aclweb.org/anthology/W17-0906/" target="_blank">故事完形填空 Story
+                                            Cloze</a></b> ：
+                                    故事理解和脚本学习。给出一个四句话的故事和两个可能的结局，选择正确的结局。
+
+                                </li>
+
+                            </ul>
+
+
+                            <h3><u>剩下的是</u>: GPT-1-2-3，大量宣传，还有一点独角兽 <a
+                                    href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=What%20is%20left%3A%20GPT%2D1%2D2%2D3%20%2C%20Lots%20of%20Hype%2C%20and%20a%20Bit%20of%20Unicorns"
+                                    style="font-size:9px;" target="_blank">(英文原文)</a>
+                            </h3>
+
+                            <p>到目前为止，共有三种GPT模型：
+                            </p>
+                            <ul>
+                                <li>
+                                    <b>GPT-1</b>: <a
+                                        href="https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf"
+                                        target="_blank">
+                                        Improving Language Understanding by Generative Pre-Training（通过生成性预训练提高语言理解能力
+                                        ）</a>
+                                </li>
+                                <li>
+                                    <b>GPT-2</b>: <a
+                                        href="https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf"
+                                        target="_blank">
+                                        Language Models are Unsupervised Multitask Learners（语言模型是无监督的多任务学习者）</a>
+                                </li>
+                                <li>
+                                    <b>GPT-3</b>: <a href="https://arxiv.org/pdf/2005.14165.pdf" target="_blank">
+                                        Language Models are Few-Shot Learners（语言模型是少样本学习者）</a>
+                                </li>
+                            </ul>
+
+                            <p>
+                                这些模型的差异主要在于预训练数据的数量和参数的数量（例如，请参阅这篇<a
+                                    href="https://medium.com/walmartglobaltech/the-journey-of-open-ai-gpt-models-32d95b7b7fb2"
+                                    target="_blank">博客文章</a>）。
+                                请注意，这些模型太大了，只有大型公司才能负担得起预训练费用。这引发了许多关于使用此类大型模型（道德、环境等）的担忧的讨论。
+                                如果你对这些感兴趣，你可以很容易地在网上找到很多信息。
+                            </p>
+                            <p>
+                                但你绝对需要看到的是<a href="https://openai.com/blog/better-language-models/"
+                                    target="_blank">GPT-2在开放人工智能博客文章中关于独角兽的故事</a>。
+                            </p>
+
+
+                    </div>
+
+
+                    <div id="bert">
+
+                        <h2><u>BERT</u>: Bidirectional Encoder Representations from Transformers（基于Transformer的双向编码器表示）
+                            <a href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=BERT%3A%20Bidirectional%20Encoder%20Representations%20from%20Transformers"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h2>
+
+                        <p>
+                            BERT是在<a href="https://arxiv.org/pdf/1810.04805.pdf" target="_blank">
+                                BERT: Pre-training of Deep Bidirectional Transformers for Language
+                                Understanding</a>一文中介绍的。如果ELMo在2018年NAACL上获得了最佳论文奖，一年后，BERT在2019年NAACL上也获得了最佳论文奖：）让我们试着理解为什么。
+
+                        </p>
+
+                        <p>BERT的模型架构非常简单，你已经知道它是如何工作的：它只是Transformer的编码器。最新的部分是其中的预训练目标和BERT用于下游任务的方式。
+
+                        </p>
+
+                        <center>
+                            <img src="../resources/lectures/transfer/bert/intro-min.png"
+                                style="max-width:90%; margin-bottom:20px;" />
+                        </center>
+
+                        <p>
+                            我们如何使用没有标注的纯文本预训练（双向）<b>编码器</b>
+                            ？我们只知道从左到右的语言建模目标，但它只适用于解码器，其中每个单词只能使用以前的标记（并且看不到未来）。BERT的作者提出了一个针对未标记数据的训练目标。在讨论它们之前，让我们先看看BERT将什么作为Transformer编码器的输入。
+
+                        </p>
+
+
+                        <h3><u>训练输入</u>：带有特殊标记的成对句子 <a
+                                href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Training%20Input%3A%20Pairs%20of%20Sentences%20with%20Special%20Tokens"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h3>
+
+
+                        <p>
+                            在训练中，BERT可以看到用一个特殊的标记分隔符 <span
+                                class="data_text"><strong>[SEP]</strong></span>分隔的成对的句子。为了让模型容易区分这些句子，除了单词和位置嵌入，它还使用了片段嵌入。
+                        </p>
+
+                        <p style="text-align: center; display: block;
+            margin-bottom:20px; max-width:100%;">
+                            <img src="../resources/lectures/transfer/bert/bert_input.gif"
+                                style="max-width:90%; margin-bottom:20px;" />
+                            <br />
+                            <span class="data_text">
+                                <font color="#888" size="small">
+                                    <u>编者按</u>: For this gif, I used the figure from
+                                    <a href="https://arxiv.org/pdf/1810.04805.pdf" target="_blank">the original BERT
+                                        paper</a>.
+                                </font>
+                            </span>
+                        </p>
+
+                        <p>
+                            另一个特殊标记是<span
+                                class="data_text"><strong>[CLS]</strong></span>。在预训练过程，它是用于NSP目标，我们将在下一步看到。一旦一个模型被预训练完成，它就可以被用于下游任务。
+
+                        </p>
+
+                        <h3><u>预训练目标</u>: 下一句预测（NSP）目标 <a
+                                href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Pre%2DTraining%20Objectives%3A%20Next%20Sentence%20Prediction%20(NSP)%20Objective"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h3>
+
+                        <p>
+                            下一个句子预测（NSP）的目标是二元分类任务。根据特殊标记<span
+                                class="data_text"><strong>[CLS]</strong></span>的最后一层表示，该模型可以预测这两个句子在某些文本中是否是连续的句子。
+                            请注意，在训练中，50%的例子包含从训练文本中提取的连续句子，另外50%的例子包含随机的一对句子。请看<a
+                                href="https://arxiv.org/pdf/1810.04805.pdf" target="_blank">原论文</a>中的几个例子。
+
+                        </p>
+
+                        <p class="data_text">
+                            <font color="#888"><u>Input</u>:</font> <strong>[CLS] the man went to [MASK]
+                                store [SEP] he bought a gallon [MASK] milk [SEP]</strong><br>
+                            <font color="#888"><u>Label</u>:</font> isNext
+                        </p>
+                        <p class="data_text">
+                            <font color="#888"><u>Input</u>:</font> <strong>[CLS] the man went to [MASK]
+                                store [SEP] penguin [MASK] are flight ##less birds [SEP]
+                            </strong><br>
+                            <font color="#888"><u>Label</u>:</font> notNext
+                        </p>
+
+                        <p>这项任务可以教会模型如何理解句子之间的关系。正如我们稍后将看到的，这将使我们能够在需要某种推理的复杂任务中使用BERT。
+                        </p>
+
+
+                        <h3><u>预训练目标</u>: 掩码语言建模（MLM）目标 <a
+                                href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Pre%2DTraining%20Objectives%3A%20Masked%20Language%20Modeling%20(MLM)%20Objective"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h3>
+
+                        <p>BERT有两个预训练目标，其中最重要的是掩码语言建模（MLM）目标。具体MLM将在步骤中发生以下情况：
+                        </p>
+                        <ul>
+                            <li>
+                                <b>选择一些单词</b><br>
+                                （每个单词的选择概率为15%）
+
+                            </li>
+                            <li>
+                                <b>替换这些选定的单词</b><br>
+
+                                （80%的概率使用特殊单词 <span
+                                    class="data_text"><strong>[MASK]</strong></span>进行替换，10%的概率使用随机单词进行替换，10%的概率使用原始单词（保持不变））
+
+                            </li>
+                            <li>
+                                <b>预测原始单词（计算损失）。</b>
+
+                            </li>
+                        </ul>
+
+                        <p>下图显示了一个句子的训练步骤示例。你可以浏览幻灯片来了解整个过程。
+
+                        </p>
+                        <!-- <img height="20" src="../resources/lectures/ico/paw_empty.png" style="float:left; margin-top:-10px;"/>
+                     <div class="box_green_left">
+
+                         <div class="text_box_green">
+                           <p class="data_text"><u>How to:</u> You see the full picture for one training step.
+                               Go over the slides from the beginning and see the whole process. </p>
+                         </div>
+             -->
+                        <div class="carousel" data-flickity='{ "imagesLoaded": true, "percentPosition": true,
+            "selectedAttraction": 1, "friction": 1, "wrapAround": true }'
+                            style="width:100%; margin-top:10px; margin-bottom:30px; margin-left:10px;">
+                            <div class="carousel-cell" style="width:100%">
+                                <center>
+                                    <img width=90% src="../resources/lectures/transfer/bert/mlm7-min.png" />
+                                </center>
+                            </div>
+                            <div class="carousel-cell" style="width:100%">
+                                <center>
+                                    <img width=90% src="../resources/lectures/transfer/bert/mlm1-min.png" />
+                                </center>
+                            </div>
+                            <div class="carousel-cell" style="width:100%">
+                                <center>
+                                    <img width=90% src="../resources/lectures/transfer/bert/mlm2-min.png" />
+                                </center>
+                            </div>
+                            <div class="carousel-cell" style="width:100%">
+                                <center>
+                                    <img width=90% src="../resources/lectures/transfer/bert/mlm3-min.png" />
+                                </center>
+                            </div>
+                            <div class="carousel-cell" style="width:100%">
+                                <center>
+                                    <img width=90% src="../resources/lectures/transfer/bert/mlm4-min.png" />
+                                </center>
+                            </div>
+                            <div class="carousel-cell" style="width:100%">
+                                <center>
+                                    <img width=90% src="../resources/lectures/transfer/bert/mlm5-min.png" />
+                                </center>
+                            </div>
+                            <div class="carousel-cell" style="width:100%">
+                                <center>
+                                    <img width=90% src="../resources/lectures/transfer/bert/mlm6-min.png" />
+                                </center>
+                            </div>
+
+
+                        </div>
+
+                        <!--</div>
+                    <img height="20" src="../resources/lectures/ico/paw_empty.png" style="float:left; margin-top:-10px;"/>
+                    <br><br>-->
+
+                        <p>MLM仍然是语言建模：目标是根据文本的某些部分预测句子/文本中的一些单词。为了更清楚，让我们将MLM与标准的从左到右语言模型目标进行对比。
+
+                        </p>
+
+                        <img src="../resources/lectures/transfer/bert/lm_vs_mlm-min.png"
+                            style="max-width:60%; margin-left:20px; float:right;" />
+                        <p>
+                            在每一步中，标准的从左到右LMs根据之前的单词预测下一个单词。这意味着最终表示，即来自最终层的用于预测的表示，只对以前的上下文进行编码，也就是说，<b>它们看不到未来</b>。
+
+                        </p>
+                        <p>
+                            与此不同的是，MLM可以一次看到整个文本，但有些单词已经损坏：这就是为什么BERT是<b>双向</b>
+                            的。请注意，为了让ELMo同时了解左右上下文，作者必须训练两个不同的单向LMs，然后连接它们的表示。在BERT中，我们并不需要这样做：一个模型就足够了。
+                        </p>
+
+
+                        <!-- <div class="card_with_ico">
+                         <img class="ico" src="../resources/lectures/ico/analysis_empty.png" width="30px"/>
+                         <div class="text_box_green">
+                         <p class="data_text"> In the
+                         <a href="#analysis_interpretability">Analysis and Interpretability</a> section,
+                             we will see how different training objectives (MT, LM, MLM) define
+                             the way tokens representations evolve between layers.
+                             More details are <a href="#evolution">here</a>.
+
+                             <font color="red">MAKE SURE IT EXISTS</font>
+                         </div>
+                         </div>
+
+                 -->
+
+
+                        <h3><u>微调:</u> 在下游任务中使用BERT <a
+                                href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Fine%2DTuning%3A%20Using%20BERT%20for%20Downstream%20Tasks"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></h3>
+
+                        <p>
+                            现在让我们看看如何将BERT应用于不同的任务。现在，我们只讨论简单的设置：使用BERT微调单个下游任务。稍后，我们将看到为不同的任务调整模型的其他方法（例如，在<a
+                                href="#adapters">适配器</a>章节部分）。
+
+                        </p>
+
+                        <p>
+                            在这一部分中，我只会提到一些任务。有关流行评估数据集的更多详细信息，请查看<a href="https://gluebenchmark.com"
+                                target="_blank">GLUE benchmark
+                                website</a>网站。
+                        </p>
+
+                        <br>
+
+                        <img src="../resources/lectures/transfer/bert/single_sentence_clf-min.png"
+                            style="max-width:30%; margin-left:20px; float:right;" />
+
+                        <h4 style="font-size:18px;">
+                            <b><u>单句分类</u></b> <a
+                                href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=benchmark%20website.-,Single%20sentence%20classification,-To%20classify%20individual"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h4>
+                        <p>
+                            要对单个句子进行分类，模型按照图示输入数据，并根据<span class="data_text"><strong>[CLS]</strong></span>标记的最终表示预测标签。
+
+                        </p>
+
+                        <p>任务示例：
+                        </p>
+                        <ul>
+                            <li>
+                                <b>SST-2</b> -
+                                二元情感分类（<a href="./text_classification.html#dataset_examples"
+                                    target="_blank">我们在文本分类章节中看到的</a>）；
+                            </li>
+                            <li>
+                                <b>CoLA (语言可接受性语料库)</b> -
+                                判断一个句子在语言上是否可接受。
+
+                            </li>
+                        </ul>
+
+
+                        <br>
+
+                        <div style="display:grid;grid-template-columns: 70% 30%;">
+                            <div>
+                                <h4 style="font-size:18px;">
+                                    <b><u>句子对分类</u></b> <a
+                                        href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Sentence%20Pair%20Classification"
+                                        style="font-size:9px;" target="_blank">(英文原文)</a>
+                                </h4>
+                                <p>
+                                    如何要对成对的句子进行分类，则像预训练中过程中输入数据一样。与单句分类任务类似，根据<span
+                                        class="data_text"><strong>[CLS]</strong></span>标记的最终表示来预测标签。
+
+                                </p>
+
+                                <p>Examples of tasks:
+                                </p>
+                                <ul>
+                                    <li>
+                                        <b>SNLI</b> -
+                                        蕴含分类。给出一对句子，判断两句话关系是否为<span class="data_text"><strong>蕴含</strong></span>、
+                                        <span class="data_text"><strong>矛盾</strong></span>还是
+                                        <span class="data_text"><strong>中性</strong></span>）；
+
+                                    </li>
+                                    <li>
+                                        <b>QQP (Quora Question Pairs)</b> -
+                                        给出两个问题，判断它们在语义上是否等价；
+
+                                    </li>
+                                    <li>
+                                        <b>STS-B</b> -
+                                        给定两个句子，相似性得分从1到5。
+
+                                    </li>
+                                </ul>
+                            </div>
+                            <div>
+                                <img src="../resources/lectures/transfer/bert/sentence_pair_clf-min.png"
+                                    style="max-width:90%; margin-bottom:20px; margin-left:20px; float:right;" />
+                            </div>
+                        </div>
+
+                        <br>
+
+                        <div style="display:grid;grid-template-columns: 60% 40%;">
+                            <div>
+                                <h4 style="font-size:18px;">
+                                    <b><u>问答</u></b> <a
+                                        href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=1%20to%205.-,Question%20Answering,-For%20QA%2C%20the"
+                                        style="font-size:9px;" target="_blank">(英文原文)</a>
+                                </h4>
+                                <p>对于QA，BERT的作者只使用了一个数据集，即SQuAD v1.1。在这项任务中，给你一段文字和一个问题。这个问题的答案总是文章的一部分，任务是找到文章的正确部分。
+
+                                </p>
+
+                                <p>要使用BERT完成这项任务，需要输入一个问题和一篇文章，如图所示。然后，对于文章中的每个单词，使用最终的BERT表示来预测该单词是正确答案的开始还是结束。
+
+                                </p>
+                            </div>
+                            <div>
+                                <img src="../resources/lectures/transfer/bert/question_answering-min.png"
+                                    style="max-width:90%; margin-bottom:20px; margin-left:20px; float:right;" />
+                            </div>
+                        </div>
+
+
+                        <br>
+
+                        <div style="display:grid;grid-template-columns: 75% 25%;">
+                            <div>
+                                <h4 style="font-size:18px;">
+                                    <b><u>单句序列标注任务</u></b> <a
+                                        href="https://lena-voita.github.io/nlp_course/transfer_learning.html#:~:text=Single%20sentence%20tagging"
+                                        style="font-size:9px;" target="_blank">(英文原文)</a>
+                                </h4>
+                                <p>
+                                    在序列标注任务中，必须预测每个单词的标签。例如，在 <b>命名实体识别（NER）</b>
+                                    ,中，你必须预测单词是否为命名实体及其类型（例如，<span class="data_text"><strong>位置</strong></span>、<span
+                                        class="data_text"><strong>人物</strong></span>等）。
+
+                            </div>
+                            <div>
+                                <img src="../resources/lectures/transfer/bert/single_sentence_tagging-min.png"
+                                    style="max-width:90%; margin-bottom:20px; margin-left:20px; float:right;" />
+                            </div>
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+                <div id="adapters">
+
+                    <h1>适配器：参数高效迁移 <a
+                            href="https://lena-voita.github.io/nlp_course/transfer_learning.html#adapters:~:text=(A%20Bit%20of)%20Adapters%3A%20Parameter%2DEfficient%20Transfer"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h1>
+
+                    <p>到目前为止，我们只考虑了将知识从预训练模型（如BERT）转移到下游任务的标准方法：微调。“微调”是指采用预先训练好的模型，并以相当小的学习率为你感兴趣的任务（例如情感分类）进行训练。这意味着，首先，你需要更新整个（大型）模型，其次，对于每个任务，你需要微调整个预训练模型的副本。最后，对于几个不同下游任务，你最终会得到非常多大型模型——这是非常低效的！
+                    </p>
+                    <center>
+                        <img src="../resources/lectures/transfer/adapters/idea-min.png"
+                            style="max-width:100%; margin-bottom:20px;" />
+                    </center>
+
+                    <p>
+                        作为一种替代方案，ICML 2019论文<a href="https://arxiv.org/pdf/1902.00751.pdf"
+                            target="_blank">Parameter-Efficient Transfer Learning
+                            for
+                            NLP</a>提出了NLP的参数有效迁移学习，建议使用适配器模块进行迁移。在这种设置中，原始模型的参数是固定的，每个任务只需训练几个可训练的参数：这些新的特定于任务的参数称为适配器。
+                        使用<b>适配器模块</b>，迁移变得非常高效：最大的部分，即预训练模型，是在所有下游任务之间共享的。
+
+                    </p>
+
+                    <p style="text-align: center;  display: block;
+         margin-top:0px; max-width:100%;">
+                        <img width=100% src="../resources/lectures/transfer/adapters/adapter-min.png" alt="" /><br />
+                        <span style="font-size: small;">
+                            图片来源于
+                            <a href="https://arxiv.org/pdf/1902.00751.pdf" target="_blank">Parameter-Efficient Transfer
+                                Learning for NLP</a>.
+                        </span>
+                    </p>
+                    <p>图中显示了适配器模块和带有适配器的Transformer的示例。如你所见，适配器模块非常简单：它只是一个具有非线性的两层前馈网络。重要的是，这个网络的隐藏维度很小，这意味着适配器中的参数总数也很小。这也是使适配器非常高效的原因。
+                    </p>
+
+                    <h2>其他适配器和一些资源 <a
+                            href="https://lena-voita.github.io/nlp_course/transfer_learning.html#adapters:~:text=Other%20Adapters%20and%20Some%20Resources"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+                    <p>
+                        现在，对于许多任务和模型，适配器有许多不同的修改。例如，<a href="https://adapterhub.ml"
+                            target="_blank">AdapterHub</a>存储库包含经过预训练的适配器模块。这是EMNLP 2020的system
+                        demo，如果你想找到最新适配器版本的链接，这可能是一个很好的起点
+                        (<font class="data_text" color="#888"><u>Lena</u>: 至少，在我写这篇文章的时候：2020年12月初，也就是EMNLP 2020后的几周
+                        </font>).
+                    </p>
+
+
+                </div>
+
+
+                <div id="benchmarks">
+
+                    <h1>（关于）基准的笔记 <a
+                            href="https://lena-voita.github.io/nlp_course/transfer_learning.html#adapters:~:text=A%20Note%20on)-,Benchmarks,-The%20most%20popular"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h1>
+
+                    <p>
+                        最流行的基准是GLUE及其版本SuperGLUE。<a href="https://gluebenchmark.com" target="_blank">GLUE
+                            benchmark</a>网站包含数据集描述、排行榜等。
+                    </p>
+
+                </div>
+
+                <br><br><br>
+                <div id="analysis_interpretability">
+                    <img height="40" src="../resources/lectures/ico/analysis_empty.png"
+                        style="float:left; padding-right:20px; " />
+                    <h1>分析与解释 <a
+                            href="https://lena-voita.github.io/nlp_course/transfer_learning.html#adapters:~:text=descriptions%2C%20leaderboard%2C%20etc.-,Analysis%20and%20Interpretability,-First%2C%20let%20us"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h1>
+
+
+                    <!--<h2 id="evolution"><u>Evolution of Representations</u>: MT, LM, MLM Training Objectives</h2>-->
+
+                    <p>首先，让我们回顾一下我们在之前的章节中已经使用的分析方法：探索模型组件（例如CNN/LSTM中的神经元和Transformer中的注意头），探索语言结构（例如，NMT表示是否对形态学信息进行编码），以及通过观察模型的预测来评估特定现象（例如，评估语言模型中的主谓一致性）。今天，我们将研究当同样的方法应用于BERT时会发生什么。
+                    </p>
+
+                    <center>
+                        <img src="../resources/lectures/transfer/analysis/methods-min.png"
+                            style="max-width:90%; margin-bottom:20px;" />
+                    </center>
+
+                    <br>
+
+
+                    <h2 id="bert_attention">
+                        模型组件：BERT的注意力头 <a
+                            href="https://lena-voita.github.io/nlp_course/transfer_learning.html#adapters:~:text=BERT%27s%20Attention%20Heads"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h2>
+
+                    <p>
+                        在之前的内容中，我们研究了<a href="./text_classification.html#analysis_interpretability"
+                            target="_blank">文本分类中的CNN卷积核</a>、 <a
+                            href="./language_modeling.html#analysis_interpretability"
+                            target="_blank">语言模型中的LSTM神经元</a>和<a
+                            href="./seq2seq_and_attention.html#analysis_interpretability" target="_blank">NMT
+                            Transformer中的注意头</a>。现在，让我们看看研究人员在BERT头部的注意力模式中发现了什么！
+                    </p>
+
+                    <h3><u>简单模式</u>: 位置头、对<span class="data_text"><strong>[SEP]</strong></span>的注意力和周期 <a
+                            href="https://lena-voita.github.io/nlp_course/transfer_learning.html#adapters:~:text=of%20BERT%27s%20heads!-,Simple%20patterns,-%3A%20Positional%20Heads%2C%20Attention"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h3>
+
+                    <p>
+                        还记得我们在机器翻译Transformer中看到的位置性自我注意头吗？事实证明，BERT也有这样的注意力头。<a
+                            href="https://arxiv.org/pdf/1906.04341.pdf" target="_blank">What Does BERT Look At? An
+                            Analysis of BERT’s
+                            Attention</a>表明，BERT的一些注意力头具有简单的模式：不仅是位置性（当所有单词关注前一个或下一个单词时），而是一些注意力头将所有注意力集中在一些单词上，例如周期的特殊标记<span
+                            class="data_text"><strong>[SEP]</strong></span>。
+
+                    </p>
+                    <p style="text-align: center;  display: block;
+         margin-top:-10px; max-width:100%;">
+                        <img width=70% src="../resources/lectures/transfer/analysis/heads/simple_patterns-min.png"
+                            alt="" /><br />
+                        <span style="font-size: small;">
+                            样例来源于
+                            <a href="https://arxiv.org/pdf/1906.04341.pdf" target="_blank">What Does BERT Look At? An
+                                Analysis of BERT’s Attention</a>.</span>
+                    </p>
+
+
+                    <div class="carousel"
+                        style="width:60%; margin-top:10px; margin-bottom:30px; margin-left:10px; float:right;"
+                        data-flickity='{ "imagesLoaded": true, "percentPosition": true, "wrapAround": true}'>
+
+                        <div class="carousel-cell" style="width:90%; padding-left:20px;padding-right:20px;">
+                            <center>
+                                <img src="../resources/lectures/transfer/analysis/heads/synt1-min.png" />
+                                <p style="text-align:center; font-size: small;">Examples of syntactic heads from the
+                                    paper
+                                    <a href="https://arxiv.org/pdf/1906.04341.pdf" target="_blank">What Does BERT Look
+                                        At?
+                                        An Analysis of BERT’s Attention</a>
+                                </p>
+                            </center>
+                        </div>
+
+                        <div class="carousel-cell" style="width:90%; padding-left:20px;padding-right:20px;">
+                            <center>
+                                <img src="../resources/lectures/transfer/analysis/heads/synt2-min.png" />
+                                <p style="text-align:center; font-size: small;">Examples of syntactic heads from the
+                                    paper
+                                    <a href="https://arxiv.org/pdf/1906.04341.pdf" target="_blank">What Does BERT Look
+                                        At?
+                                        An Analysis of BERT’s Attention</a>
+                                </p>
+                            </center>
+                        </div>
+
+                        <div class="carousel-cell" style="width:90%; padding-left:20px;padding-right:20px;">
+                            <center>
+                                <img src="../resources/lectures/transfer/analysis/heads/synt3-min.png" />
+                                <p style="text-align:center; font-size: small;">Examples of syntactic heads from the
+                                    paper
+                                    <a href="https://arxiv.org/pdf/1906.04341.pdf" target="_blank">What Does BERT Look
+                                        At?
+                                        An Analysis of BERT’s Attention</a>
+                                </p>
+                            </center>
+                        </div>
+
+                        <div class="carousel-cell" style="width:90%; padding-left:20px;padding-right:20px;">
+                            <center>
+                                <img src="../resources/lectures/transfer/analysis/heads/synt4-min.png" />
+                                <p style="text-align:center; font-size: small;">Examples of syntactic heads from the
+                                    paper
+                                    <a href="https://arxiv.org/pdf/1906.04341.pdf" target="_blank">What Does BERT Look
+                                        At?
+                                        An Analysis of BERT’s Attention</a>
+                                </p>
+                            </center>
+                        </div>
+
+                        <div class="carousel-cell" style="width:90%; padding-left:20px;padding-right:20px;">
+                            <center>
+                                <img src="../resources/lectures/transfer/analysis/heads/synt5-min.png" />
+                                <p style="text-align:center; font-size: small;">Examples of syntactic heads from the
+                                    paper
+                                    <a href="https://arxiv.org/pdf/1906.04341.pdf" target="_blank">What Does BERT Look
+                                        At?
+                                        An Analysis of BERT’s Attention</a>
+                                </p>
+                            </center>
+                        </div>
+
+                    </div>
+
+                    <h3><u>句法头</u> <a
+                            href="https://lena-voita.github.io/nlp_course/transfer_learning.html#adapters:~:text=of%20BERT%E2%80%99s%20Attention-,Syntactic%20Heads,-Similar%20to%20syntactic"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h3>
+
+                    <p>
+                        与为<a ref="./seq2seq_and_attention.html#analysis_interpretability" target="_blank">NMT
+                            Transformer发现的关注句法的自我注意力头</a>类似，这里也发现了几个专门跟踪某些句法功能的BERT头。请看图示。
+
+                    </p>
+                    <p>
+                        请注意，还有其他一些研究BERT的注意力机制的工作。例如， <a href="https://arxiv.org/pdf/1911.12246.pdf" target="_blank">Do
+                            Attention Heads in BERT Track
+                            Syntactic Dependencies?</a>中确认一些BERT头是句法相关的，而其它一些工作并没有很有自信找到类似功能的头。因此和往常一样，你需要非常小心：）
+                    </p>
+
+
+                    <br><br>
+
+
+                    <h2 id="nlp_pipeline">
+                        探索： BERT重新发现了经典的NLP管道 <a
+                            href="https://lena-voita.github.io/nlp_course/transfer_learning.html#adapters:~:text=be%20very%20careful%20%3A)-,Probing,-%3A%20BERT%20Rediscovers"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+
+                    </h2>
+
+                    <p>
+
+                        现在有很多论文将探针应用到BERT身上。在这一部分中，我们来看一下ACL2020短文<a href="https://arxiv.org/pdf/1905.05950.pdf"
+                            target="_blank">BERT Rediscovers the Classical NLP
+                            Pipeline</a>。
+
+                    </p>
+
+                    <h3><u>方法：</u> 用一点创造力进行探索 <a
+                            href="https://lena-voita.github.io/nlp_course/transfer_learning.html#adapters:~:text=NLP%20Pipeline.-,How,-%3A%20Probing%20with"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h3>
+
+                    <p>
+                        在上一节课中，我们学习了<a href="./seq2seq_and_attention.html#probing" target="_blank">语言结构的标准探针</a>：
+                    </p>
+                    <ul>
+                        <li>将数据输入预训练模型，</li>
+                        <li>从某个层获取向量表示，</li>
+                        <li>基于这些表示训练一个探针性的分类器去预测语言标签，</li>
+                        <li>使用它的准确性来衡量表示对这些标签的编码程度。</li>
+                    </ul>
+
+                    <p>当然，这也可以为BERT做。但是BERT有很多层（例如18层或24层），为了理解哪一层更好地编码某项任务，我们必须为每项任务训练18（或24）个探测分类器——这是很繁重的工作！
+
+                    </p>
+
+                    <center>
+                        <img src="../resources/lectures/transfer/analysis/probing-min.png"
+                            style="max-width:80%; margin-bottom:20px;" />
+                    </center>
+
+                    <p>幸运的是，作者想出了一种方法来同时评估所有层。为了训练探测分类器，他们不需要分别从每一层选取表示，而是对所有层的表示进行加权，并使用探测分类器学习权重（就像在ELMo中一样！）。一旦探针分类器经过训练，权重可以衡量不同层对特定任务的重要性。
+
+                    </p>
+
+
+                    <h3><u>什么：</u> 边缘探测任务 <a
+                            href="https://lena-voita.github.io/nlp_course/transfer_learning.html#adapters:~:text=a%20certain%20task.-,What,-%3A%20Edge%20Probing"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h3>
+
+
+                    <p>
+                        作者们进行了一系列<a href="https://openreview.net/forum?id=SJzSgnRcKX"
+                            target="_blank">边缘探针任务</a>的实验。这些是一些语言任务的测试集。看看下面的一些例子。
+
+                    </p>
+
+                    <p><span style="margin-right:15px;font-size:14px;">&#8226;</span>词性标注<br>
+                        <span class="data_text" style="margin-left:20px;">
+                            <font color="#888">I want to find more ,</font> [something] <font color="#888">bigger or
+                                deeper .
+                            </font> → NN (Noun)
+                        </span>
+                    </p>
+
+                    <p><span style="margin-right:15px;font-size:14px;">&#8226;</span>组成分析<br>
+                        <span class="data_text" style="margin-left:20px;">
+                            <font color="#888">I want to find more ,</font> [something bigger or deeper]<font
+                                color="#888"> .</font> → NP (Noun Phrase)
+                        </span>
+                    </p>
+
+                    <p><span style="margin-right:15px;font-size:14px;">&#8226;</span>依存分析<br>
+                        <span class="data_text" style="margin-left:20px;">
+                            [I]\(_1\) <font color="#888">am not</font> [sure]\(_2\) <font color="#888">how reliable it
+                                is , though .</font> → nsubj (nominal subject)</span>
+                    </p>
+
+                    <p><span style="margin-right:15px;font-size:14px;">&#8226;</span>实体<br>
+                        <span class="data_text" style="margin-left:20px;">
+                            <font color="#888">The most fascinating is the maze known as</font> [Wind Cave] <font
+                                color="#888">.</font> → LOC (location)
+                        </span>
+                    </p>
+
+                    <p><span style="margin-right:15px;font-size:14px;">&#8226;</span>语义角色标注<br>
+                        <span class="data_text" style="margin-left:20px;">
+                            <font color="#888">I want to</font> [find]\(_1\) [something bigger or deeper]\(_2\) <font
+                                color="#888">.</font> → Arg1 (Agent)
+                        </span>
+                    </p>
+
+                    <p><span style="margin-right:15px;font-size:14px;">&#8226;</span>共指<br>
+                        <span class="data_text" style="margin-left:20px;">
+                            <font color="#888">So</font> [the followers]\(_1\)
+                            <font color="#888">wanted to say anything about what</font> [they]\(_2\)
+                            <font color="#888">saw .</font> → True
+                        </span>
+                    </p>
+
+
+                    <br>
+                    <h3><u>结果：</u> BERT遵循经典的NLP管道 <a
+                            href="https://lena-voita.github.io/nlp_course/transfer_learning.html#adapters:~:text=saw%20.%20%E2%86%92%20True-,Results,-%3A%20BERT%20Follows"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h3>
+
+
+                    <p style="text-align: center;  display: block;
+         margin-top:-10px; margin-left:15px; max-width:65%;float:right;">
+                        <img width=100% src="../resources/lectures/transfer/analysis/pipeline_results-min.png"
+                            alt="" /><br />
+                        <span style="font-size: small;">
+                            The figure with the results is from the paper
+                            <a href="https://arxiv.org/pdf/1905.05950.pdf" target="_blank">
+                                BERT Rediscovers the Classical NLP Pipeline</a>.</span>
+                    </p>
+
+                    <p>结果如右图所示。图层从左到右显示，每层的权重以深蓝色显示。
+
+                    </p>
+
+                    <p>
+                        我们看到，当你从底层到顶层时，一层对每一层的影响会先上升，然后下降。但主要结果并不在于价值观本身，而是在于BERT代表不同语言任务的方式。
+                        在经典的NLP中，有不同任务的顺序（这是图中所示的顺序，以及我向你展示每个任务示例的顺序）。
+                        要解决经典NLP中的后续任务，必须解决之前的所有任务。有趣的是，<b>BERT以同样的顺序表示这些任务</b>
+                        ！例如，依存性的表示要晚于词性标注，而共指的学习则要晚于这两个任务。
+
+                    </p>
+
+
+                    <br>
+                    <h2 id="predictions">
+                        看看预测：ELMo和BERT知道事实吗？ <a
+                            href="https://lena-voita.github.io/nlp_course/transfer_learning.html#adapters:~:text=Looking%20at%20Predictions"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h2>
+
+                    <p>
+                        在<a href="./language_modeling.html" target="_blank">语言建模章节</a>中，我们学习了如何通过观察语言模型的预测来评估特定现象的语言模型。
+                        在那章中，我们看了一个非常流行的主谓一致任务。
+                        今天，我们将做一些更有趣的事情——探索一个模型是否知道事实！例如，我们使用EMNLP 2019的工作 <a
+                            href="https://www.aclweb.org/anthology/D19-1250/" target="_blank">Language Models as
+                            Knowledge Bases?</a>。
+                    </p>
+
+                    <p style="text-align: center;  display: block;
+         margin-top:-10px; margin-left:15px; max-width:50%;float:right;">
+                        <img width=100% src="../resources/lectures/transfer/analysis/kb-min.png" alt="" /><br />
+                        <span style="font-size: small;">
+                            The figure with the results is from the paper
+                            <a href="https://www.aclweb.org/anthology/D19-1250/" target="_blank">
+                                Language Models as Knowledge Bases?</a></span>
+                    </p>
+
+                    <p>
+                        通常，事实知识存储在包含三元组<span class="data_text"><strong>（主语、关系、宾语）</strong></span>的知识库中，如图所示<span
+                            class="data_text"><strong>（Dante，born in，Florence）/
+                                （但丁，出生于，佛罗伦萨）</strong></span>。然而，这些知识库很难获得：要提取知识，通常需要使用复杂的管道来获取。
+
+                    </p>
+                    <p>
+                        但是，如果预先训练过的语言模型（ELMo，BERT）已经知道事实会怎样呢？让我们检查一下！我们将向模型输入一个带有MASK单词的完形填空式句子，而不是关系三元组。
+                        例如，我们喂入模型一个句子，<span class="data_text"><strong>但丁出生在_______</strong></span>；
+                        并要求它预测一个代词来代替MASK。请注意，我们没有任何进行微调-只是使用一个简单的语言模型！
+
+                    </p>
+
+                    <p>事实证明，经过预训练的模型可以很好地掌握事实知识。请注意，这里的“知道”并不意味着他们了解任何东西，只是这些模型中再训练数据捕获的统计特征信息可以用于提取事实。看看下面的一些例子（原工作论文还有更多）
+
+                    </p>
+
+                    <p style="text-align: center;  display: block;
+         margin-top:0px; max-width:100%; ">
+                        <img width=100% src="../resources/lectures/transfer/analysis/facts-min.png" alt="" /><br />
+                        <span style="font-size: small;">
+                            样例来源于
+                            <a href="https://www.aclweb.org/anthology/D19-1250/" target="_blank">
+                                Language Models as Knowledge Bases?</a></span>
+                    </p>
+
+                    <p>更有趣的是，我们不仅可以了解正式事实，还可以了解常识：看看例子。有关测试集构造的更多详细信息，可以查询paper。
+                    </p>
+
+                    <p style="text-align: center;  display: block;
+         margin-top:0px; max-width:100%; ">
+                        <img width=100% src="../resources/lectures/transfer/analysis/common_knowledge-min.png"
+                            alt="" /><br />
+                        <span style="font-size: small;">
+                            样例来源于
+                            <a href="https://www.aclweb.org/anthology/D19-1250/" target="_blank">
+                                Language Models as Knowledge Bases?</a></span>
+                    </p>
+
+
+                </div>
+
+
+                <br><br><br>
+
+                <div id="research_thinking">
+                    <img height="40" src="../resources/lectures/ico/bulb_empty.png"
+                        style="float:left; padding-right:10px; margin-top:-20px;" />
+                    <h1 style="margin-left:10px; margin-right:20px; float: left; margin-top:-20px">研究思考 <a
+                            href="https://lena-voita.github.io/nlp_course/transfer_learning.html#adapters:~:text=as%20Knowledge%20Bases%3F-,Research%20Thinking,-How%20to"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h1>
+                    <hr color="#fced95" style="height:5px">
+                    <br><br>
+
+
+                    <fieldset style="border: 1px solid #f0e4a5;
+    border-radius: 5px;">
+                        <legend>
+                            <p class="data_text"><strong>How to</strong></p>
+                        </legend>
+                        <ul class="data_text">
+                            <li>阅读开头的简短描述——这是我们的出发点，一些已知的内容。
+
+                            </li>
+                            <li>读一个问题并思考：一分钟，一天，或是一周，给自己一些时间！即使你不是一直在想这个问题，你仍然得到一些思考和启发。
+
+                            </li>
+                            <li>看看可能的答案——之前回答/解决这个问题的尝试。
+                                <br>
+                                <u>重要提示：</u>
+                                你<strong>不应该</strong>提出和这里完全一样的东西—记住，每篇论文通常需要花费作者几个月的工作。思考这些事情是一种有用的习惯！科学家所需要的盛夏的就是时间：用来不断地尝试-失败-思考，直到成功。
+
+                            </li>
+                        </ul>
+
+                        <p class="data_text">众所周知，如果你不是马上得到答案，而是先思考一下，你会更容易学到东西。即使你不想成为一名研究人员，这仍然是一个学习的好方法！
+                        </p>
+                    </fieldset>
+
+                    <br><br>
+
+
+                    <div style="border: 0px solid #ccc;border-radius:15px;margin: 10px; padding: 4px;
+ background-color: #f5f5f5;margin-top:-20px;">
+                        <div style="display: grid; grid-template-columns: 75% 25%; margin:10px;">
+                            <div>
+                                <div style="margin-top:20px;">
+                                    <p style="margin:30px; font-size:30px;">相关练习！</p>
+
+                                    <p style="margin:30px;">逐步更新中！</p>
+                                </div>
+                            </div>
+                            <div>
+                                <center>
+                                    <img src="../resources/lectures/main/preview/pusheen_draws_on_white-min.png"
+                                        style="width:80%; padding-top:20px; padding-bottom:20px;border-radius:50%">
+                                </center>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <br><br>
+
+                </div>
+
+
+                <br><br><br>
+
+                <div id="related_papers">
+                    <img height="40" src="../resources/lectures/ico/book_empty.png"
+                        style="float:left; padding-right:10px; margin-top:-20px;" />
+                    <h1 style="margin-left:10px; margin-right:20px; float: left; margin-top:-20px">相关论文</h1>
+                    <hr color="#facae9" style="height:5px">
+
+                    <br><br>
+
+                    <fieldset style="border: 1px solid #dec8d6;
+    border-radius: 5px;">
+                        <legend>
+                            <p class="data_text"><strong>How to</strong></p>
+                        </legend>
+                        <ul class="data_text">
+                            <li><u>概览速读</u>: 在简要总结中看一看关键结果—了解该领域的情况。
+
+                            </li>
+                            <li><u>更深入一些</u>: 对于你更感兴趣的主题，阅读包含图示和解释更长的摘要，浏览作者的推理步骤和关键观察结果。
+                            </li>
+                            <li><u>深度阅读</u>: 阅读你喜欢的论文。现在，当你理解了主要的想法，这会更容易！
+                            </li>
+                        </ul>
+                    </fieldset>
+
+                    <br><br>
+
+                    <br><br>
+
+                    <div style="border: 0px solid #ccc;border-radius:15px;margin: 10px; padding: 4px;
+ background-color: #f5f5f5;margin-top:-20px;">
+                        <div style="display: grid; grid-template-columns: 75% 25%; margin:10px;">
+                            <div>
+                                <div style="margin-top:20px;">
+                                    <p style="margin:30px; font-size:30px;">相关论文！</p>
+
+                                    <p style="margin:30px;">逐步更新中！</p>
+                                </div>
+                            </div>
+                            <div>
+                                <center>
+                                    <img src="../resources/lectures/main/preview/pusheen_reads_on_white-min.png"
+                                        style="width:80%; padding-top:20px; padding-bottom:20px;border-radius:50%">
+                                </center>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <br><br><br>
+            <div id="have_fun">
+                <img height="40" src="../resources/lectures/ico/fun_empty.png"
+                    style="float:left; padding-right:10px; margin-top:-20px;" />
+                <h1 style="margin-left:10px; margin-right:20px; float: left; margin-top:-20px">Have Fun!</h1>
+                <hr color="#c8edfa" style="height:5px">
+                <br><br>
+
+
+                <div style="border: 0px solid #ccc;border-radius:15px;margin: 10px; padding: 4px;
+ background-color: #f5f5f5;margin-top:-20px;">
+                    <div style="display: grid; grid-template-columns: 75% 25%; margin:10px;">
+                        <div>
+                            <div style="margin-top:20px;">
+                                <p style="margin:30px; font-size:30px;">即将推出！</p>
+
+                                <p style="margin:30px;">逐步更新中！</p>
+                            </div>
+                        </div>
+                        <div>
+                            <center>
+                                <img src="../resources/lectures/main/preview/typing.gif"
+                                    style="width:80%; padding-top:20px; padding-bottom:20px;border-radius:50%">
+                            </center>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+
+    </div>
+
+    <footer class="site-footer">
+        <div class="wrapper">
+
+            <div class="footer-col-wrapper">
+                <div class="footer-col">
+                    <p class="text" align="right">&copy; Copyright <font color="#4869df"><strong><a
+                                    href="https://lena-voita.github.io/" target="_blank">Lena Voita</a></strong></font>.
+                        Translated by <font color="#4869df"><strong>MLNLP</strong></font>. All Rights Reserved
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </footer>
+
+
+</body>
+
+</html>

@@ -1,0 +1,2677 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>序列到序列模型与注意力机制</title>
+    <meta name="description"
+        content="Sequence to sequence models (training and inference), the concept of attention and the Transformer model.">
+
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="canonical" href="http://lena-voita.github.io/nlp_course/seq2seq_and_attention.html">
+
+    <!-- diff from head.html begin -->
+    <link rel="mask-icon" href="../resources/lectures/ico/course_logo.png">
+    <link rel="alternate icon" class="js-site-favicon" type="image/png"
+        href="../resources/lectures/ico/course_logo.png">
+    <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="../resources/lectures/ico/course_logo.png">
+    <!-- diff from head.html end -->
+
+    <!--<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>-->
+
+
+</head>
+
+
+<body>
+
+    <header class="site-header">
+
+        <div class="wrapper">
+
+            <div id="title-image" style="display:inline">
+                <img class="site-img" src="../img/ico/logo.jpeg" />
+            </div>
+
+            <div id="title-texts" style="display:inline">
+                <a class="site-title" href="https://github.com/MLNLP-World" target="_blank">MLNLP</a>
+            </div>
+
+            <nav class="site-nav">
+                <a href="#" class="menu-icon">
+                    <svg viewBox="0 0 18 15">
+                        <path fill="#424242"
+                            d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z" />
+                        <path fill="#424242"
+                            d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z" />
+                        <path fill="#424242"
+                            d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z" />
+                    </svg>
+                </a>
+
+                <div class="trigger">
+                    <a class="page-link" href="https://lena-voita.github.io/" target="_blank">原作者：Lena Voita</a>
+                    <a class="page-link" href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html"
+                        target="_blank">原始英文版本</a>
+                    <a class="page-link" href="../about.html" target="_blank">关于我们</a>
+
+                </div>
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <!-- the next two lines are inserted once per page even if there are several shtukovinas,
+ the rest is one-per-shtukovina; read more: https://flickity.metafizzy.co/options.html -->
+    <link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css" media="screen">
+    <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
+
+    <!-- MathJax -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <style>
+        .demo_sidebar {
+            margin: 0;
+            padding: 0;
+            background-color: white;
+
+            position: relative;
+            height: auto;
+            width: 290px;
+        }
+
+        .demo_sidebar_text {
+            font-size: 18px;
+        }
+
+        .demo_sidebar_comment {
+            font-size: 15px;
+            margin-left: 10px;
+            font-family: "Comic Neue", "Arial";
+
+        }
+
+
+        .demo_sidebar a {
+            display: block;
+            color: black;
+            padding: 8px;
+            text-decoration: none;
+
+        }
+
+        .demo_sidebar a li {
+            margin-left: 5px;
+            padding: 0px;
+        }
+
+
+        .demo_sidebar a:hover {
+            box-shadow: 0 3px 6px #6e8f27, 0 1px 1px #6e8f27;
+        }
+
+        .demo_sidebar a:hover:not(.active) {
+            background-color: #f3f3f3;
+        }
+
+        .demo_sidebar .main_components {
+            background-color: #f3f3f3;
+        }
+
+        .demo_sidebar .extra_components {
+            background-color: #eaeaea;
+        }
+
+
+        #demo_sidebar_research_thinking:hover {
+            box-shadow: 0 3px 6px #a68305, 0 1px 1px #a68305;
+
+        }
+
+
+        #demo_sidebar_related_papers:hover {
+            box-shadow: 0 3px 6px #8a4972, 0 1px 1px #8a4972;
+        }
+
+
+        #demo_sidebar_fun:hover {
+            box-shadow: 0 3px 6px #377b94, 0 1px 1px #377b94;
+        }
+    </style>
+
+
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Josefin+Sans&display=swap');
+        @import url("https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap");
+        @import url("https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap");
+
+
+        #main_page_content {
+            margin-left: 300px;
+            padding: 30px;
+            padding-left: 70px;
+            text-align: justify;
+        }
+
+        .sidebar {
+            margin: 0;
+            padding: 0;
+            width: 270px;
+            background-color: #fafafa;
+            position: fixed;
+            height: 100%;
+            overflow: auto;
+            z-index: 1;
+        }
+
+        .sidebar a,
+        .dropdown-btn {
+            display: block;
+            color: black;
+            padding: 8px;
+            text-decoration: none;
+            border-right: 5px solid #b7db67;
+        }
+
+
+        .sidebar a li {
+            margin-left: 10px;
+            padding: 0px;
+        }
+
+        .dropdown-container {
+            display: none;
+            background-color: #f4f4f4;
+        }
+
+        .active_caret .fa-caret-down {
+            color: #b7db67;
+            font-size: 30px;
+        }
+
+        .fa-caret-down {
+            float: right;
+            padding-right: 8px;
+        }
+
+        .sidebar a.active {
+            background-color: #e3e3e3;
+            color: black;
+        }
+
+        .sidebar a:hover {
+            box-shadow: 0 3px 6px #6e8f27, 0 1px 1px #6e8f27;
+        }
+
+        .sidebar a:hover:not(.active) {
+            background-color: #f3f3f3;
+        }
+
+        .sidebar .extra_components {
+            background-color: #eaeaea;
+        }
+
+        #sidebar_analysis {
+            padding: 10px;
+        }
+
+        #sidebar_research_thinking {
+            padding: 10px;
+            border-right: 5px solid #fad400;
+        }
+
+        #sidebar_research_thinking:hover {
+            box-shadow: 0 3px 6px #a68305, 0 1px 1px #a68305;
+
+        }
+
+
+        #sidebar_related_papers {
+            padding: 10px;
+            border-right: 5px solid #d192ba;
+        }
+
+        #sidebar_related_papers:hover {
+            box-shadow: 0 3px 6px #8a4972, 0 1px 1px #8a4972;
+        }
+
+
+        #sidebar_fun {
+            padding: 10px;
+            border-right: 5px solid #6fb7d1;
+        }
+
+        #sidebar_fun:hover {
+            box-shadow: 0 3px 6px #377b94, 0 1px 1px #377b94;
+        }
+
+
+        .sidebar_ico {
+            float: right;
+            height: 20;
+        }
+
+        div.content {
+            margin-left: 200px;
+            padding: 1px 16px;
+            height: 1000px;
+        }
+
+        #sidebar_small {
+            width: 60px;
+        }
+
+
+        @media screen and (max-width: 1000px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            #main_page_content {
+                margin-left: 200px;
+                padding-left: 50px;
+            }
+
+            #for_you_in_sidebar {
+                display: none;
+            }
+
+        }
+
+
+        @media screen and (max-width: 800px) {
+
+            div.content {
+                margin-left: 0;
+            }
+
+            #main_page_content {
+                margin-left: 80px;
+                padding: 15px;
+            }
+
+            #demo_sidebar {}
+        }
+
+
+        .softmax_tau_bokeh {
+            font-size: 16px;
+        }
+
+
+        .card_with_ico {
+            position: relative;
+            padding: 10px;
+            margin: 10px;
+        }
+
+        .card_with_ico p {
+            padding: 10px;
+        }
+
+        .card_with_ico ul {
+            padding: 10px;
+        }
+
+        .card_with_ico .text_box_green {
+            border: 1px solid #d8e8b5;
+            border-radius: 5px;
+            margin-left: 30px;
+        }
+
+        .card_with_ico .text_box_pink {
+            border: 1px solid #dec8d6;
+            border-radius: 5px;
+            margin-left: 30px;
+        }
+
+        .card_with_ico .text_box_yellow {
+            border: 1px solid #f0e4a5;
+            border-radius: 5px;
+            margin-left: 30px;
+        }
+
+        .card_with_ico .ico {
+            float: left;
+            width: 25px;
+        }
+
+
+        .text_box_green {
+            border: 1px solid #d8e8b5;
+            border-radius: 5px;
+            display: table;
+            margin-left: 20px;
+        }
+
+        .text_box_green p {
+            padding: 10px;
+            padding-bottom: 0px;
+        }
+
+
+        .green_left_thought {
+            border-left: 5px solid #b7db67;
+            margin: 10px;
+            margin-left: 20px;
+            padding: 0px;
+            background-color: #fafcf5;
+        }
+
+        .green_left_thought p {
+
+            margin-left: 10px;
+            padding: 5px;
+        }
+
+
+        .box_green_left {
+            border-left: 2px solid #79a123;
+            margin-left: 10px;
+            padding: 10px;
+        }
+
+        .box_green_right {
+            border-right: 2px solid #79a123;
+            margin-right: 10px;
+            padding: 10px;
+        }
+
+        .box_violet_right {
+            border-right: 2px solid #67468f;
+            margin-right: 10px;
+            padding: 10px;
+        }
+
+        .box_pink_left {
+            border-left: 2px solid #7a3160;
+            margin-left: 5px;
+            padding: 10px;
+        }
+
+        .box_yellow_left {
+            border-left: 2px solid #d6b000;
+            margin-left: 5px;
+            padding: 10px;
+        }
+
+        .box_blue_left {
+            border-left: 2px solid #0278a1;
+            margin-left: 5px;
+            padding: 10px;
+        }
+
+        .paper_title {
+            text-align: center;
+            padding: 5px;
+            padding-top: 0px;
+            font-size: 16px;
+
+        }
+
+        .paper_authors {
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        p {
+            text-align: justify;
+        }
+
+
+        .greenCard {
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 1px;
+            margin: 10px 5px;
+            padding: 3px;
+            display: grid;
+            grid-template-rows: auto auto;
+        }
+
+        #thumbnail_green {
+            box-shadow: 0 2px 4px #6e8f27, 0 1px 1px #6e8f27;
+        }
+
+        #thumbnail_green:hover {
+            box-shadow: 0 6px 12px #6e8f27, 0 4px 4px #6e8f27;
+        }
+
+        #thumbnail_violet {
+            box-shadow: 0 2px 4px #655578, 0 1px 1px #655578;
+        }
+
+        #thumbnail_violet:hover {
+            box-shadow: 0 6px 12px #655578, 0 4px 4px #655578;
+        }
+
+        #thumbnail_paper {
+            box-shadow: 0 2px 4px #ab859e, 0 1px 1px #ab859e;
+        }
+
+        #thumbnail_paper:hover {
+            box-shadow: 0 6px 12px #ab859e, 0 4px 4px #ab859e;
+        }
+
+
+        #thumbnail_blue {
+            box-shadow: 0 2px 4px #377b94, 0 1px 1px;
+        }
+
+        #thumbnail_blue:hover {
+            box-shadow: 0 6px 12px #377b94, 0 4px 4px #377b94;
+        }
+
+        .paperCard {
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 1px;
+            margin: 10px 5px;
+            padding: 3px;
+            display: grid;
+            grid-template-rows: auto auto;
+        }
+
+        .paperIntro {
+            display: grid;
+            grid-template-columns: 70% 30%;
+        }
+
+        .showMePaper {
+            box-shadow: 0 2px 4px #a68305, 0 2px 1px #a68305;
+        }
+
+        .showMePaper:hover {
+            box-shadow: 0 3px 6px #ab859e, 0 4px 4px #ab859e;
+        }
+
+
+        .cardContent {
+            padding: 10px;
+        }
+
+        .center {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .conf_name {
+            float: right;
+            font-family: sans-serif;
+            font-size: 13px;
+            margin-bottom: 0px;
+            background-color: #f7edf4;
+            border: 1px solid #d1a1c3;
+            border-radius: 1px;
+            padding: 0px 4px 0px 4px;
+        }
+
+
+        .paper_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #cf99be;
+            border: 1px solid #8c2b6e;
+            border-radius: 50%;
+        }
+
+        .research_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #ffda00;
+            border: 1px solid #998300;
+            border-radius: 50%;
+        }
+
+        .fun_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #68c7e8;
+            border: 1px solid #0278a1;
+            border-radius: 50%;
+        }
+
+        .green_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #b7db67;
+            border: 1px solid #598005;
+            border-radius: 50%;
+        }
+
+        .violet_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #b59fcf;
+            border: 1px solid #67468f;
+            border-radius: 50%;
+        }
+
+        .data_text {
+            font-family: "Comic Neue", "Arial";
+        }
+
+
+        .researchCard {
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 1px;
+            margin: 10px 5px;
+            padding: 3px;
+            display: grid;
+            grid-template-rows: auto auto;
+        }
+
+        .researchIntro {
+            display: grid;
+            grid-template-columns: 70% 30%;
+        }
+
+        #thumbnail_research {
+            box-shadow: 0 2px 4px #a68305, 0 1px 1px #a68305;
+        }
+
+        #thumbnail_research:hover {
+            box-shadow: 0 6px 12px #a68305, 0 4px 4px #a68305;
+        }
+
+        .research_title {
+            text-align: center;
+            padding: 5px;
+            font-size: 18px;
+            font-family: "Comic Neue", "Arial";
+            background-color: #fafaf5;
+
+
+        }
+
+        .research_tag {
+            float: right;
+            font-family: sans-serif;
+            font-size: 13px;
+            margin-bottom: 0px;
+            background-color: #f5f0d5;
+            border: 1px solid #fad400;
+            border-radius: 1px;
+            padding: 0px 4px 0px 4px;
+        }
+
+        .research_question {
+            font-weight: bold;
+            font-size: 18px;
+            background-color: #fff4b3;
+            margin-right: 15px;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
+        .research_summary {
+            padding: 5px;
+            font-size: 18px;
+            font-family: "Comic Neue", "Arial";
+            background-color: #fafaf5;
+            margin-left: 10px;
+        }
+
+
+        .text_table td,
+        .text_table th {
+            text-align: center;
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-top: 2px;
+            padding-bottom: 2px;
+        }
+    </style>
+
+    <!--##################################################-->
+
+    <div>
+        <div class="sidebar" id="sidebar">
+            <a href="javascript:void(0)" id="close_sidebar_btn" onclick="closeNav()"
+                style="text-align:center;font-size:30px;padding:0px;">⇤</a>
+            <a class="active" href="../nlp_course.html" style="font-weight: bold;">
+                <img height="18" class='sidebar_ico' src="../resources/lectures/ico/course_logo.png"
+                    style="margin-right: 8px;margin-left: 8px;margin-top: 4px;" />
+                NLP Course <font color="#92bf32" id="for_you_in_sidebar">| 专属定制</font></a>
+            <a href="#main_content" style="font-weight: bold;">序列到序列与注意力机制</a>
+
+            <div class="dropdown-scope">
+                <a class="dropdown-btn">序列到序列基础
+                    <i class="fa fa-caret-down"></i>
+                </a>
+                <div class="dropdown-container">
+                    <a href="#seq2seq_basics_intro"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        简介</a>
+                    <a href="#enc_dec_framework"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        编码器解码器框架</a>
+                    <a href="#conditional_lms"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        条件语言模型</a>
+                    <a href="#seq2seq_simple_rnn"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        最简单的模型： RNNs</a>
+                    <a href="#seq2seq_training"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        训练</a>
+                    <a href="#seq2seq_inference"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        推理：集束搜索</a>
+
+                </div>
+            </div>
+
+
+            <div class="dropdown-scope">
+                <a class="dropdown-btn">注意力
+                    <i class="fa fa-caret-down"></i>
+                </a>
+                <div class="dropdown-container">
+                    <a href="#attention_intro"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        为什么需要注意力？</a>
+                    <a href="#attention_idea"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        抽象观点</a>
+
+                    <a href="#attention_specific_functions"><span
+                            style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        注意力分数方程</a>
+                    <a href="#attention_bahdanau_luong"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        模型：Bahdanau vs Luong</a>
+                    <a href="#attention_alignment"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        注意力和对齐</a>
+                </div>
+            </div>
+
+            <div class="dropdown-scope">
+                <a class="dropdown-btn">Transformer
+                    <i class="fa fa-caret-down"></i>
+                </a>
+                <div class="dropdown-container">
+                    <a href="#transformer_intro"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        简介</a>
+                    <a href="#self_attention"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        自注意力</a>
+                    <a href="#masked_self_attention"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        掩码自注意力</a>
+                    <a href="#multi_head_attention"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        多头注意力</a>
+                    <a href="#transformer_model_architecture"><span
+                            style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        模型架构</a>
+
+                </div>
+            </div>
+
+            <a href="#bpe">子词切分：BPE</a>
+
+
+            <a href="#analysis_interpretability" id="sidebar_analysis">分析与解释 <img height="25"
+                    src="../resources/lectures/ico/analysis_empty.png" class="sidebar_ico" /></a>
+            <div class="extra_components">
+                <a href="#research_thinking" id="sidebar_research_thinking">研究思考 <img height="30"
+                        src="../resources/lectures/ico/bulb_empty.png" class="sidebar_ico" /></a>
+                <!--<hr color="#b7db67">-->
+
+                <a href="#related_papers" id="sidebar_related_papers">相关论文 <img height="22"
+                        src="../resources/lectures/ico/book_empty.png" class="sidebar_ico" /></a>
+                <!--<hr color="#b7db67">-->
+
+                <a href="#have_fun" id="sidebar_fun">Have Fun! <img height="30"
+                        src="../resources/lectures/ico/fun_empty.png" class="sidebar_ico" /></a>
+            </div>
+        </div>
+
+
+        <div class="sidebar" id="sidebar_small">
+
+            <a class="active" onclick="openNav()" style="text-align:center;">☰</a>
+            <a href="../nlp_course.html">
+                <img height="20" src="../resources/lectures/ico/course_logo.png"
+                    style="margin-right: 8px;margin-left: 8px;" /></a>
+            <a href="#main_page_content" style="text-align:center; font-size:20px;color:#7ca81e"> <i
+                    class="fa fa-home"></i></a>
+
+            <a href="#analysis_interpretability" id="sidebar_analysis"> <img height="25"
+                    src="../resources/lectures/ico/analysis_empty.png" /></a>
+            <div class="extra_components">
+                <a href="#research_thinking" id="sidebar_research_thinking"><img height="30"
+                        src="../resources/lectures/ico/bulb_empty.png" /></a>
+                <!--<hr color="#b7db67">-->
+
+                <a href="#related_papers" id="sidebar_related_papers"><img height="22"
+                        src="../resources/lectures/ico/book_empty.png" /></a>
+                <!--<hr color="#b7db67">-->
+
+                <a href="#have_fun" id="sidebar_fun"><img height="30"
+                        src="../resources/lectures/ico/fun_empty.png" /></a>
+            </div>
+        </div>
+
+
+        <script>
+            function openNav() {
+                document.getElementById("sidebar").style.display = "block";
+                document.getElementById("sidebar_small").style.display = "none";
+                document.getElementById("close_sidebar_btn").style.display = "block";
+            }
+
+            function closeNav() {
+                document.getElementById("sidebar").style.display = "none";
+                document.getElementById("sidebar_small").style.display = "block";
+                document.getElementById("close_sidebar_btn").style.display = "none";
+            }
+
+        </script>
+
+
+        <script>
+            function onResize() {
+                if (window.innerWidth >= 800) {
+                    document.getElementById("sidebar").style.display = "block";
+                    document.getElementById("sidebar_small").style.display = "none";
+                    document.getElementById("close_sidebar_btn").style.display = "none";
+                } else {
+                    document.getElementById("sidebar").style.display = "none";
+                    document.getElementById("sidebar_small").style.display = "block";
+                }
+            }
+
+            window.onresize = onResize;
+            onResize();
+        </script>
+
+        <script>
+            /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
+            var dropdown = document.getElementsByClassName("dropdown-btn");
+            var i;
+
+            for (i = 0; i < dropdown.length; i++) {
+                dropdown[i].addEventListener("click", function (event) {
+                    this.classList.toggle("active_caret");
+                    var dropdownButton = event.target || event.srcElement;
+                    while (dropdownButton.className != "dropdown-scope")
+                        dropdownButton = dropdownButton.parentElement;
+                    var dropdownContent = dropdownButton.getElementsByClassName("dropdown-container")[0];
+
+                    if (dropdownContent.style.display === "block") {
+                        dropdownContent.style.display = "none";
+                    } else {
+                        dropdownContent.style.display = "block";
+                    }
+                });
+            }
+        </script>
+
+
+        <div class="wrapper" id="main_page_content">
+            <div class="header">
+                <h1>序列到序列（Seq2Seq）与注意力机制 <a
+                        href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=Sequence%20to%20Sequence%20(seq2seq)%20and%20Attention"
+                        style="font-size:9px;" target="_blank">(英文原文)</a></h1>
+            </div>
+
+            <div class="main_content" id="main_content">
+
+                <p class="data_text">
+                    <font color="black">
+                        译者：<a href="http://xcfeng.net/" target="_blank">冯夏冲</a> 校对：<a
+                            href="https://yihengshu.github.io/" target=" _blank">舒意恒</a>
+                    </font>
+                </p>
+
+                <div id="intro">
+
+                    <img src="../resources/lectures/seq2seq/examples.gif"
+                        style="max-width:50%; float:right; margin-left:20px;" />
+
+
+                    <p>最流行的序列到序列任务是翻译（Translation），通常来讲，翻译将一种自然语言转换到另一种自然语言。在过去几年，机器翻译商业系统取得了出彩的效果，例如：
+
+                        <a href="https://translate.google.com" target="_blank">谷歌翻译</a>,
+                        <a href="https://translate.yandex.com" target="_blank">Yandex翻译</a>,
+                        <a href="https://www.deepl.com/en/translator" target="_blank">DeepL翻译</a>,
+                        <a href="https://www.bing.com/translator" target="_blank">微软必应翻译</a>.
+                        今天，我们将会学习这些系统的核心部分。
+                    </p>
+
+                    <p>除了不同自然语言之间的机器翻译，你还可以在不同的编程语言之间进行翻译（参见Facebook AI博客<a
+                            href="https://ai.facebook.com/blog/deep-learning-to-translate-between-programming-languages/"
+                            target="_blank">
+                            Deep learning to translate between programming
+                            languages</a>)，或者在你可以想到的任何token序列之间进行翻译。从现在开始，我们所说的<strong>机器翻译</strong>泛指任何序列到序列任务，即任何性质的token序列之间的翻译。
+                    </p>
+
+                    <p>
+                        在下文中，我们将首先学习序列到序列模型（Seq2Seq）的基础知识，接着学习当下模型的重要组成部分：注意力机制（Attention），最后学习目前最流行的模型：Transformer。当然，还有大量的分析、练习、论文和Have
+                        Fun！
+                    </p>
+
+                </div>
+
+
+                <div id="seq2seq_basics">
+
+                    <h1>序列到序列基础 <a
+                            href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=Sequence%20to%20Sequence%20Basics"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h1>
+
+                    <div id="seq2seq_basics_intro">
+
+                        <p>在机器翻译任务中，我们有输入序列：\(x_1, x_2, \dots, x_m\)
+                            ，以及输出序列：\(y_1, y_2, \dots, y_n\) （注意：输入序列与输出序列长度可以不同)。
+                            给定输入序列，翻译任务的目标是寻找最有可能的输出序列，也就是使得条件概率\(p(y|x)\):
+                            \(y^{\ast}=\arg\max\limits_{y}p(y|x)\)最大的输出序列。
+
+                        </p>
+
+                        <p>如果你懂两种语言，并能很容易地翻译两种语言，那么对于给定的输入序列\(x\)和输出序列\(y\)，你就会有一种对于\(p(y|x)\)
+                            的直觉<i>“这个翻译对于句子\(x\)来说更加自然”</i>。
+                            但是在机器翻译中，我们需要学习一个带有参数\(\theta\) 的函数\(p(y|x, \theta)\) ，并在给定输入\(x\)以及参数\(\theta\)
+                            的情况下，找到使得该条件概率\(p\)最大的翻译\(y'=\arg\max\limits_{y}p(y|x, \theta)\)。
+                        </p>
+
+                        <img src="../resources/lectures/seq2seq/general/human_machine_translation-min.png"
+                            style="max-width:100%;margin-bottom:20px;" />
+
+                        <p>为了定义一个机器翻译系统，我们需要回答以下三个问题：</p>
+                        <ul>
+                            <li><strong>建模</strong>：模型\(p(y|x, \theta)\)看起来是什么样子的？</li>
+                            <li><strong>学习</strong>：如何找到参数\(\theta\)？</li>
+                            <li><strong>推断</strong>：如何找到最优的\(y\)？</li>
+                        </ul>
+
+                        <p>在这一节中，我们将基于基础模型来完整地回答第二个和第三个问题。更加“真实”的模型将在<a href="attention">Attention</a>与<a
+                                href="transformer">Transformer</a>小节讨论。</p>
+
+                    </div>
+
+                    <div id="enc_dec_framework">
+                        <h2>编码器-解码器框架 <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=Encoder%2DDecoder%20Framework"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+
+                        <img src="../resources/lectures/seq2seq/general/enc_dec-min.png"
+                            style="max-width:60%; margin-left:20px; float:right;" />
+
+                        <p>编码器-解码器是序列到序列任务的标准建模范式。这个框架由两部分组成：</p>
+                        <ul>
+                            <li><strong>编码器</strong>：读取源序列并产生其表示；
+                            </li>
+                            <li><strong>解码器</strong>：使用来自编码器的源表示，生成目标序列。
+                            </li>
+                        </ul>
+
+                        <p>在本文中，我们将看到不同的模型，但是其均具有编码器-解码器结构。</p>
+                    </div>
+
+
+                    <div id="conditional_lms">
+                        <h2>条件语言模型 <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=encoder%2Ddecoder%20structure.-,Conditional%20Language%20Models,-In%20the%20Language"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+
+                        <p>在<a href="./language_modeling.html" target="_blank">语言模型</a>一文中，我们学习了预测token序列 \(y=(y_1, y_2,
+                            \dots ,
+                            y_n)\) 的概率 \(p(y)\) 。不同于<strong>语言模型</strong>预测序列 \(y\) 的无条件概率 \(p(y)\)
+                            ，<strong>序列到序列模型</strong>需要在给定源序列 \(x\) 的条件下预测目标序列 \(y\) 的条件概率 \(p(y|x)\)
+                            。这就是为什么序列到序列任务可以被建模为<strong>条件语言模型</strong>（Conditional
+                            Language Models，CLM），条件语言模型与语言模型的操作方式相似，但需要额外考虑源信息 \(x\)。
+                        </p>
+                        <center>
+                            <img src="../resources/lectures/seq2seq/general/lm_clm-min.png"
+                                style="max-width:60%; margin-bottom:20px; " />
+                        </center>
+
+                        <p class="data_text">
+                            <font color="#888"><u>编者按</u>:
+                                请注意条件语言模型不局限于解决序列到序列任务。在更广义的场景下， \(x\) 可以表示除了token序列以外的信息。例如：在图像描述（Image
+                                Captioning）任务中， \(x\) 可以表示图像， \(y\) 表示图像的描述。
+                            </font>
+                        </p>
+
+                        <center>
+                            <video width="90%" height="auto" loop autoplay muted style="margin-left: 20px;">
+                                <source src="../resources/lectures/seq2seq/general/enc_dec_prob_idea.mp4"
+                                    type="video/mp4">
+                            </video>
+                        </center>
+
+                        <p>由于条件语言模型与语言模型唯一的区别在于是否接收源信息，因此条件语言模型的建模与训练与语言模型十分相似。具体来说，流程如下：
+                        </p>
+                        <ul>
+                            <li>将源序列和已经生成的目标词语输入网络；</li>
+                            <li>从网络解码器中获取上下文向量表示（包括源序列和已经生成的目标词语）；</li>
+                            <li>利用该向量表示，预测下一个词语的概率分布。</li>
+                        </ul>
+
+                        <img src="../resources/lectures/seq2seq/general/enc_dec_linear_out-min.png"
+                            style="max-width:100%; margin-bottom:20px; " />
+                        <p>
+                            类似于神经分类器和语言模型，我们可以用一种非常简单的方式来考虑分类部分(即如何从文本的向量表示中获得token概率)。
+                            文本的向量表示具有维度 \(d\)，但最终，我们需要维度为 \(|V|\) 的向量（对于 \(|V|\) 个token或类别的概率)。
+                            为了从一个维度为 \(d\) 的向量得到一个维度为 \(|V|\) 的向量，我们可以使用一个线性层。一旦我们有了维度为 \(|V|\)
+                            的向量，剩下的就是应用softmax操作将原始数字转换为token概率。
+                        </p>
+                    </div>
+
+
+                    <div id="seq2seq_simple_rnn">
+                        <h2>最简单的模型：编码器与解码器均为RNN <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=The%20Simplest%20Model%3A%20Two%20RNNs%20for%20Encoder%20and%20Decoder"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+
+
+                        <img src="../resources/lectures/seq2seq/general/enc_dec_simple_rnn-min.png"
+                            style="max-width:100%; margin-bottom:20px;" />
+
+                        <p>最简单的编码器-解码器模型由两个 RNN（LSTM）组成，一个用于编码器，另一个用于解码器。编码器 RNN 读取源句， 其最后的状态被用作解码器 RNN
+                            的初始状态。这种方式希望最终的编码器状态能够“编码”全部源端信息，解码器能够基于此向量生成目标句子。</p>
+
+                        <p>这个模型可以有不同的变体：例如，编码器和解码器可以有多层。在论文<a href="https://arxiv.org/pdf/1409.3215.pdf"
+                                target="_blank">Sequence
+                                to Sequence Learning with Neural Networks</a>中就用到了这样一个多层的模型，这是使用神经网络解决序列到序列任务的首次尝试之一。
+                        </p>
+
+                        <p>在同一篇论文中，作者们探究了编码器的最后一个状态表示，并可视化了几个样例，如下图。有趣的是，意义相似但是结构不同的句子表示是很接近的！
+                        </p>
+
+
+                        <p style="text-align: center; display: block;
+            margin-bottom:20px; max-width:100%;">
+                            <img src="../resources/lectures/seq2seq/general/rnn_simple_examples-min.png"
+                                style="max-width:100%; margin-bottom:20px;" />
+                            <br />
+                            <span style="font-size: small;">样例来源于论文
+                                <a href="https://arxiv.org/pdf/1409.3215.pdf" target="_blank">Sequence to Sequence
+                                    Learning with Neural Networks</a>.</span>
+                        </p>
+
+
+                        <div class="card_with_ico">
+                            <img class="ico" src="../resources/lectures/ico/bulb_empty.png" />
+                            <div class="text_box_yellow">
+                                <p class="data_text">
+                                    论文<a href="https://arxiv.org/pdf/1409.3215.pdf" target="_blank">Sequence to Sequence
+                                        Learning with Neural Networks</a>介绍了一个优雅的技巧使得简单的LSTM性能更好。在<a
+                                        href="#research_reverse_order_in_lstm">研究思考</a>小节的<a
+                                        href="#research_thinking">练习</a>中了解更多。
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div id="seq2seq_training">
+                        <h2>训练：交叉熵损失 <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=Training%3A%20The%20Cross%2DEntropy%20Loss%20(Once%20Again)"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+
+                        <p class="data_text">
+                            <font color="#888"><u>编者按</u>: 这与我们之前在<a href="./text_classification.html"
+                                    target="_blank">文本分类</a>与<a href="./language_modeling.html"
+                                    target="_blank">语言模型</a>中讨论的交叉熵损失是同一个损失。你可以跳过这一部分，或者快速的阅读这部分。
+                            </font>
+                        </p>
+
+                        <p>
+                            与神经语言模型相似，神经序列到序列模型的训练是为了在给定之前上下文（源序列和已经生成的目标词语）的条件下，预测下一个词语的概率分布。直觉上来讲，在每一步，我们最大化模型分配给正确词语的概率。
+                        </p>
+                        <p>假设我们有训练样例，包含了源序列 \(x=(x_1, \dots, x_m)\) 和目标序列 \(y=(y_1, \dots,
+                            y_n)\) ，在每一个时间步 \(t\) ，一个模型预测概率分布 \(p^{(t)} = p(\ast|y_1, \dots, y_{t-1}, x_1, \dots,
+                            x_m)\) 。这一步的目标是 \(p^{\ast}=\mbox{one-hot}(y_t)\) ，也就是说，我们想要一个模型给正确词语分配概率为1，给剩余的词语分配概率为0。
+                        </p>
+
+                        <p>标准的损失函数是<strong>交叉熵损失</strong>。目标分布\(p^{\ast}\)和预测分布\(p^{}\)的交叉熵损失为：
+                            \[Loss(p^{\ast}, p^{})= - p^{\ast} \log(p) = -\sum\limits_{i=1}^{|V|}p_i^{\ast} \log(p_i).\]
+                            由于仅有一个\(p_i^{\ast}\)是非0的（对于正确的词语\(y_t\)），将有：
+                            \[Loss(p^{\ast}, p) = -\log(p_{y_t})=-\log(p(y_t| y_{\mbox{<}t},
+                                x))\]在每一步，我们最大化模型分配给正确词语的概率，如下图所示。</p>
+
+                                <center>
+                                    <img src="../resources/lectures/seq2seq/general/one_step_loss_intuition-min.png"
+                                        style="max-width:100%; margin:20px;" />
+                                </center>
+
+                                <p>对于整个样例，损失为：\(-\sum\limits_{t=1}^n\log(p(y_t| y_{\mbox{<}t}, x))\)。训练过程如下图所示（该图是针对 RNN
+                                        模型的，其他类似模型也适用）： </p>
+
+                                        <center>
+                                            <video width="100%" height="auto" loop autoplay muted
+                                                style="margin-left: 20px;">
+                                                <source
+                                                    src="../resources/lectures/seq2seq/general/seq2seq_training_with_target.mp4"
+                                                    type="video/mp4">
+                                            </video>
+                                            <center>
+
+
+                    </div>
+
+                    <br><br>
+
+                    <div id="seq2seq_inference">
+                        <h2>推断：贪婪解码（Greedy Decoding）和集束搜索（Beam Search） <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=Inference%3A%20Greedy%20Decoding%20and%20Beam%20Search"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+
+                        <p>现在我们理解了一个模型看起来是什么样子的以及如何训练这个模型，现在让我们思考如何使用该模型生成翻译：
+                        </p>
+                        <img src="../resources/lectures/seq2seq/general/inference_formula-min.png"
+                            style="max-width:80%; margin:20px;" />
+                        <p>现在的核心问题是：如何找到函数的argmax?</p>
+
+                        <p>请注意<strong>我们无法找到精确的解决方案</strong>。我们需要检查的假设总数为\(|V|^n\)，这在实际操作中是不可行的。因此，我们需要找到一个近似的解决方案。
+                        </p>
+                        <p>
+                            <font class="data_text" color="#888"><u>编者按</u>: 在实际中，精确的解决方案通常要比我们将要使用的近似解决方案差。
+                            </font>
+                        </p>
+
+
+                        <h3><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                            <strong>贪婪解码: </strong>在每一步，选择最有可能的词语 <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=Greedy%20Decoding%3A%20At%20each%20step%2C%20pick%20the%20most%20probable%20token"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h3>
+
+                        <p>最直接的解码策略是贪婪解码。在每一步，生成具有最高概率的词语。这是一个不错的基线方法，但这种方法有内在缺陷：当前步骤中的最好词语不一定推出最好的序列。</p>
+                        <img src="../resources/lectures/seq2seq/general/greedy_is_bad-min.png"
+                            style="max-width:60%; margin:20px;" />
+
+
+                        <h3><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                            <strong>集束搜索: </strong> 追踪几个最有可能的假设。 <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=Beam%20Search%3A%20Keep%20track%20of%20several%20most%20probably%20hypotheses"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h3>
+                        <p>不同于贪婪解码只跟踪一个序列，我们现在保持多个假设。在每一步，我们选择概率最高的N个假设（top-N）继续搜索。这叫做<strong>集束搜索（Beam
+                                Search）</strong>。
+                        </p>
+                        <center>
+                            <video width="80%" height="auto" loop autoplay muted style="margin-left: 20px;">
+                                <source src="../resources/lectures/seq2seq/general/beam_search.mp4" type="video/mp4">
+                            </video>
+                            <center>
+
+
+                                <p>通常来讲，集束大小为4-10。增加集束大小会使得计算低效，更重要的是，将会导致更差的生成质量。
+                                </p>
+
+
+                    </div>
+
+
+                </div>
+
+                <br><br>
+                <div id="attention">
+                    <h1>注意力机制 <a
+                            href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=to%20worse%20quality.-,Attention,-The%20Problem%20of"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h1>
+
+                    <div id="attention_intro">
+                        <h2>固定编码器表示的问题 <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=The%20Problem%20of%20Fixed%20Encoder%20Representation"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+                        <div class="green_left_thought" style="font-size:18px;">
+                            <p class="data_text"><u>问题</u>: 固定的源表示是次优的: (i) 对于编码器来讲，很难压缩句子；(ii)
+                                对于解码器来讲，与不同的解码步相关的信息可能不同。
+                            </p>
+                        </div>
+
+                        <img src="../resources/lectures/seq2seq/attention/bottleneck-min.png"
+                            style="max-width:60%; margin:20px;float:right;" />
+
+                        <p>到目前为止我们看到的模型中，编码器将整个源句子压缩到单一向量。这是十分有难度的。源句子含义的数量可能是无限的。并且强制要求编码器将所有信息压缩到单一向量，该向量可能会丢失信息。
+
+                        </p>
+                        <p>
+                            <font class="data_text" color="#888"><u>编者按</u>:
+                                想象一下浩瀚的宇宙，试着可视化所有你能在这里找到的东西以及你如何用语言描述它。然后想象这一切被压缩到单一向量，例如，仅有512维的向量，你觉得这个宇宙还OK吗？
+                            </font>
+                        </p>
+
+                        <p>
+                            除了编码器将所有信息压缩到单一向量的难度以外。这对于解码器来说也很难。解码器仅仅可以观测到来自于源端的一个向量表示。然而，在每一个生成步，源端的不同部分会有不同的作用。但是在目前的设定中，解码器必须从相同的固定表示中提取相关信息，这是一件很难的事情。
+                        </p>
+
+                    </div>
+
+
+                    <div id="attention_idea">
+                        <h2>注意力机制：一个抽象的观点 <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=Attention%3A%20A%20High%2DLevel%20View"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+
+                        <p>注意力机制由论文 <a href="https://arxiv.org/pdf/1409.0473.pdf" target="_blank">Neural Machine
+                                Translation
+                                by Jointly Learning to Align and Translate</a> 提出，用于解决固定表示所造成的问题。</p>
+                        <div class="green_left_thought" style="font-size:18px;">
+                            <p class="data_text"><u>注意力</u>: 在不同步，让模型"专注"于输入的不同部分。
+                            </p>
+                        </div>
+
+                        <p>注意力机制是神经网络的一部分。在解码的每一步，该机制决定源端哪一个部分是更加重要的。
+                            在这种设定下，编码器无需将整个源端压缩进单一向量表示，该机制为所有的源端词语提供表示（例如：RNN
+                            的所有状态而非仅仅最后一个状态）。
+                        </p>
+
+                        <img src="../resources/lectures/seq2seq/attention/general_scheme-min.png"
+                            style="max-width:100%; margin:20px;margin-top:0px;" />
+                        <p>在解码的每一步，注意力机制：</p>
+                        <ul>
+                            <li>
+                                接收<b>注意力输入</b>
+                                ：一个解码器状态 \(\color{#b01277}{h_t}\) 以及全部编码器状态 \(\color{#7fb32d}{s_1}\) ,
+                                \(\color{#7fb32d}{s_2}\), ..., \(\color{#7fb32d}{s_m}\) ；
+                            </li>
+                            <li>
+                                计算<b>注意力分数</b>：对于每一个编码器状态 \(\color{#7fb32d}{s_k}\)
+                                ，注意力机制计算该编码器状态与解码器状态 \(\color{#b01277}{h_t}\) 的“相关性”。
+                                形式化来讲，注意力机制接收一个解码器状态以及一个编码器状态，
+                                并使用注意力方程返回标量输出
+                                \(\color{#307cc2}{score}(\color{#b01277}{h_t}\color{black}{,}\color{#7fb32d}{s_k}\color{black})\)
+                                。
+                            </li>
+                            <li>
+                                计算<b>注意力权重</b>：一个概率分布，将函数应用于注意力分数。
+                            </li>
+                            <li>
+                                计算<b>注意力输出</b>：编码器状态与对应注意力权重的加权求和。
+                            </li>
+                        </ul>
+
+                        <p>一般计算流程如下：</p>
+                        <img src="../resources/lectures/seq2seq/attention/computation_scheme-min.png"
+                            style="max-width:80%; margin:20px;" />
+
+                        <h3>注意：所有运算都是可导的，以端到端的方式学习！ <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=Note%3A%20Everything%20is%20differentiable%20%2D%20learned%20end%2Dto%2Dend!"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></h3>
+                        <p>
+                            注意力机制的核心想法是：在每一步，网络可以<b>学习</b>哪些输入部分是更加重要的。
+                            由于现在所有的运算都是可导的（注意力方程，，以及其余部分），因此具有注意力机制的模型可以进行端到端训练。
+                            你不需要专门教模型挑选你想要的词，<b>模型本身会学习挑选重要信息</b>。
+                        </p>
+
+
+                        <br>
+                        <img height="20" src="../resources/lectures/ico/paw_empty.png"
+                            style="float:left; margin-top:-10px;" />
+                        <div class="box_green_left">
+
+                            <div class="text_box_green">
+                                <p class="data_text">浏览幻灯片。试着注意每一步的注意权重是如何变化的，在每一步中哪些词是最重要的？
+                                </p>
+                            </div>
+
+                            <div class="carousel" data-flickity='{ "imagesLoaded": true, "percentPosition": true,
+            "selectedAttraction": 1, "friction": 1 }'
+                                style="width:100%; margin-top:10px; margin-bottom:30px; margin-left:10px;">
+                                <div class="carousel-cell" style="width:100%">
+                                    <center>
+                                        <img width=100%
+                                            src="../resources/lectures/seq2seq/attention/attn_for_steps/1-min.png" />
+                                    </center>
+                                </div>
+                                <div class="carousel-cell" style="width:100%">
+                                    <center>
+                                        <img width=100%
+                                            src="../resources/lectures/seq2seq/attention/attn_for_steps/2-min.png" />
+                                    </center>
+                                </div>
+                                <div class="carousel-cell" style="width:100%">
+                                    <center>
+                                        <img width=100%
+                                            src="../resources/lectures/seq2seq/attention/attn_for_steps/3-min.png" />
+                                    </center>
+                                </div>
+                                <div class="carousel-cell" style="width:100%">
+                                    <center>
+                                        <img width=100%
+                                            src="../resources/lectures/seq2seq/attention/attn_for_steps/4-min.png" />
+                                    </center>
+                                </div>
+                                <div class="carousel-cell" style="width:100%">
+                                    <center>
+                                        <img width=100%
+                                            src="../resources/lectures/seq2seq/attention/attn_for_steps/5-min.png" />
+                                    </center>
+                                </div>
+                                <div class="carousel-cell" style="width:100%">
+                                    <center>
+                                        <img width=100%
+                                            src="../resources/lectures/seq2seq/attention/attn_for_steps/6-min.png" />
+                                    </center>
+                                </div>
+                                <div class="carousel-cell" style="width:100%">
+                                    <center>
+                                        <img width=100%
+                                            src="../resources/lectures/seq2seq/attention/attn_for_steps/7-min.png" />
+                                    </center>
+                                </div>
+                                <div class="carousel-cell" style="width:100%">
+                                    <center>
+                                        <img width=100%
+                                            src="../resources/lectures/seq2seq/attention/attn_for_steps/8-min.png" />
+                                    </center>
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <img height="20" src="../resources/lectures/ico/paw_empty.png"
+                            style="float:left; margin-top:-10px;" />
+                        <br><br>
+
+
+                    </div>
+
+                    <div id="attention_specific_functions">
+
+
+                        <img src="../resources/lectures/seq2seq/attention/attn_score_what_is_here-min.png"
+                            style="max-width:35%; margin-left:20px; float:right;" />
+
+                        <h2> 如何计算注意力分数？ <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=How%20to%20Compute%20Attention%20Score%3F"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+                        <p>在上面描述的方法中，我们还没有明确如何计算注意力分数。你可以应用任何你想要使用的函数，甚至是一个极其复杂的函数。然而，通常你不需要这样做，现在已经有几个效果好，
+                            并且简单的注意力函数变体可以使用。
+                        </p>
+
+                        <center>
+                            <img src="../resources/lectures/seq2seq/attention/score_functions-min.png"
+                                style="max-width:90%; margin-bottom:20px;" />
+                        </center>
+
+                        <p>最流行的计算注意力分数的方法是：</p>
+                        <ul>
+                            <li>
+                                <b>dot-product</b>： 最简单的方法；
+                            </li>
+
+                            <li>
+                                <b>bilinear function</b>（又称“Luong attention”），在论文<a
+                                    href="https://arxiv.org/abs/1508.04025" target="_blank">Effective
+                                    Approaches to Attention-based Neural Machine Translation</a>中使用；
+                            </li>
+
+                            <li>
+                                <b>multi-layer perceptron</b>（又称“Bahdanau attention”），由<a
+                                    href="https://arxiv.org/pdf/1409.0473.pdf" target="_blank">论文</a>提出。
+                            </li>
+                        </ul>
+                    </div>
+
+
+                    <div id="attention_bahdanau_luong">
+                        <h2>模型变种：Bahdanau 和 Luong <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=Model%20Variants%3A%20Bahdanau%20and%20Luong"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+                        <p>当谈论到早期的注意力模型的时候，你极有可能听到这些变种：</p>
+                        <ul>
+                            <li>
+                                <b>Bahdanau attention</b>，来自Dzmitry Bahdanau, KyungHyun Cho 和 Yoshua
+                                Bengio的论文<a href="https://arxiv.org/pdf/1409.0473.pdf" target="_blank">
+                                    Neural Machine Translation by Jointly Learning to Align and Translate
+                                </a>（这是首次引入注意力机制的论文）；
+                            </li>
+
+                            <li>
+                                <b>Luong attention</b> ，来自Minh-Thang Luong, Hieu Pham, Christopher D.
+                                Manning的论文
+                                <a href="https://arxiv.org/abs/1508.04025" target="_blank">Effective
+                                    Approaches to Attention-based Neural Machine Translation</a>。
+                            </li>
+                        </ul>
+
+                        <p>这些指的是论文中模型使用的注意力得分函数。在这一部分，我们将更仔细地研究这两个模型变体。
+                        </p>
+
+
+                        <h3><u>Bahdanau 模型</u> <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=two%20model%20variants.-,Bahdanau%20Model,-encoder%3A%20bidirectional%0ATo"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></h3>
+                        <ul>
+                            <li>
+                                <b>编码器：双向的</b><br>
+                                为了更好地编码每一个源端词语，编码器拥有两个 RNN
+                                ：前向RNN与后向RNN，它们以相反的方向读取输入。对于每一个token，两个RNN的状态被拼接起来作为该token的表示。
+                            </li>
+                            <li>
+                                <b>注意力分数：multi-laryer perceptron</b><br>
+                                为了获得注意力分数，将多层感知机（MLP）应用于编码器状态和解码器状态。
+                            </li>
+                            <li>
+                                <b>注意力应用：解码步骤之间</b><br>
+                                注意力在解码步骤之间使用。状态\(\color{#b01277}{h_{t-1}}\)被用来计算注意力及其输出\(\color{#7fb32d}{c}^{\color{#b01277}{(t)}}\)，
+                                \(\color{#b01277}{h_{t-1}}\)与\(\color{#7fb32d}{c}^{\color{#b01277}{(t)}}\)均在第\(t\)步被传递给解码器。
+
+                            </li>
+
+                        </ul>
+
+                        <center>
+                            <img src="../resources/lectures/seq2seq/attention/bahdanau_model-min.png"
+                                style="max-width:100%; margin-bottom:20px;" />
+                        </center>
+
+
+                        <h3><u>Luong 模型</u> <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=.-,Luong%20Model,-While%20the%20paper"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></h3>
+                        <p>
+                            <a href="https://arxiv.org/abs/1508.04025" target="_blank">论文</a>考虑了多种模型变体，被称为“Luong
+                            注意力”的方法如下：
+                        </p>
+                        <ul>
+                            <li>
+                                <b>编码器：单向的（简单）</b> (simple)
+                            </li>
+                            <li>
+                                <b>注意力分数：bilinear function</b>
+                            </li>
+                            <li>
+                                <b>注意力应用：在解码器 RNN 状态\(t\)和该步的预测之间</b><br>
+                                注意力在RNN解码\(t\)步之后，做出预测之前使用。状态\(\color{#b01277}{h_{t}}\)被用来计算注意力以及输出\(\color{#7fb32d}{c}^{\color{#b01277}{(t)}}\)。
+                                然后\(\color{#b01277}{h_{t}}\)结合\(\color{#7fb32d}{c}^{\color{#b01277}{(t)}}\)得到更新后的表示\(\color{#b01277}{\tilde{h}_{t}}\)，被用来获得最终预测。
+                            </li>
+
+                        </ul>
+
+                        <center>
+                            <img src="../resources/lectures/seq2seq/attention/luong_model-min.png"
+                                style="max-width:100%; margin-bottom:20px;" />
+                        </center>
+
+
+                    </div>
+
+                    <div id="attention_alignment">
+
+                        <h2>注意力机制学习对齐 <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=Attention%20Learns%20(Nearly)%20Alignment"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+
+                        <p>还记得注意力机制的动机吗？在不同步，解码器可能需要关注不同的源token，即在这一步中更相关的的源token。让我们来看一下注意力权重，解码器使用哪些源词语？
+                        </p>
+
+                        <p style="text-align: center; display: block;
+            margin-bottom:20px; max-width:100%;">
+                            <img src="../resources/lectures/seq2seq/attention/bahdanau_examples-min.png"
+                                style="max-width:100%; margin-bottom:20px;" />
+                            <br />
+                            <span style="font-size: small;">样例来源于
+                                <a href="https://arxiv.org/pdf/1409.0473.pdf" target="_blank">Neural Machine Translation
+                                    by Jointly Learning to Align and Translate</a>.</span>
+                        </p>
+
+                        <p>从样例中我们看出，注意力机制学会了源词语和目标词语之间的（软）对齐，解码器“看向”它正在翻译的源端词语。</p>
+
+                        <p class="data_text">
+                            <font color="#888"><u>编者按</u>:
+                                “对齐”是统计机器翻译中的一个术语，但在这一部分，其直观理解为“什么被翻译成什么”就足够了
+                            </font>
+                        </p>
+                    </div>
+
+
+                </div>
+
+
+                <div id="transformer">
+                    <h1>Transformer: Attention is All You Need <a
+                            href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=Transformer%3A%20Attention%20is%20All%20You%20Need"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h1>
+
+
+                    <div id="transformer_intro">
+
+                        <p>
+                            Transformer是2017年在论文<a
+                                href="https://papers.nips.cc/paper/7181-attention-is-all-you-need.pdf"
+                                target="_blank">Attention is All You Need</a>中介绍的一个模型。
+                            它完全基于注意力机制：即没有循环和卷积。除了更高的翻译质量之外，该模型的训练速度也快了一个数量级。目前，Transformers（及其变种）不仅是序列到序列任务的标准模型，
+                            同时也是语言模型和预训练设定下的标准模型，我们将在下一章介绍。
+                        </p>
+
+                        <p>
+                            Transformer引入了一种新的建模范式：不同于之前的模型编码器和解码器采用循环和卷积的处理方式，Transformer只使用注意力机制进行操作
+                        </p>
+
+                        <center>
+                            <img src="../resources/lectures/seq2seq/transformer/modeling_table-min.png"
+                                style="max-width:80%; margin-bottom:20px;" />
+                        </center>
+
+                        <p>
+                            请看<a href="https://ai.googleblog.com/2017/08/transformer-novel-neural-network.html"
+                                target="_blank">
+                                Google AI blog post </a>中介绍Transformer的插图。
+                        </p>
+                        <p style="text-align: center; display: block;
+            margin-bottom:20px; margin-left:25px; max-width:80%;">
+                            <img src="../resources/lectures/seq2seq/transformer/transformer_original.gif"
+                                style="max-width:100%; margin-bottom:20px;" />
+                            <br />
+                            <span style="font-size: small;">动画来源于<a
+                                    href="https://ai.googleblog.com/2017/08/transformer-novel-neural-network.html"
+                                    target="_blank">Google AI博客</a>。</span>
+                        </p>
+
+                        <p>
+                            不涉及太多细节，让我们用文字来描述刚刚在插图中看到的东西。我们将得到如下内容:
+                        </p>
+                        <center>
+                            <img src="../resources/lectures/seq2seq/transformer/encdec_intuitive_words-min.png"
+                                style="max-width:90%; margin-bottom:20px;" />
+                        </center>
+
+                        <p>但是，为什么它相比于RNN在语言理解上更加合适？我们看一个例子。
+                        </p>
+
+                        <img src="../resources/lectures/seq2seq/transformer/rnn_vs_transformer_river-min.png"
+                            style="max-width:60%; margin-left:20px; float:right;" />
+                        <p>
+                            当编码一个句子的时候，RNN 直到阅读完整个句子才会理解<font class="data_text"><strong>“bank”</strong></font>
+                            的含义，这一过程对于长序列来说需要一些时间。与此相反，在Transformer编码器中，所有token的交互都在<b>一次</b>完成。
+                        </p>
+
+                        <p>
+                            直观上，Transformer的编码器可以被看作是推理步骤（层）的序列。在每一步，token之间互相观测（这是我们需要注意的地方，<font face="arial">自注意力
+                            </font>
+                            ），
+                            交换信息并试图在整个句子上下文中更好地理解对方。这发生在多个层（例如：第六层）
+                        </p>
+                        <p>在每一个解码器层中，前缀中的token同样通过自注意力机制交互，除此以外，它们还查看编码器状态（如果没有这一部分，将无法进行翻译，是吧？）
+                        </p>
+
+
+                        <p>现在，让我们努力理解这是如何在模型中实现的。
+                        </p>
+
+                    </div>
+
+
+                    <div id="self_attention">
+                        <h2>
+                            <b>自注意力机制</b>：“互相观测”部分 <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=Self%2DAttention%3A%20the%20%22Look%20at%20Each%20Other%22%20Part"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h2>
+
+                        <p>
+                            <b>自注意力</b>是模型中关键的组成部分之一。<b>注意力</b>和<font face="arial">自注意力</font>
+                            的区别在于：自注意力在同一性质的表示之间起作用：例如，某一层中的所有编码器状态。
+                        </p>
+
+                        <center>
+                            <img src="../resources/lectures/seq2seq/transformer/decenc_vs_self-min.png"
+                                style="max-width:90%; margin-bottom:20px;" />
+                        </center>
+
+
+                        <p>
+                            自注意力是模型的一部分，在该部分，之间互相观测。每一个token使用注意力机制“观测”句子中的其他词语，收集上下文，并更新“自身”之前的表示。请看插图。
+                        </p>
+
+                        <video width="80%" height="auto" loop autoplay muted style="margin-left: 20px;">
+                            <source src="../resources/lectures/seq2seq/transformer/encoder_self_attention.mp4"
+                                type="video/mp4">
+                        </video>
+
+                        <p>注意在实践中，这是并行发生的。
+                        </p>
+
+                        <h3>
+                            <b>自注意力中的查询（Query）、键（Key）和值（Value）</b> <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=Query%2C%20Key%2C%20and%20Value%20in%20Self%2DAttention"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h3>
+
+                        <p>
+                            从形式上看，上述想法通过查询-键-值（query-key-value）注意力来实现。在自注意力中，每个输入token都接收到三种对应于它可以扮演的角色的表示:
+                        </p>
+                        <ul>
+                            <li>
+                                <b><b>查询</b></b> ：询问信息；
+                            </li>
+                            <li>
+                                <b><b>键</b></b> ：表示它本身包含了一些信息；
+                            </li>
+                            <li>
+                                <b><b>值</b></b> ：可以提供的信息；
+                            </li>
+                        </ul>
+                        <p>
+                            当一个token查看其他token的时候会使用<b>查询</b>
+                            ，它寻找信息以更好的理解自己。<b>键</b>是对查询请求的响应，它用于计算注意力权重。<b>值</b>用来计算注意力输出，它给那些“说”需要它的token提供信息（即给这个token分配大的权重）。
+                        </p>
+
+                        <center>
+                            <img src="../resources/lectures/seq2seq/transformer/qkv_explained-min.png"
+                                style="max-width:100%; margin-bottom:20px;" />
+                        </center>
+
+                        <p>注意力输出的计算公式如下：</p>
+                        <center>
+                            <img src="../resources/lectures/seq2seq/transformer/qkv_attention_formula-min.png"
+                                style="max-width:55%; margin-bottom:20px; " />
+                        </center>
+
+                    </div>
+
+                    <div id="masked_self_attention">
+                        <h2>
+                            <b>掩码自注意力机制</b>：解码器“不要超前看” <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=Masked%20Self%2DAttention%3A%20%22Don%27t%20Look%20Ahead%22%20for%20the%20Decoder"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h2>
+
+                        <p>在解码器中，同样也有一个自注意力机制：它是一个“查看之前token”的函数。
+                        </p>
+                        <video width="50%" height="auto" loop autoplay muted style="margin-left: 20px;float:right;">
+                            <source src="../resources/lectures/seq2seq/transformer/masked_self_attn.mp4"
+                                type="video/mp4">
+                        </video>
+
+
+                        <p>
+                            解码器中的自注意力与编码器中的自注意力稍有不同。编码器一次性接收<b>所有</b>
+                            的token，并且输入句子中的token可以互相观测。在解码器中，我们在<b>每一个时刻生成一个token</b>
+                            ：在生成过程中，我们不知道未来将会生成哪些token。
+                        </p>
+                        <p>
+                            （在训练时）为了避免解码器超前查看，模型使用<b>掩码自注意力</b>：未来的token会被掩盖。请看插图。
+                        </p>
+
+                        <h3>
+                            <b>解码器在什么情况下可以超前看呢？</b> <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=But%20how%20can%20the%20decoder%20look%20ahead%3F"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h3>
+                        <p>
+                            在生成过程中，解码器无法超前查看，我们不知道接下来将会输出什么。但是在训练过程中，我们使用标注的翻译（我们已经提前知道）。
+                            因此，在训练过程中，我们将整个目标句子输入到解码器中，没有掩码，token可以超前看到“未来的”token，但这并不是我们想要的。
+                        </p>
+                        <p>
+                            这样做是为了提高计算效率：Transformer没有循环模块，因此所有的token均可以一次性处理。这是它在机器翻译中如此受欢迎的原因之一，它比曾经占主导地位的基于循环组件的模型训练得更快。
+                            对于基于循环组件的模型，一个训练步骤需要O(len(源句子) + len(目标句子))步数。但对于Transformer，仅需要O(1)，是一个常数。
+                        </p>
+
+                    </div>
+
+
+                    <div id="multi_head_attention">
+                        <h2>
+                            <b>多头注意力机制</b>：独立专注于不同的事情 <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=Multi%2DHead%20Attention%3A%20Independently%20Focus%20on%20Different%20Things"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h2>
+
+                        <video width="60%" height="auto" loop autoplay muted style="margin-left: 20px;float:right;">
+                            <source src="../resources/lectures/seq2seq/transformer/multi_head.mp4" type="video/mp4">
+                        </video>
+
+                        <p>
+                            通常来讲，理解句子中一个词语的作用需要理解它与句子不同部分的关系。这不仅对源句的处理很重要，而且对目标句的生成也很重要。例如，在一些语言中，主语定义了动词的语态（如性别一致），动词定义了其宾语的情况等。我想说的是：
+                            <b>每个词都是许多关系的一部分</b>。
+                        </p>
+                        <p>
+                            因此，我们需要让模型专注于不同的事情：这是<b>多头注意力</b>背后的动机。不同于只有一个注意力机制，多头注意力有多个独立工作的“头”。
+                        </p>
+
+
+                        <img src="../resources/lectures/seq2seq/transformer/qkv_for_heads-min.png"
+                            style="max-width:40%; margin-left:20px; float:right;" />
+
+                        <p>形式化地，这是通过将多个注意力机制的结果相结合来实现的：
+                            \[\mbox{MultiHead}(Q, K, V) = \mbox{Concat}(\mbox{head}_1, \dots, \mbox{head}_n)W_o,\]
+                            \[\mbox{head}_i=\mbox{Attention}(QW_Q^i, KW_K^i, VW_V^i)\]
+                        </p>
+                        <p>在实现中，你仅需要将为单头注意力计算的查询、键和值拆分为几个部分。通过这种方法，具有一个或多个注意头的模型具有相同的大小，多头注意力不会增加模型的大小。
+                        </p>
+
+
+                        <div class="card_with_ico">
+                            <img class="ico" src="../resources/lectures/ico/analysis_empty.png" width="30px" />
+                            <div class="text_box_green">
+                                <p class="data_text">
+                                    在<a href="#analysis_interpretability">分析与解释</a>一节，我们将会看到这些头在模型中扮演不同的角色，例如：定位或跟踪语法依赖。
+                            </div>
+                        </div>
+
+
+                    </div>
+
+
+                    <div id="transformer_model_architecture">
+                        <h2>Transformer： 模型架构 <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=Transformer%3A%20Model%20Architecture"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+
+                        <p>
+                            现在，当我们理解了模型的主要组成部分和总体思路后，让我们来看看整个模型的情况。图中显示了<a
+                                href="https://papers.nips.cc/paper/7181-attention-is-all-you-need.pdf"
+                                target="_blank">原论文</a>中的模型架构。
+                        </p>
+
+                        <img src="../resources/lectures/seq2seq/transformer/model-min.png"
+                            style="max-width:100%; margin-bottom:20px; " />
+                        <p>
+                            直观地说，这个模型所做的正是我们之前讨论的：在编码器中，token之间交互并更新它们的表示；在解码器中，一个目标token首先观测先前生成的目标token，然后查看源端信息，最后更新其表示。这一过程分为几层，通常是6层。
+                        </p>
+                        <p>让我们更详细地看一下其他的模型组件。
+                        </p>
+
+                        <h3><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                            <b>前馈块（Feed-forward blocks）</b> <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=%E2%80%A2-,Feed%2Dforward%20blocks,-In%20addition%20to"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h3>
+
+                        <img src="../resources/lectures/seq2seq/transformer/ffn-min.png"
+                            style="max-width:25%; margin-left:20px; float:right;" />
+                        <p>除了注意力，每一层都有一个前馈神经网络块：两个线性层以及它们之间的非线性 ReLU：
+                            \[FFN(x) = \max(0, xW_1+b_1)W_2+b_2.\]
+                            在通过注意力机制查看其他token之后，模型使用一个前馈神经网络块来处理新的信息。（注意力： <span
+                                class="data_text">查看其他token并收集信息</span>，前馈神经网络：
+                            <span class="data_text">花点时间思考和处理这些信息</span>）。
+                        </p>
+
+                        <h3><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                            <b>残差连接（Residual connections）</b> <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=%E2%80%A2-,Residual%20connections,-We%20already%20saw"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h3>
+                        <img src="../resources/lectures/seq2seq/transformer/residual-min.png"
+                            style="max-width:35%; margin-left:20px; float:right;" />
+                        <p>
+                            在讨论<a href="./language_modeling.html#neural_lms_models_cnn"
+                                target="_blank">卷积语言模型</a>时，我们已经看到了残差连接。尽管残差连接非常简单（将模块的输入添加到它的输出），但是却非常有效：它缓解了网络中的梯度流，并且允许网络堆叠多层。
+                        </p>
+                        <p>
+                            在Transformer中，在每个注意力块和前馈神经网络块之后使用残差连接。在上面的插图中，残差以箭头的形式围绕块（注意力块和前馈神经网络快）
+                            并指向黄色的<b>“Add & Norm”</b>层。在<b>“Add & Norm”</b>部分，
+                            <b>“Add”</b>部分代表残差连接。
+                        </p>
+
+
+                        <h3><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                            <b>层归一化（Layer Normalization）</b> <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=%E2%80%A2-,Layer%20Normalization,-The%20%22Norm%22"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h3>
+                        <img src="../resources/lectures/seq2seq/transformer/layer_norm-min.png"
+                            style="max-width:40%; margin-left:20px; float:right;" />
+                        <p><b>“Add & Norm”</b>层中的“Norm”部分代表<a href="https://arxiv.org/pdf/1607.06450.pdf"
+                                target="_blank">层归一化（layer
+                                Normalization）</a>。它独立地对批次（Batch）中每一个例子的向量表示进行归一化处理，这样做是为了控制进入下一层的
+                            "信息流"。层归一化可以提高收敛稳定性，有时甚至提高收敛质量。
+
+                        </p>
+                        <p>
+                            在Transformer中，你必须对每个token的向量表示进行归一化。除此以外，这里的LayerNorm有可训练的参数， \(scale\) 和 \(bias\)
+                            ，这些参数在归一化之后被用来重新缩放层的输出(或下一层的输入)。
+                            注意， \(\mu_k\) 和 \(\sigma_k\) 是针对每个例子进行评估的，但是 \(scale\) 和 \(bias\) 对于每个例子是相同的，这些是层参数。
+                        </p>
+
+
+                        <h3><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                            <b>位置编码（Positional encoding）</b> <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=%E2%80%A2-,Positional%20encoding,-Note%20that%20since"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h3>
+                        <img src="../resources/lectures/seq2seq/transformer/positional_encoding-min.png"
+                            style="max-width:50%; margin-left:20px; float:right;" />
+                        <p>
+                            注意，由于Transformer不包含循环或卷积，因此它不知道输入token的顺序。因此，我们必须让模型明确地知道token的位置。
+                            为此，我们有两组嵌入（embedding）：对于token（和我们之前的做法一样）和对于位置（这个模型需要的新嵌入）。然后，<font face="arial">
+                                一个token的输入表示是两个嵌入的总和：token表示和位置表示。</font>
+                        </p>
+                        <p>位置嵌入是可学习的，但作者发现固定的嵌入并不会损害质量。在Transformer中使用的固定位置编码是:
+                            \[\mbox{PE}_{pos, 2i}=\sin(pos/10000^{2i/d_{model}}),\]
+                            \[\mbox{PE}_{pos, 2i+1}=\cos(pos/10000^{2i/d_{model}}),\]
+                            \(pos\) 是位置， \(i\) 是向量维度。位置编码的每个维度都对应于一个正弦曲线（sinusoid），波长形成一个从2π到10000 · 2π的几何级数。
+                        </p>
+                    </div>
+
+
+                </div>
+
+                <br>
+
+                <div id="bpe">
+                    <h1>子词切分：Byte Pair Encoding <a
+                            href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=Subword%20Segmentation%3A%20Byte%20Pair%20Encoding"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h1>
+
+                    <p>
+                        正如我们所知，一个模型有一个预定义的token词汇表。那些不在词汇表中的输入token，将被替换成一个特殊的 <font class="data_text">
+                            <strong>UNK（"未知"）token</strong>
+                        </font>。
+                        因此，如果你直接使用单词级别的分词（即你的token就是单词），你将能够处理固定数量的单词。这就是<b>固定词汇量的问题</b>
+                        ：你会得到很多未知的token，你的模型将无法正确地翻译它们。
+                    </p>
+
+                    <center>
+                        <img src="../resources/lectures/seq2seq/bpe/tokenization_word_subword-min.png"
+                            style="max-width:80%; margin-bottom:20px; " />
+                    </center>
+
+
+                    <p>
+                        但是，我们怎样才能够表示所有的词，即使是那些我们在训练数据中没有见过的词？好吧，即使你不熟悉一个词，你也熟悉它所包含的部分：子词（在最坏的情况下是：符号）。那么，我们为什么不把稀有和未知的词分成更小的部分呢？
+                    </p>
+
+                    <p>
+                        这正是Rico Sennrich、Barry Haddow和Alexandra Birch在<a href="https://arxiv.org/pdf/1508.07909.pdf"
+                            target="_blank">Neural Machine Translation of Rare
+                            Words with Subword Units</a>一文中提出的。他们提出了标准的子词切分方法：Byte Pair Encoding
+                        (BPE)。BPE保留频繁出现的单词，并将罕见和未知的单词分割成更小的已知部分。
+                    </p>
+
+                    <h2>BPE是如何工作的？ <a
+                            href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=smaller%20known%20parts.-,How%20does%20it%20work%3F,-The%20original%20Byte"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+
+                    <p>
+                        原始的<a href="https://en.wikipedia.org/wiki/Byte_pair_encoding" target="_blank">Byte Pair Encoding
+                            (BPE)
+                            (Gage,
+                            1994)</a>是一种简单的数据压缩技术，它迭代地使用一个未使用的字节替换序列中最频繁的字节对。我们现在所讨论的BPE是将其适配到单词切分的一种算法。它合并字符或者字符序列，而非合并频繁的字节对。
+
+                    </p>
+
+                    <p>BPE算法由两部分组成：
+                    </p>
+                    <ul>
+                        <li>
+                            <b>训练</b>：学习“BPE规则”，即要合并的符号对；
+                        </li>
+                        <li>
+                            <b>推理</b>：应用学习到的规则来分割文本。
+                        </li>
+                    </ul>
+
+                    <p>让我们更详细地学习这两部分。</p>
+
+                    <h3>
+                        <b>训练：学习BPE规则 <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=Training%3A%20learn%20BPE%20rules"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></b>
+                    </h3>
+                    <p>在这一步，BPE算法建立一个合并表和一个token表。初始的token表包含了字符，初始的合并表为一个空表。这一步，每一个单词首先被切分为字符序列。然后，算法如下：
+
+                    </p>
+                    <ul>
+                        <li>计数符号对：在训练数据中，每个符号对一共出现了多少次；
+                        </li>
+                        <li>找到最频繁的符号对；</li>
+                        <li>合并该符号对：在合并表中添加该合并，以及在词汇表中添加合并后新的token。</li>
+                    </ul>
+
+                    <p>在实践中，该算法首先计数每个单词在数据中出现的次数。利用该信息，它可以更容易地计数符号对。还要注意，token不跨越单词边界，一切都发生在单词内。
+                    </p>
+
+                    <p>
+
+                        插图展示一个简单的示例：假设在训练数据中， <font class="data_text"><strong>cat</strong></font>出现4次，
+                        <font class="data_text"><strong>mat</strong></font>出现5次，
+                        <font class="data_text"><strong>mats</strong></font>，
+                        <font class="data_text"><strong>mate</strong></font>，
+                        <font class="data_text"><strong>ate</strong></font>，
+                        <font class="data_text"><strong>eat</strong></font>分别出现2，3，3，2次。我们还必须设置我们想要的最大合并次数；
+                        通常，根据数据集大小，大概是4k-32k，但在我们简单的例子中，我们设置最大合并次数为5。
+
+                    </p>
+
+                    <img src="../resources/lectures/seq2seq/bpe/build_merge_table.gif"
+                        style="max-width:90%; margin-bottom:10px; " />
+
+                    <p>
+                        当我们达到最大合并数目时，并不是所有的单词都合并到一个token中。例如，<font class="data_text"><strong>mats</strong></font>
+                        被分割为两个token：
+                        <font class="data_text"><strong>mat@@</strong>和<strong></strong>s</strong></font>
+                        。注意，在分割之后，我们添加了特殊字符<font class="data_text"><strong>@@</strong></font>，
+                        以区分代表整个单词的token和代表部分单词的token。在我们的示例中，<font class="data_text"><strong>mat</strong></font>和<font
+                            class="data_text"><strong>mat@@</strong></font>是不同的token。
+                    </p>
+
+                    <p><u>实现笔记。</u>
+                        在实现中，您需要确保新的合并仅向词汇表添加一个新token。为此，你可以为每个单词添加一个特殊的词尾（end-of-word）符号（就像在<a
+                            href="https://arxiv.org/pdf/1508.07909.pdf" target="_blank">原始BPE论文</a>中所做的那样），
+                        或者用一个特殊符号替换空格（就像在 <a href="https://github.com/google/sentencepiece"
+                            target="_blank">Sentencepece</a>
+                        和 <a href="https://github.com/VKCOM/YouTokenToMe">YouTokenToMe</a>
+                        中所做的那样，这是最快的实现），或者采取其他一些操作。在插图中，为了简单起见，我省略了这一点。
+                    </p>
+
+
+                    <h3>
+                        <b>推断：切分文本 <a
+                                href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=Inference%3A%20segment%20a%20text"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></b>
+                    </h3>
+
+                    <p>在学习BPE规则之后，你已经有了一个合并表，现在，我们将使用它来分割一段新文本。
+                    </p>
+
+                    <img src="../resources/lectures/seq2seq/bpe/bpe_apply.gif"
+                        style="max-width:40%; float:right; margin-left:20px;" />
+
+                    <p>该算法首先将一个单词分割成一个字符序列。然后，它迭代地进行以下两个步骤，直到没有合并操作可以进行:
+                    </p>
+                    <ul>
+                        <li>在这一步所有可能的合并中，找到表中位置最靠前的合并；
+                        </li>
+                        <li>应用该合并操作
+                        </li>
+                    </ul>
+                    <p>注意，合并表是有序的，表中位置靠前的合并表示该合并在数据中出现地更频繁。这就是为什么在算法中，靠前的合并具有更高的优先级：在每一步，我们在所有可能的合并中选择位置最靠前的合并操作。
+                    </p>
+
+                    <div class="card_with_ico">
+                        <img class="ico" src="../resources/lectures/ico/bulb_empty.png" />
+                        <div class="text_box_yellow">
+                            <p class="data_text">
+                                请注意，虽然BPE切分是确定的，但即使是同一个词汇，一个词也可以有不同的切分，例如<font class="data_text"><strong>un
+                                        related</strong></font>，<font class="data_text"><strong>u n relate d</strong>
+                                </font>, <font class="data_text"><strong>unrel
+                                        ated</strong></font>等。也许在训练过程中使用不同的分割会更好?
+                                好吧，也许会。在<a href="#research_thinking">研究思考</a>部分的<a
+                                    href="#research_bpe_dropout">练习</a>中了解更多信息。
+
+                        </div>
+                    </div>
+
+
+                </div>
+
+
+                <br><br><br>
+                <div id="analysis_interpretability">
+                    <img height="40" src="../resources/lectures/ico/analysis_empty.png"
+                        style="float:left; padding-right:20px; " />
+                    <h1>分析与解释 <a
+                            href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=Research%20Thinking%20section.-,Analysis%20and%20Interpretability,-Multi%2DHead%20Self"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h1>
+
+                    <h2>多头自注意力：这些“头”在做什么？ <a
+                            href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=Multi%2DHead%20Self%2DAttention%3A%20What%20are%20these%20heads%20doing%3F"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+
+                    <p>让我们首先从传统的模型分析方法开始：查看模型组件。之前，我们查看了分类器中的卷积滤波器，语言模型中的神经元；现在，是时候查看一个更大的组件：注意力。
+                        但我们先不考虑简单的那一种，而是考虑Transformer多头注意力中的各个“头”。
+                    </p>
+                    <p class="data_text">
+                        <font color="#888"><u>编者按</u>:
+                            首先，我们为什么要这么做？多头注意力是Transformer中引入的归纳偏置。当在一个模型中创建<b>归纳偏置</b>的时候，
+                            我们通常对该归纳偏置是否有用有某种直觉。因此，理解这个新的部分是如何工作的是有益的。它能学习我们认为它会学习的东西吗？
+                            如果没有，为什么它有帮助？如果是，我们该如何改进？希望你现在有足够的动力，让我们继续。
+
+                        </font>
+                    </p>
+
+                    <h3>最重要的头是可以解释的 <a
+                            href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=The%20Most%20Important%20Heads%20are%20Interpretable"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h3>
+                    <p>
+                        在这里我们将提到ACL 2019论文<a href="https://www.aclweb.org/anthology/P19-1580.pdf"
+                            target="_blank">Analyzing
+                            Multi-Head
+                            Self-Attention:
+                            Specialized Heads Do the Heavy Lifting, the Rest Can Be Pruned</a>中的一些结果。
+                        作者研究了编码器中多头注意力中各个独立的注意力头，并评估了不同的头对生成的翻译的平均 "贡献 "程度（细节可查看<a
+                            href="https://www.aclweb.org/anthology/P19-1580.pdf" target="_blank">原论文</a>或者<a
+                            href="https://lena-voita.github.io/posts/acl19_heads.html" target="_blank">博客</a>）。结果发现，
+
+                    </p>
+                    <ul>
+                        <li>只有一小部分注意力头对翻译是重要的，</li>
+                        <li>这些注意力头扮演着可解释的 "角色"。
+                        </li>
+                    </ul>
+                    <p>这些角色是:
+                    </p>
+                    <ul>
+                        <li>
+                            <b>位置</b>：关注一个token的近邻，模型中有几个这样的注意力头（通常是2-3个头关注之前的token，2个头关注之后的token）；
+                        </li>
+                        <li>
+                            <b>句法</b>：学会了在句子中追踪一些主要的句法关系(主谓、动宾);
+                        </li>
+                        <li>
+                            <b>稀有token</b>：第一层最重要的头关注句子中最不常见的token（对于在不同语言对上训练的模型是正确的!）
+                        </li>
+                    </ul>
+                    <p> 请看下述“位置头”和“句法头”的示例。这意味着我们拥有多个头的直觉是正确的，模型确实学会了追踪单词之间的关系!
+
+                    </p>
+
+                    <div style="display: grid; grid-template-columns: 50% 50%; margin:10px;">
+
+                        <div>
+                            <h3 style="text-align:center;">
+                                <b>Positional heads</b>
+                            </h3>
+                            <div class="carousel"
+                                style="float:left; width:95%; margin-top:0px; margin-bottom:30px; margin-left:0px"
+                                data-flickity='{ "imagesLoaded": true, "percentPosition": true}'>
+                                <div class="carousel-cell" style="width:90%">
+                                    <center>
+                                        <img
+                                            src="../resources/posts/acl19_heads/position_head/wmt_en_de_prev-min.png" />
+                                        <p style="text-align:center;">Model trained on WMT EN-DE</p>
+                                    </center>
+                                </div>
+                                <div class="carousel-cell" style="width:100%">
+                                    <center>
+                                        <img
+                                            src="../resources/posts/acl19_heads/position_head/wmt_en_de_next-min.png" />
+                                        <p style="text-align:center;">Model trained on WMT EN-DE</p>
+                                    </center>
+                                </div>
+
+
+                                <div class="carousel-cell" style="width:100%">
+                                    <center>
+                                        <img
+                                            src="../resources/posts/acl19_heads/position_head/wmt_en_fr_prev-min.png" />
+                                        <p style="text-align:center;">Model trained on WMT EN-FR</p>
+                                    </center>
+                                </div>
+                                <div class="carousel-cell" style="width:100%">
+                                    <center>
+                                        <img
+                                            src="../resources/posts/acl19_heads/position_head/wmt_en_fr_next-min.png" />
+                                        <p style="text-align:center;">Model trained on WMT EN-FR</p>
+                                    </center>
+                                </div>
+
+
+                                <div class="carousel-cell" style="width:100%">
+                                    <center>
+                                        <img
+                                            src="../resources/posts/acl19_heads/position_head/wmt_en_ru_prev-min.png" />
+                                        <p style="text-align:center;">Model trained on WMT EN-RU</p>
+                                    </center>
+                                </div>
+                                <div class="carousel-cell" style="width:100%">
+                                    <center>
+                                        <img
+                                            src="../resources/posts/acl19_heads/position_head/wmt_en_ru_next-min.png" />
+                                        <p style="text-align:center;">Model trained on WMT EN-RU</p>
+                                    </center>
+                                </div>
+
+
+                                <div class="carousel-cell" style="width:100%">
+                                    <center>
+                                        <img
+                                            src="../resources/posts/acl19_heads/position_head/subs_en_ru_prev-min.png" />
+                                        <p style="text-align:center;">Model trained on OpenSubtitles EN-RU</p>
+                                    </center>
+                                </div>
+                                <div class="carousel-cell" style="width:100%">
+                                    <center>
+                                        <img
+                                            src="../resources/posts/acl19_heads/position_head/subs_en_ru_next-min.png" />
+                                        <p style="text-align:center;">Model trained on OpenSubtitles EN-RU</p>
+                                    </center>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 style="text-align:center;">
+                                <b>Syntactic heads</b> <a
+                                    href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=Convolutions%20for%20Images%20and%20Translation%20Invariance"
+                                    style="font-size:9px;" target="_blank">(英文原文)</a>
+                            </h3>
+                            <div class="carousel" style="float:right; width:95%; margin-top:0px; margin-bottom:30px; "
+                                data-flickity='{ "imagesLoaded": true, "percentPosition": true}'>
+                                <div class="carousel-cell" style="width:100%">
+                                    <center>
+                                        <img
+                                            src="../resources/posts/acl19_heads/syntactic_head/subs_en_ru_sv_1-min.png" />
+                                        <p style="text-align:center;"> subject-> verb</p>
+                                    </center>
+                                </div>
+                                <div class="carousel-cell" style="width:100%">
+                                    <center>
+                                        <img
+                                            src="../resources/posts/acl19_heads/syntactic_head/subs_en_ru_vs_1-min.png" />
+                                        <p style="text-align:center;"> verb -> subject</p>
+                                    </center>
+                                </div>
+
+
+                                <div class="carousel-cell" style="width:100%">
+                                    <center>
+                                        <img
+                                            src="../resources/posts/acl19_heads/syntactic_head/subs_en_ru_sv_2-min.png" />
+                                        <p style="text-align:center;"> subject-> verb</p>
+                                    </center>
+                                </div>
+                                <div class="carousel-cell" style="width:100%">
+                                    <center>
+                                        <img
+                                            src="../resources/posts/acl19_heads/syntactic_head/subs_en_ru_vs_2-min.png" />
+                                        <p style="text-align:center;"> verb -> subject</p>
+                                    </center>
+                                </div>
+                                <div class="carousel-cell" style="width:100%">
+                                    <center>
+                                        <img
+                                            src="../resources/posts/acl19_heads/syntactic_head/subs_en_ru_vs_3-min.png" />
+                                        <p style="text-align:center;"> verb -> subject</p>
+                                    </center>
+                                </div>
+
+
+                                <div class="carousel-cell" style="width:100%">
+                                    <center>
+                                        <img
+                                            src="../resources/posts/acl19_heads/syntactic_head/wmt_en_ru_ov_2-min.png" />
+                                        <p style="text-align:center;"> object -> verb</p>
+                                    </center>
+                                </div>
+                                <div class="carousel-cell" style="width:100%">
+                                    <center>
+                                        <img
+                                            src="../resources/posts/acl19_heads/syntactic_head/wmt_en_ru_vo_2-min.png" />
+                                        <p style="text-align:center;"> verb -> object</p>
+                                    </center>
+                                </div>
+
+                                <div class="carousel-cell" style="width:100%">
+                                    <center>
+                                        <img
+                                            src="../resources/posts/acl19_heads/syntactic_head/subs_en_ru_ov_1-min.png" />
+                                        <p style="text-align:center;"> object -> verb</p>
+                                    </center>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div style="float:right; width:40%; margin-left:20px; ">
+                        <h3 style="text-align:center;">
+                            <b>Rare tokens head</b> <a
+                                href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=Convolutions%20for%20Images%20and%20Translation%20Invariance"
+                                style="font-size:9px;" target="_blank">(英文原文)</a>
+                        </h3>
+                        <div class="carousel" style="margin-top:10px; margin-bottom:30px; margin-left:10px"
+                            data-flickity='{ "imagesLoaded": true, "percentPosition": true}'>
+
+                            <div class="carousel-cell" style="width:100%">
+                                <center>
+                                    <img src="../resources/posts/acl19_heads/topic_head/wmt_en_de_1-min.png" />
+                                    <p style="text-align:center;">Model trained on WMT EN-DE</p>
+                                </center>
+                            </div>
+                            <div class="carousel-cell" style="width:100%">
+                                <center>
+                                    <img src="../resources/posts/acl19_heads/topic_head/wmt_en_de_2-min.png" />
+                                    <p style="text-align:center;">Model trained on WMT EN-DE</p>
+                                </center>
+                            </div>
+                            <div class="carousel-cell" style="width:100%">
+                                <center>
+                                    <img src="../resources/posts/acl19_heads/topic_head/wmt_en_de_3-min.png" />
+                                    <p style="text-align:center;">Model trained on WMT EN-DE</p>
+                                </center>
+                            </div>
+
+                            <div class="carousel-cell" style="width:100%">
+                                <center>
+                                    <img src="../resources/posts/acl19_heads/topic_head/wmt_en_fr_1-min.png" />
+                                    <p style="text-align:center;">Model trained on WMT EN-FR</p>
+                                </center>
+                            </div>
+                            <div class="carousel-cell" style="width:100%">
+                                <center>
+                                    <img src="../resources/posts/acl19_heads/topic_head/wmt_en_fr_2-min.png" />
+                                    <p style="text-align:center;">Model trained on WMT EN-FR</p>
+                                </center>
+                            </div>
+                            <div class="carousel-cell" style="width:100%">
+                                <center>
+                                    <img src="../resources/posts/acl19_heads/topic_head/wmt_en_fr_3-min.png" />
+                                    <p style="text-align:center;">Model trained on WMT EN-FR</p>
+                                </center>
+                            </div>
+
+                            <div class="carousel-cell" style="width:100%">
+                                <center>
+                                    <img src="../resources/posts/acl19_heads/topic_head/wmt_en_ru_1-min.png" />
+                                    <p style="text-align:center;">Model trained on WMT EN-RU</p>
+                                </center>
+                            </div>
+                            <div class="carousel-cell" style="width:100%">
+                                <center>
+                                    <img src="../resources/posts/acl19_heads/topic_head/wmt_en_ru_2-min.png" />
+                                    <p style="text-align:center;">Model trained on WMT EN-RU</p>
+                                </center>
+                            </div>
+                            <div class="carousel-cell" style="width:100%">
+                                <center>
+                                    <img src="../resources/posts/acl19_heads/topic_head/wmt_en_ru_3-min.png" />
+                                    <p style="text-align:center;">Model trained on WMT EN-RU</p>
+                                </center>
+                            </div>
+                            <div class="carousel-cell" style="width:100%">
+                                <center>
+                                    <img src="../resources/posts/acl19_heads/topic_head/wmt_en_ru_4-min.png" />
+                                    <p style="text-align:center;">Model trained on WMT EN-RU</p>
+                                </center>
+                            </div>
+
+                            <div class="carousel-cell" style="width:100%">
+                                <center>
+                                    <img src="../resources/posts/acl19_heads/topic_head/subs_en_ru_1-min.png" />
+                                    <p style="text-align:center;">Model trained on OpenSubtitles EN-RU</p>
+                                </center>
+                            </div>
+                            <div class="carousel-cell" style="width:100%">
+                                <center>
+                                    <img src="../resources/posts/acl19_heads/topic_head/subs_en_ru_2-min.png" />
+                                    <p style="text-align:center;">Model trained on OpenSubtitles EN-RU</p>
+                                </center>
+                            </div>
+                            <div class="carousel-cell" style="width:100%">
+                                <center>
+                                    <img src="../resources/posts/acl19_heads/topic_head/subs_en_ru_3-min.png" />
+                                    <p style="text-align:center;">Model trained on OpenSubtitles EN-RU</p>
+                                </center>
+                            </div>
+
+                        </div>
+                    </div>
+                    <p>虽然稀有token头看起来非常有趣，但不要高估它，极有可能，这是过度拟合的迹象。通过查看稀有token，模型试图抓住这些罕见的“线索”。
+                    </p>
+
+                    <h3>大部分的头可以被修剪 <a
+                            href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=The%20Majority%20of%20the%20Heads%20Can%20be%20Pruned"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h3>
+
+                    <p>
+                        在这篇论文的后面，作者让模型决定它不需要哪些头(更多细节请参阅论文或<a href="https://lena-voita.github.io/posts/acl19_heads.html"
+                            target="_blank">博客</a>)，并迭代地裁剪注意力头，即从模型中删除它们。除了证明特定的头是最重要的（因为模型保持它们的完整，而裁剪其他的头），作者发现大多数的头可以被移除而不会有明显的质量损失。
+
+                    </p>
+                    <p>
+                        <font face="arial">为什么我们不一开始就用少量的头来训练一个模型呢？
+                        </font>
+                    </p>
+                    <p>你不能这样做，如果这样做模型质量会低很多。在训练中你需要很多头，让它们学习所有有用的信息。
+                    </p>
+
+
+                    <h2 id="probing">探测：表示捕捉到了什么？ <a
+                            href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=Probing%3A%20What%20Do%20Representations%20Capture%3F"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h2>
+
+                    <p>
+                        注意，查看模型组件是一种<b>特定于模型</b>的方法：你可能感兴趣的组件和 "观察 "它们的方法都取决于模型。
+
+                    </p>
+                    <p>
+                        现在我们对<b>模型无关</b>的方法感兴趣。例如，模型中的表示学习到了什么信息？它们是否学习到编码一些语言学特征？在这里，我们将把数据输入到一个训练好的网络中，收集数据的向量表示，并将尝试理解这些向量是否编码了一些有趣的东西。
+
+                    </p>
+
+                    <img src="../resources/lectures/seq2seq/analysis/standard_probe-min.png" width=45%
+                        style="float:right; margin-left:20px">
+
+                    <p>
+                        最流行的方法是使用<b>探测分类器</b>(又称探测、探测任务、诊断分类器)。在这种设定下，你：
+                    </p>
+                    <ul>
+                        <li>将数据输入网络，并得到数据的向量表示，
+                        </li>
+                        <li>训练一个分类器，从这些表示中预测一些语言学标签（但模型本身是冻结的，只用于产生表示）。
+                        </li>
+                        <li>用分类器的准确性来衡量表示对标签的编码程度。</li>
+                    </ul>
+
+                    <p>这种分析方法（目前）是NLP中最流行的，我们将在下一章讨论迁移学习时再次用到。现在，让我们看看一些例子，看看如何用它来分析神经机器翻译模型。
+
+                    </p>
+
+                    <p class="data_text">
+                        <font color="#888"><u>编者按</u>:
+                            最近，事实证明，探测分类器的准确性并不是一个好的衡量标准，你需要修改你使用探测分类器评估的内容。但这就是另一个非常不同的故事了...
+
+                        </font>
+                    </p>
+
+                    <h3>机器翻译模型对词法学有什么了解？ <a
+                            href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=What%20do%20NMT%20Models%20Learn%20about%20Morphology%3F"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h3>
+                    <p>
+                        在这一部分，我们来看看ACL 2017年的论文<a href="https://arxiv.org/pdf/1704.03471.pdf" target="_blank">What do
+                            Neural Machine Translation Models Learn about
+                            Morphology?</a>作者在几对语言上训练机器翻译系统（基于LSTM），并分析了这些模型的表示。
+                        在这里，我将只提到部分结果，以说明如何使用探测进行分析。
+
+                    </p>
+
+                    <h4 style="font-size:18px;"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        <b>词性标签</b> <a
+                            href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=%E2%80%A2-,Part%20of%20Speech%20Tags,-One%20of%20the"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h4>
+                    <p>第一个实验研究编码器表示如何很好地捕获词性标签(POS标签)。对于从嵌入开始的每个编码器层，作者训练了一个分类器，从该层的表示预测词性标签。结果如图所示（层0：嵌入层；层1和层2：编码层）。
+
+                    </p>
+                    <img src="../resources/lectures/seq2seq/analysis/probing_pos-min.png"
+                        style="max-width:40%; margin-left:20px; float:right;" />
+                    <p>我们可以看到
+                    </p>
+                    <ul>
+                        <li>通过编码器传递嵌入提升了词性标注性能。这是预料之中的，虽然第0层只知道当前的token，但来自编码器层的表示知道它的上下文，因此可以更好地理解词性信息。
+
+                        </li>
+                        <li>第1层比第2层好。猜想是：虽然第1层捕获了单词结构，但第2层编码了更多的高级信息（例如，语义）。
+
+                        </li>
+                    </ul>
+
+                    <h4 style="font-size:18px;"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        <b>目标语言的影响</b> <a
+                            href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=The%20Effect%20of%20Target%20Language"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h4>
+                    <img src="../resources/lectures/seq2seq/analysis/probing_language-min.png"
+                        style="max-width:40%; margin-left:20px; float:right;" />
+                    <p>作者研究的另一个有趣的问题是目标语言的影响。给定相同的源语言（阿拉伯语）和不同的目标语言，用哪种目标语言训练的编码器将学习到更多的源语言词法学?
+                        对于目标语言，作者选用了阿拉伯语、希伯来语（词法丰富的语言，与源语言的词法相似）、德语（词法丰富的语言，但词法与源语言不同）和英语（词法贫乏的语言）。
+
+                    </p>
+                    <p>
+                        有点出乎意料的是，<b>较弱的目标词法迫使模型更好地理解源端词法</b>。
+
+                    </p>
+
+
+                </div>
+
+
+                <br><br><br>
+
+                <div id="research_thinking">
+                    <img height="40" src="../resources/lectures/ico/bulb_empty.png"
+                        style="float:left; padding-right:10px; margin-top:-20px;" />
+                    <h1 style="margin-left:10px; margin-right:20px; float: left; margin-top:-20px">研究思考</h1>
+                    <hr color="#fced95" style="height:5px">
+                    <br><br>
+
+
+                    <fieldset style="border: 1px solid #f0e4a5;
+    border-radius: 5px;">
+                        <legend>
+                            <p class="data_text"><strong>How to</strong></p>
+                        </legend>
+                        <ul class="data_text">
+                            <li>阅读开头的简短描述——这是我们的出发点，一些已知的内容。
+
+                            </li>
+                            <li>读一个问题并思考：一分钟，一天，或是一周，给自己一些时间！即使你不是一直在想这个问题，你仍然得到一些思考和启发。
+
+                            </li>
+                            <li>看看可能的答案——之前回答/解决这个问题的尝试。
+                                <br>
+                                <u>重要提示：</u>
+                                你<strong>不应该</strong>提出和这里完全一样的东西—记住，每篇论文通常需要花费作者几个月的工作。思考这些事情是一种有用的习惯！科学家所需要的盛夏的就是时间：用来不断地尝试-失败-思考，直到成功。
+
+                            </li>
+                        </ul>
+
+                        <p class="data_text">众所周知，如果你不是马上得到答案，而是先思考一下，你会更容易学到东西。即使你不想成为一名研究人员，这仍然是一个学习的好方法！
+                        </p>
+                    </fieldset>
+
+
+                    <br><br>
+
+
+                    <!--##################################################-->
+                    <!--##################################################-->
+                    <!--##################################################-->
+
+                    <div class="research_circle" style="float:left;"></div>
+                    <h2 style="margin-top:-10px; float: left; padding-left:10px; padding-right:10px; color:#786702">
+                        未配备注意力机制的LSTM <a
+                            href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=to%20learn%20things!-,Simple%20LSTMs%20without%20Attention,-Training%20trick%20to"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+
+                    <div class="box_yellow_left">
+
+                        <!--##################################################-->
+                        <div class="researchCard" id="thumbnail_research">
+                            <div class="researchIntro" id="research_reverse_order_in_lstm">
+
+                                <div class="cardContent">
+
+                                    <div class="research_title">
+                                        Training trick to make simple LSTMs w/o attention work
+                                        使得未配备注意力机制的LSTMs有效的训练技巧
+                                    </div>
+
+                                    <hr color="#dedeca" style="margin:5px;">
+                                    未配备注意力机制的简单LSTM性能较低：这是因为所有的依赖关系都是长期的，这种长距离依赖对于模型来讲很难建模。例如，当解码器生成翻译的开头时，它可能已经忘记了最相关的源输入序列的开头信息。
+                                </div>
+                                <div>
+                                    <img width=90% src="../resources/lectures/seq2seq/research/all_long-min.png" alt=""
+                                        style="margin-top:20px;" class="center" />
+
+                                </div>
+
+                            </div>
+                            <hr color="#dedeca" style="margin:5px">
+                            <div class="cardContent">
+
+                                <span class="research_question">你是否可以更改训练流程（不修改模型），使模型在开始生成目标时更容易记住源序列的开头?</span>
+
+                                <br>
+                                <details>
+                                    <summary class="research_summary">
+                                        可能的解答
+                                    </summary>
+                                    <br>
+
+                                    <h2>逆序源token序列</h2>
+                                    <p>论文<a href="https://arxiv.org/pdf/1409.3215.pdf" target="_blank">Sequence to
+                                            Sequence Learning with Neural
+                                            Networks</a>提出了一种优雅的策略使得简单的LSTM序列到序列模型更加有效：逆序源序列的token（保持目标序列不变）。这种做法使得模型会有许多短距离连接（short-term
+                                        connections），当解码目标序列的开头时，最近编码的源表示将会有更高的相关性。
+                                    </p>
+                                    <img width=100%
+                                        src="../resources/lectures/seq2seq/research/reverse_order_before_after-min.png"
+                                        alt="" style="margin-top:20px;margin-bottom:20px;" class="center" />
+
+                                </details>
+
+                            </div>
+                        </div>
+
+                        <!--##################################################-->
+                    </div>
+                    <div class="research_circle" style="float:left;"></div>
+                    <!--##################################################-->
+                    <!--##################################################-->
+                    <!--##################################################-->
+
+                    <br><br>
+
+
+                    <!--##################################################-->
+                    <!--##################################################-->
+                    <!--##################################################-->
+
+                    <div class="research_circle" style="float:left;"></div>
+                    <h2 style="margin-top:-10px; float: left; padding-left:10px; padding-right:10px; color:#786702">
+                        提升字词分割 <a
+                            href="https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#:~:text=Improve%20Subword%20Segmentation"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+                    <div class="box_yellow_left">
+
+                        <!--##################################################-->
+                        <div class="researchCard" id="thumbnail_research">
+                            <div class="researchIntro" id="research_bpe_dropout">
+
+                                <div class="cardContent">
+
+                                    <div class="research_title">
+                                        Make BPE stochastic: segment words differently
+                                    </div>
+
+                                    <hr color="#dedeca" style="margin:5px;">
+                                    标准BPE分割是确定的:在每一步，它总是选择合并表中最高概率的合并操作。然而，即使是同一个词表，一个单词也可能有不同的分割，例如，
+                                    <font class="data_text"><strong>un relat ed</strong></font>,
+                                    <font class="data_text"><strong>u n relate d</strong></font>,
+                                    <font class="data_text"><strong>un rel ated</strong></font>,
+                                    等。
+
+                                    <br><br>
+                                    想象一下，在训练NMT模型的过程中，每次我们从几个可能的分割中选择一个，即相同的单词可以有不同的分割。我们使用由标准BPE构建的相同的合并表，并在测试时使用标准分割，我们只修改训练。
+                                </div>
+
+                                <div>
+                                    <img width=90% src="../resources/lectures/seq2seq/research/bpe-min.png" alt=""
+                                        style="margin-top:20px;" class="center" />
+
+                                </div>
+
+                            </div>
+                            <hr color="#dedeca" style="margin:5px">
+                            <div class="cardContent">
+
+                                <span class="research_question">?</span>
+                                你认为这会提高模型的质量吗?为什么?
+                                <br>
+                                <details>
+                                    <summary class="research_summary">
+                                        可能的解答
+                                    </summary>
+                                    <br>
+
+                                    <p>为什么选择同一个单词的不同分割可以帮助模型，可能的原因是：</p>
+                                    <ul>
+                                        <li>
+                                            通过单词的不同分割，模型可以更好地理解该单词所包含的子词。因此，它可以更好地理解单词的构成成分。
+                                        </li>
+                                        <li>
+                                            由于只有罕见和未知的单词被分割为子词，模型可能不能很好地学习子词的表示。通过不同的分割，它可以在许多不同的上下文中看到子词，并更好地理解它们。
+                                        </li>
+                                        <li>
+                                            这可以作为一种正则化，模型将学会不过度依赖单个token，而是考虑更广泛的上下文(类似于标准的单词dropout)。
+                                        </li>
+                                    </ul>
+
+                                    <p>
+                                        为了支持这些观点，让我们挑选几个稀有token，看看它们的最近邻。为了找到最近的邻居，我们使用两个模型的嵌入，分别用（1）BPE和（2）随机分割(我们将在下一个问题中讨论)训练。
+                                    </p>
+
+                                    <img width=90%
+                                        src="../resources/lectures/seq2seq/research/bpe_drop_closest_neighbors-min.png"
+                                        alt="" style="margin:20px;" class="center" />
+
+                                    <p>
+                                        我们发现，带有随机分割的模型更能理解单词。随机分割的嵌入空间中最近邻共享公共部分，而BPE则不是这样。
+                                    </p>
+                                    <p>注意，BPE有这个问题只针对罕见的token，对于常见的token，其邻居是合理的</p>
+
+
+                                </details>
+
+                                <span class="research_question">?</span>
+                                你将如何更改BPE的分词过程，以支持同一单词的不同分割?
+                                <br>
+                                <details>
+                                    <summary class="research_summary">
+                                        可能的解答
+                                    </summary>
+                                    <br>
+
+                                    <h2>BPE-Dropout:从合并表中删除一些合并</h2>
+                                    <p>让我们考虑一下<b>BPE-dropout</b>: ACL 2020论文<a
+                                            href="https://www.aclweb.org/anthology/2020.acl-main.170.pdf"
+                                            target="_blank">
+                                            BPE-Dropout: Simple and Effective Subword Regularization</a>提出的方法。
+                                    </p>
+                                    <p>
+                                        这个想法非常简单：如果BPE是确定的，这因为我们总是选择概率最高的合并，那么我们需要做的就是（有时）选择其他的合并。为此，作者从BPE合并表中随机删除了一些合并（例如，所有合并的10%）。在这种情况下，最高的合并有时会从表中删除，我们将不得不选择另一个，分割将会不同。
+                                    </p>
+
+                                    <p>
+                                        下面展示了与token无关的算法和分割示例。红色下划线表示在每个步骤中删除的合并。注意，要删除的合并在每一步都会再次被选择
+                                    </p>
+                                    <img width=90% src="../resources/lectures/seq2seq/research/bpe_dropout_alg-min.png"
+                                        alt="" style="margin:20px;" class="center" />
+                                    <p>
+                                        在本文中，有大量的实验表明使用BPE-dropout提高了质量，并分析了发生这种情况的原因。在前面的问题中，当研究嵌入空间中最近邻时，您已经看到了这种分析的部分内容。
+                                    </p>
+                                </details>
+                            </div>
+                        </div>
+
+                        <!--##################################################-->
+                    </div>
+                    <div class="research_circle" style="float:left;"></div>
+                    <!--##################################################-->
+                    <!--##################################################-->
+                    <!--##################################################-->
+
+                    <br><br>
+
+                    <div style="border: 0px solid #ccc;border-radius:15px;margin: 10px; padding: 4px;
+ background-color: #f5f5f5;margin-top:-20px;">
+                        <div style="display: grid; grid-template-columns: 75% 25%; margin:10px;">
+                            <div>
+                                <div style="margin-top:20px;">
+                                    <p style="margin:30px; font-size:30px;">这里会有更多的练习!</p>
+
+                                    <p style="margin:30px;">这部分将会逐步更新。</p>
+                                </div>
+                            </div>
+                            <div>
+
+                                <center>
+                                    <img src="../resources/lectures/main/preview/pusheen_draws_on_white-min.png"
+                                        style="width:80%; padding-top:20px; padding-bottom:20px;border-radius:50%">
+                                </center>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <br><br>
+
+                </div>
+
+
+                <br><br><br>
+
+                <div id="related_papers">
+                    <img height="40" src="../resources/lectures/ico/book_empty.png"
+                        style="float:left; padding-right:10px; margin-top:-20px;" />
+                    <h1 style="margin-left:10px; margin-right:20px; float: left; margin-top:-20px">相关论文</h1>
+                    <hr color="#facae9" style="height:5px">
+
+                    <br><br>
+
+                    <fieldset style="border: 1px solid #dec8d6;
+    border-radius: 5px;">
+                        <legend>
+                            <p class="data_text"><strong>How to</strong></p>
+                        </legend>
+                        <ul class="data_text">
+                            <li><u>概览速读</u>: 在简要总结中看一看关键结果—了解该领域的情况。
+
+                            </li>
+                            <li><u>更深入一些</u>: 对于你更感兴趣的主题，阅读包含图示和解释更长的摘要，浏览作者的推理步骤和关键观察结果。
+                            </li>
+                            <li><u>深度阅读</u>: 阅读你喜欢的论文。现在，当你理解了主要的想法，这会更容易！
+                            </li>
+                        </ul>
+                    </fieldset>
+
+                    <br><br>
+
+                    <br><br>
+
+
+                    <div style="border: 0px solid #ccc;border-radius:15px;margin: 10px; padding: 4px;
+ background-color: #f5f5f5;margin-top:-20px;">
+                        <div style="display: grid; grid-template-columns: 75% 25%; margin:10px;">
+                            <div>
+                                <div style="margin-top:20px;">
+                                    <p style="margin:30px; font-size:30px;">这里将会有更多论文！</p>
+
+                                    <p style="margin:30px;">论文将会逐渐出现。</p>
+                                </div>
+                            </div>
+                            <div>
+                                <center>
+                                    <img src="../resources/lectures/main/preview/pusheen_reads_on_white-min.png"
+                                        style="width:80%; padding-top:20px; padding-bottom:20px;border-radius:50%">
+                                </center>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <br><br><br>
+            <div id="have_fun">
+                <img height="40" src="../resources/lectures/ico/fun_empty.png"
+                    style="float:left; padding-right:10px; margin-top:-20px;" />
+                <h1 style="margin-left:10px; margin-right:20px; float: left; margin-top:-20px">Have Fun！</h1>
+                <hr color="#c8edfa" style="height:5px">
+                <br><br>
+
+
+                <div style="border: 0px solid #ccc;border-radius:15px;margin: 10px; padding: 4px;
+ background-color: #f5f5f5;margin-top:-20px;">
+                    <div style="display: grid; grid-template-columns: 75% 25%; margin:10px;">
+                        <div>
+                            <div style="margin-top:20px;">
+                                <p style="margin:30px; font-size:30px;">马上更新！</p>
+
+                                <p style="margin:30px;">我们正在编写这部分。</p>
+                            </div>
+                        </div>
+                        <div>
+                            <center>
+                                <img src="../resources/lectures/main/preview/typing.gif"
+                                    style="width:80%; padding-top:20px; padding-bottom:20px;border-radius:50%">
+                            </center>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+
+    </div>
+
+    <footer class="site-footer">
+        <div class="wrapper">
+
+            <div class="footer-col-wrapper">
+                <div class="footer-col">
+                    <p class="text" align="right">&copy; Copyright <font color="#4869df"><strong><a
+                                    href="https://lena-voita.github.io/" target="_blank">Lena Voita</a></strong></font>.
+                        Translated by <font color="#4869df"><strong>MLNLP</strong></font>. All Rights Reserved
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </footer>
+
+
+</body>
+
+</html>

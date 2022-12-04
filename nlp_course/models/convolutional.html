@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>针对文本的卷积神经网络</title>
+    <meta name="description"
+        content="Convolutional Neural Networks from building blocks to applications for specific tasks.">
+
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="canonical" href="http://lena-voita.github.io/nlp_course/models/convolutional.html">
+
+    <!-- diff from head.html begin -->
+    <link rel="mask-icon" href="../../resources/lectures/ico/course_logo.png">
+    <link rel="alternate icon" class="js-site-favicon" type="image/png"
+        href="../../resources/lectures/ico/course_logo.png">
+    <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="../../resources/lectures/ico/course_logo.png">
+    <!-- diff from head.html end -->
+
+    <!--<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>-->
+
+
+</head>
+
+
+<!--style>
+p {
+  text-align: justify;
+}
+</style-->
+
+<body>
+
+    <header class="site-header">
+
+        <div class="wrapper">
+
+            <div id="title-image" style="display:inline">
+                <img class="site-img" src="../../img/ico/logo.jpeg" />
+            </div>
+
+            <div id="title-texts" style="display:inline">
+                <a class="site-title" href="https://github.com/MLNLP-World" target="_blank">MLNLP</a>
+            </div>
+
+            <nav class="site-nav">
+                <a href="#" class="menu-icon">
+                    <svg viewBox="0 0 18 15">
+                        <path fill="#424242"
+                            d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z" />
+                        <path fill="#424242"
+                            d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z" />
+                        <path fill="#424242"
+                            d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z" />
+                    </svg>
+                </a>
+
+                <div class="trigger">
+                    <a class="page-link" href="https://lena-voita.github.io/" target="_blank">原作者：Lena Voita</a>
+                    <a class="page-link" href="https://lena-voita.github.io/nlp_course/models/convolutional.html"
+                        target="_blank">原始英文版本</a>
+                    <a class="page-link" href="../../about.html" target="_blank">关于我们</a>
+                </div>
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <!-- the next two lines are inserted once per page even if there are several shtukovinas,
+ the rest is one-per-shtukovina; read more: https://flickity.metafizzy.co/options.html -->
+    <link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css" media="screen">
+    <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
+
+    <!-- MathJax -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <style>
+        .demo_sidebar {
+            margin: 0;
+            padding: 0;
+            background-color: white;
+
+            position: relative;
+            height: auto;
+            width: 290px;
+        }
+
+        .demo_sidebar_text {
+            font-size: 18px;
+        }
+
+        .demo_sidebar_comment {
+            font-size: 15px;
+            margin-left: 10px;
+            font-family: "Comic Neue", "Arial";
+
+        }
+
+
+        .demo_sidebar a {
+            display: block;
+            color: black;
+            padding: 8px;
+            text-decoration: none;
+
+        }
+
+        .demo_sidebar a li {
+            margin-left: 5px;
+            padding: 0px;
+        }
+
+
+        .demo_sidebar a:hover {
+            box-shadow: 0 3px 6px #6e8f27, 0 1px 1px #6e8f27;
+        }
+
+        .demo_sidebar a:hover:not(.active) {
+            background-color: #f3f3f3;
+        }
+
+        .demo_sidebar .main_components {
+            background-color: #f3f3f3;
+        }
+
+        .demo_sidebar .extra_components {
+            background-color: #eaeaea;
+        }
+
+
+        #demo_sidebar_research_thinking:hover {
+            box-shadow: 0 3px 6px #a68305, 0 1px 1px #a68305;
+
+        }
+
+
+        #demo_sidebar_related_papers:hover {
+            box-shadow: 0 3px 6px #8a4972, 0 1px 1px #8a4972;
+        }
+
+
+        #demo_sidebar_fun:hover {
+            box-shadow: 0 3px 6px #377b94, 0 1px 1px #377b94;
+        }
+    </style>
+
+
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Josefin+Sans&display=swap');
+        @import url("https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap");
+        @import url("https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap");
+
+
+        #main_page_content {
+            margin-left: 300px;
+            padding: 30px;
+            padding-left: 70px;
+            text-align: justify;
+        }
+
+        .sidebar {
+            margin: 0;
+            padding: 0;
+            width: 270px;
+            background-color: #fafafa;
+            position: fixed;
+            height: 100%;
+            overflow: auto;
+            z-index: 1;
+        }
+
+        .sidebar a,
+        .dropdown-btn {
+            display: block;
+            color: black;
+            padding: 8px;
+            text-decoration: none;
+            border-right: 5px solid #b7db67;
+        }
+
+
+        .sidebar a li {
+            margin-left: 10px;
+            padding: 0px;
+        }
+
+        .dropdown-container {
+            display: none;
+            background-color: #f4f4f4;
+        }
+
+        .active_caret .fa-caret-down {
+            color: #b7db67;
+            font-size: 30px;
+        }
+
+        .fa-caret-down {
+            float: right;
+            padding-right: 8px;
+        }
+
+        .sidebar a.active {
+            background-color: #e3e3e3;
+            color: black;
+        }
+
+        .sidebar a:hover {
+            box-shadow: 0 3px 6px #6e8f27, 0 1px 1px #6e8f27;
+        }
+
+        .sidebar a:hover:not(.active) {
+            background-color: #f3f3f3;
+        }
+
+        .sidebar .extra_components {
+            background-color: #eaeaea;
+        }
+
+        #sidebar_analysis {
+            padding: 10px;
+        }
+
+        #sidebar_research_thinking {
+            padding: 10px;
+            border-right: 5px solid #fad400;
+        }
+
+        #sidebar_research_thinking:hover {
+            box-shadow: 0 3px 6px #a68305, 0 1px 1px #a68305;
+
+        }
+
+
+        #sidebar_related_papers {
+            padding: 10px;
+            border-right: 5px solid #d192ba;
+        }
+
+        #sidebar_related_papers:hover {
+            box-shadow: 0 3px 6px #8a4972, 0 1px 1px #8a4972;
+        }
+
+
+        #sidebar_fun {
+            padding: 10px;
+            border-right: 5px solid #6fb7d1;
+        }
+
+        #sidebar_fun:hover {
+            box-shadow: 0 3px 6px #377b94, 0 1px 1px #377b94;
+        }
+
+
+        .sidebar_ico {
+            float: right;
+            height: 20;
+        }
+
+        div.content {
+            margin-left: 200px;
+            padding: 1px 16px;
+            height: 1000px;
+        }
+
+        #sidebar_small {
+            width: 60px;
+        }
+
+
+        @media screen and (max-width: 1000px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            #main_page_content {
+                margin-left: 200px;
+                padding-left: 50px;
+            }
+
+            #for_you_in_sidebar {
+                display: none;
+            }
+
+        }
+
+
+        @media screen and (max-width: 800px) {
+
+            div.content {
+                margin-left: 0;
+            }
+
+            #main_page_content {
+                margin-left: 80px;
+                padding: 15px;
+            }
+
+            #demo_sidebar {}
+        }
+
+
+        .softmax_tau_bokeh {
+            font-size: 16px;
+        }
+
+
+        .card_with_ico {
+            position: relative;
+            padding: 10px;
+            margin: 10px;
+        }
+
+        .card_with_ico p {
+            padding: 10px;
+        }
+
+        .card_with_ico ul {
+            padding: 10px;
+        }
+
+        .card_with_ico .text_box_green {
+            border: 1px solid #d8e8b5;
+            border-radius: 5px;
+            margin-left: 30px;
+        }
+
+        .card_with_ico .text_box_pink {
+            border: 1px solid #dec8d6;
+            border-radius: 5px;
+            margin-left: 30px;
+        }
+
+        .card_with_ico .text_box_yellow {
+            border: 1px solid #f0e4a5;
+            border-radius: 5px;
+            margin-left: 30px;
+        }
+
+        .card_with_ico .ico {
+            float: left;
+            width: 25px;
+        }
+
+
+        .text_box_green {
+            border: 1px solid #d8e8b5;
+            border-radius: 5px;
+            display: table;
+            margin-left: 20px;
+        }
+
+        .text_box_green p {
+            padding: 10px;
+            padding-bottom: 0px;
+        }
+
+
+        .green_left_thought {
+            border-left: 5px solid #b7db67;
+            margin: 10px;
+            margin-left: 20px;
+            padding: 0px;
+            background-color: #fafcf5;
+        }
+
+        .green_left_thought p {
+
+            margin-left: 10px;
+            padding: 5px;
+        }
+
+
+        .box_green_left {
+            border-left: 2px solid #79a123;
+            margin-left: 10px;
+            padding: 10px;
+        }
+
+        .box_green_right {
+            border-right: 2px solid #79a123;
+            margin-right: 10px;
+            padding: 10px;
+        }
+
+        .box_violet_right {
+            border-right: 2px solid #67468f;
+            margin-right: 10px;
+            padding: 10px;
+        }
+
+        .box_pink_left {
+            border-left: 2px solid #7a3160;
+            margin-left: 5px;
+            padding: 10px;
+        }
+
+        .box_yellow_left {
+            border-left: 2px solid #d6b000;
+            margin-left: 5px;
+            padding: 10px;
+        }
+
+        .box_blue_left {
+            border-left: 2px solid #0278a1;
+            margin-left: 5px;
+            padding: 10px;
+        }
+
+        .paper_title {
+            text-align: center;
+            padding: 5px;
+            padding-top: 0px;
+            font-size: 16px;
+
+        }
+
+        .paper_authors {
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        p {
+            text-align: justify;
+        }
+
+
+        .greenCard {
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 1px;
+            margin: 10px 5px;
+            padding: 3px;
+            display: grid;
+            grid-template-rows: auto auto;
+        }
+
+        #thumbnail_green {
+            box-shadow: 0 2px 4px #6e8f27, 0 1px 1px #6e8f27;
+        }
+
+        #thumbnail_green:hover {
+            box-shadow: 0 6px 12px #6e8f27, 0 4px 4px #6e8f27;
+        }
+
+        #thumbnail_violet {
+            box-shadow: 0 2px 4px #655578, 0 1px 1px #655578;
+        }
+
+        #thumbnail_violet:hover {
+            box-shadow: 0 6px 12px #655578, 0 4px 4px #655578;
+        }
+
+        #thumbnail_paper {
+            box-shadow: 0 2px 4px #ab859e, 0 1px 1px #ab859e;
+        }
+
+        #thumbnail_paper:hover {
+            box-shadow: 0 6px 12px #ab859e, 0 4px 4px #ab859e;
+        }
+
+
+        #thumbnail_blue {
+            box-shadow: 0 2px 4px #377b94, 0 1px 1px;
+        }
+
+        #thumbnail_blue:hover {
+            box-shadow: 0 6px 12px #377b94, 0 4px 4px #377b94;
+        }
+
+        .paperCard {
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 1px;
+            margin: 10px 5px;
+            padding: 3px;
+            display: grid;
+            grid-template-rows: auto auto;
+        }
+
+        .paperIntro {
+            display: grid;
+            grid-template-columns: 70% 30%;
+        }
+
+        .showMePaper {
+            box-shadow: 0 2px 4px #a68305, 0 2px 1px #a68305;
+        }
+
+        .showMePaper:hover {
+            box-shadow: 0 3px 6px #ab859e, 0 4px 4px #ab859e;
+        }
+
+
+        .cardContent {
+            padding: 10px;
+        }
+
+        .center {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .conf_name {
+            float: right;
+            font-family: sans-serif;
+            font-size: 13px;
+            margin-bottom: 0px;
+            background-color: #f7edf4;
+            border: 1px solid #d1a1c3;
+            border-radius: 1px;
+            padding: 0px 4px 0px 4px;
+        }
+
+
+        .paper_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #cf99be;
+            border: 1px solid #8c2b6e;
+            border-radius: 50%;
+        }
+
+        .research_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #ffda00;
+            border: 1px solid #998300;
+            border-radius: 50%;
+        }
+
+        .fun_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #68c7e8;
+            border: 1px solid #0278a1;
+            border-radius: 50%;
+        }
+
+        .green_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #b7db67;
+            border: 1px solid #598005;
+            border-radius: 50%;
+        }
+
+        .violet_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #b59fcf;
+            border: 1px solid #67468f;
+            border-radius: 50%;
+        }
+
+        .data_text {
+            font-family: "Comic Neue", "Arial";
+        }
+
+
+        .researchCard {
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 1px;
+            margin: 10px 5px;
+            padding: 3px;
+            display: grid;
+            grid-template-rows: auto auto;
+        }
+
+        .researchIntro {
+            display: grid;
+            grid-template-columns: 70% 30%;
+        }
+
+        #thumbnail_research {
+            box-shadow: 0 2px 4px #a68305, 0 1px 1px #a68305;
+        }
+
+        #thumbnail_research:hover {
+            box-shadow: 0 6px 12px #a68305, 0 4px 4px #a68305;
+        }
+
+        .research_title {
+            text-align: center;
+            padding: 5px;
+            font-size: 18px;
+            font-family: "Comic Neue", "Arial";
+            background-color: #fafaf5;
+
+
+        }
+
+        .research_tag {
+            float: right;
+            font-family: sans-serif;
+            font-size: 13px;
+            margin-bottom: 0px;
+            background-color: #f5f0d5;
+            border: 1px solid #fad400;
+            border-radius: 1px;
+            padding: 0px 4px 0px 4px;
+        }
+
+        .research_question {
+            font-weight: bold;
+            font-size: 18px;
+            background-color: #fff4b3;
+            margin-right: 15px;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
+        .research_summary {
+            padding: 5px;
+            font-size: 18px;
+            font-family: "Comic Neue", "Arial";
+            background-color: #fafaf5;
+            margin-left: 10px;
+        }
+
+
+        .text_table td,
+        .text_table th {
+            text-align: center;
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-top: 2px;
+            padding-bottom: 2px;
+        }
+    </style>
+
+    <!--##################################################-->
+
+    <div>
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar_components">
+                <a href="javascript:void(0)" id="close_sidebar_btn" onclick="closeNav()"
+                    style="text-align:center;font-size:30px;padding:0px;">⇤</a>
+                <a class="active" href="../../nlp_course.html" style="font-weight: bold;">
+                    <img height="18" class='sidebar_ico' src="../../resources/lectures/ico/course_logo.png"
+                        style="margin-right: 8px;margin-left: 8px;margin-top: 4px;" />
+                    NLP Course <font color="#92bf32" id="for_you_in_sidebar">| 专属定制</font></a>
+                <a href="#main_content" style="font-weight: bold;">卷积网络</a>
+                <a href="#intro">直觉</a>
+                <a href="#typical_model">一个典型的模型</a>
+
+
+                <div class="dropdown-scope">
+                    <a class="dropdown-btn active_caret">模型构件
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                    <div class="dropdown-container" style="display:block;">
+                        <a href="#blocks_convolution"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                            卷积</a>
+                        <a href="#blocks_pooling"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                            池化</a>
+                        <a href="#blocks_residual"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                            残差连接</a>
+                    </div>
+                </div>
+
+
+                <div class="dropdown-scope">
+                    <a class="dropdown-btn active_caret">特定任务
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                    <div class="dropdown-container" style="display:block;">
+                        <a href="#text_classification"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                            文本分类</a>
+                        <a href="#language_modeling"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                            语言模型</a>
+                    </div>
+                </div>
+
+
+                <a href="#analysis_interpretability" id="sidebar_analysis">分析与解释
+                    <img height="25" src="../../resources/lectures/ico/analysis_empty.png" class="sidebar_ico" /></a>
+
+            </div>
+        </div>
+
+
+        <div class="sidebar" id="sidebar_small">
+
+            <a class="active" onclick="openNav()" style="text-align:center;">☰</a>
+            <a href="../nlp_course.html" style="font-weight: bold;">
+                <img height="20" src="../../resources/lectures/ico/course_logo.png"
+                    style="margin-right: 8px;margin-left: 8px;" /></a>
+            <a href="#main_page_content" style="text-align:center; font-size:20px;color:#7ca81e"> <i
+                    class="fa fa-home"></i></a>
+
+            <a href="#analysis_interpretability" id="sidebar_analysis"> <img height="25"
+                    src="../../resources/lectures/ico/analysis_empty.png" /></a>
+
+        </div>
+
+
+        <script>
+            function openNav() {
+                document.getElementById("sidebar").style.display = "block";
+                document.getElementById("sidebar_small").style.display = "none";
+                document.getElementById("close_sidebar_btn").style.display = "block";
+            }
+
+            function closeNav() {
+                document.getElementById("sidebar").style.display = "none";
+                document.getElementById("sidebar_small").style.display = "block";
+                document.getElementById("close_sidebar_btn").style.display = "none";
+            }
+
+        </script>
+
+
+        <script>
+            function onResize() {
+                if (window.innerWidth >= 800) {
+                    document.getElementById("sidebar").style.display = "block";
+                    document.getElementById("sidebar_small").style.display = "none";
+                    document.getElementById("close_sidebar_btn").style.display = "none";
+                } else {
+                    document.getElementById("sidebar").style.display = "none";
+                    document.getElementById("sidebar_small").style.display = "block";
+
+                }
+            }
+
+            window.onresize = onResize;
+            onResize();
+        </script>
+
+        <script>
+            /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
+            var dropdown = document.getElementsByClassName("dropdown-btn");
+            var i;
+
+            for (i = 0; i < dropdown.length; i++) {
+                dropdown[i].addEventListener("click", function (event) {
+                    this.classList.toggle("active_caret");
+                    var dropdownButton = event.target || event.srcElement;
+                    while (dropdownButton.className != "dropdown-scope")
+                        dropdownButton = dropdownButton.parentElement;
+                    var dropdownContent = dropdownButton.getElementsByClassName("dropdown-container")[0];
+
+                    if (dropdownContent.style.display === "block") {
+                        dropdownContent.style.display = "none";
+                    } else {
+                        dropdownContent.style.display = "block";
+                    }
+                });
+            }
+        </script>
+
+
+        <div class="wrapper" id="main_page_content">
+            <div class="header">
+                <h1>针对文本的卷积神经网络 <a
+                        href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=Analysis%20and%20Interpretability-,Convolutional%20Neural%20Networks%20for%20Text,-This%20is%20the"
+                        style="font-size:9px;" target="_blank">(英文原文)</a></h1>
+            </div>
+
+
+            <div class="main_content" id="main_content">
+
+                <p class="data_text">
+                    <font color="black">
+                        译者：<a href="https://sites.google.com/view/yongfei-liu" target="_blank">刘永飞</a> 校对：<a
+                            href="https://edwardzh.github.io/" target=" _blank">刘正浩</a>
+                    </font>
+                </p>
+
+                <div id="intro">
+                    <p class="data_text">
+                        <font color="black">
+                            本文是对<a href="">卷积模型的补充介绍</a>。其中包含了对通用卷积模型的详细描述，同时也包括对特定任务的卷积模型的配置介绍。
+                            大部分内容是从相应的课程里面复制过来的。为了方便阅读，本文将它们收集到一起。更多的的内容请参见: <a
+                                href="#parameters">参数：卷积核大小，步长，填充，偏置量</a> 和 <a href="#k_max_pooling">K-最大池化</a>.
+                        </font>
+                    </p>
+
+                    <h2>图像中的卷积与平移不变性 <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=Convolutions%20for%20Images%20and%20Translation%20Invariance"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+                    <p>卷积网络最初是为计算机视觉任务设计的。因此，让我们首先来了解图像卷积模型背后的直观原理。</p>
+                    <p>
+                        想象一下，我们想要把一张图片分为几个类别，例如猫、狗、飞机等。在这种情况下，如果你想在图像上找到一只猫，你<b>并不关心</b>这只猫位于图像的什么位置，你核心关心猫是否在图像中。
+                    </p>
+
+                    <center>
+                        <img src="../../resources/lectures/models/cnn/translation_cats-min.png"
+                            style="max-width:100%; margin-bottom:20px;" />
+                    </center>
+                    <p>
+                    </p>
+
+                    <div style="display:grid;grid-template-columns: 75% 25%;">
+
+                        <div>
+                            <p>
+                                卷积网络对图像的每个局部区域都采用同样的操作来提取特征。每个操作都是在寻找图像中与给定模式相匹配的特征，卷积网络会自动学习哪些模式特征是有用的。
+                                随着卷积网络层数的增加，学习到的模式特征会变得越来越复杂：从浅层的线条特征到深层的非常复杂的模式特征（例如，整个猫或狗)。更多内容，你可以阅读<a
+                                    href="#analysis_interpretability">分析与解释</a>部分中的例子。
+
+                            </p>
+                            <p>
+                                这种卷积网络的属性被称为<b>平移不变性</b>: <b>平移</b>是因为我们考虑空间上移动，<b>不变性</b>是我们希望特征不会随着空间的改变而改变。
+                            </p>
+                        </div>
+                        <div>
+                            <p style="text-align: center; float: right; display: block; margin-left:25px;
+                   margin-top:-10px; line-height:15px;">
+                                <video width="100%" height="auto" loop autoplay muted style="margin-left: 20px;">
+                                    <source src="../../resources/lectures/models/cnn/cnn_with_cat.mp4" type="video/mp4">
+                                </video>
+                                <br />
+                                <span style="font-size: small;">The illustration is adapted from the one taken from
+                                    <a href="https://github.com/vdumoulin/conv_arithmetic" target="_blank">this cool
+                                        repo</a>.</span>
+                            </p>
+                        </div>
+                    </div>
+
+
+                    <h2>文本中的卷积 <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=cool%20repo.-,Convolutions%20for%20Text,-Well%2C%20for%20images"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+
+                    <p>
+                        对于图像来说卷积网络很容易理解，例如，我们希望能够移动一只猫，因为我们并不关心猫在哪里。但是，<b>对于文本呢？</b>乍一看，这并不简单：我们不能轻易地移动短语---因为短语的意思会改变，或者我们会得到一些没有什么意义的文本或者短语。
+                    </p>
+
+                    <p>
+                        然而，在一些应用中，我们可以想到与卷积模型同样的直觉。让我们想象一下，当我们对文本进行分类，判断该文本是否是积极或者消极的情绪，而不是像分类图像中的猫/狗的时候。
+                        那么，有一些词和短语可能是非常有信息量的 "线索"（例如，<font class="data_text"><strong>它是伟大的</strong></font>，<font
+                            class="data_text"><strong>无聊到死的</strong></font>，<font class="data_text">
+                            <strong>绝对惊人的</strong>
+                        </font>，<font class="data_text"><strong>有史以来最好的</strong></font>，等等)，
+                        剩下的还有一些词语根本一点都不重要。我们并不太关心在文章的什么地方看到<font class="data_text"><strong>“无聊到死”</strong></font>
+                        的内容来理解其情感，对吗？
+                    </p>
+
+                    <center>
+                        <img src="../../resources/lectures/models/cnn/translation_texts-min.png"
+                            style="max-width:100%; margin-bottom:20px;" />
+                    </center>
+
+
+                    <div id="typical_model">
+                        <h2>一个典型的模型：卷积 + 池化 模块 <a
+                                href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=A%20Typical%20Model%3A%20Convolution%2BPooling%20Blocks"
+                                style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+
+                        <p>沿着上面所述的直观原理，当我们想要检测一些模式特征，我们其实不太关心这些模式特征所在的具体位置。为了达到这样的目的，我们可以通过两层网络来实现：
+                        </p>
+                        <ul>
+                            <li>
+                                <b>卷积</b>：寻找特定模式特征的匹配 (正如我们上面所看到的猫的头部）
+                            </li>
+                            <li>
+                                <b>池化</b>：在空间上整合那些匹配（无论是在局部层面，还是全局层面）
+                            </li>
+                        </ul>
+
+                        <p>下图展示了一个针对文本的典型的卷积模型。通常，一个卷积层被应用在word
+                            embedding（单词的特征表达，词嵌入）上，紧接着就是一个非线性层（通常是ReLU）以及一个池化操作。这些是卷积模型的主要构件：对于特定的任务，配置可以不同，但这些构件是标准的。
+
+                        </p>
+
+
+                        <center>
+                            <img src="../../resources/lectures/models/cnn/typical_cnn_with_cat-min.png"
+                                style="max-width:100%; margin-bottom:20px;" />
+                        </center>
+                        <p>接下来，我们将详细地讨论这些主要构件，如<b>卷积</b>和<b>池化</b>，然后考虑模型的修改。
+
+                        </p>
+
+                        <p><u>值得注意的是</u>，针对特定任务的模型修改会在相对应的课程中有所描述。为了方便起见，我们在这里仅仅重复卷积网络在特定任务中的应用。
+
+                    </div>
+
+                </div>
+
+
+                <div id="blocks_convolution">
+                    <h1>模型构件：卷积 <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=Building%20Blocks%3A%20Convolution"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h1>
+
+
+                    <div style="display:grid;grid-template-columns: 75% 25%;">
+
+                        <div>
+                            <p>
+                                计算机视觉中的卷积是用滑动窗口的方式来处理图像，并对每个窗口应用相同的操作，即：<b>卷积滤波器</b>
+                                。一个卷积层通常有好几个滤波器，不同的滤波器检测不同的模式特征（下面会详细介绍）。
+                            </p>
+
+                            <p>
+                                右图（来自一个GitHub仓库：<a href="https://github.com/vdumoulin/conv_arithmetic"
+                                    target="_blank">链接</a>）显示了一个滤波器的运行过程：底部是输入图像，顶部是滤波器的输出。由于图像有两个维度（宽度和高度），所以卷积是<b>二维操作</b>。
+                            </p>
+                        </div>
+                        <div>
+                            <p style="text-align: center; float: right; display: block; margin-left:25px;
+         margin-top:-10px; line-height:15px;">
+                                <img src="../../resources/lectures/models/cnn/same_padding_no_strides.gif" /><br />
+                                <span style="font-size: small;">Convolution filter for images. The illustration is from
+                                    <a href="https://github.com/vdumoulin/conv_arithmetic" target="_blank">this cool
+                                        repo</a>.</span>
+                            </p>
+                        </div>
+                    </div>
+
+
+                    <div style="display:grid;grid-template-columns: 50% 50%;">
+                        <div>
+                            <p>与图像不同的是，文本只有一个维度。因此，如图所示，针对文本的卷积操作是<b>一维操作</b>。
+                            </p>
+
+                        </div>
+                        <div>
+                            <video width="90%" height="auto" loop autoplay muted style="margin-left: 20px;float:right;">
+                                <source src="../../resources/lectures/models/cnn/cnn_filter_reads_text.mp4"
+                                    type="video/mp4">
+                            </video>
+                            <p style="font-size:14px;text-align:center;margin-top:-20px;">Convolution filter for text.
+                            </p>
+                            </p>
+
+                        </div>
+                    </div>
+
+
+                    <h2>卷积是应用在每个窗口上的线性操作 <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=Convolution%20is%20a%20Linear%20Operation%20Applied%20to%20Each%20Window"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h2>
+                    <img src="../../resources/lectures/models/cnn/convolution_linear_layer-min.png"
+                        style="max-width:100%; margin-bottom:20px;" />
+                    <p>一个卷积是一个线性层（后面紧接着非线性操作），它可以被应用在每一个输入窗口内部。我们有如下形式化定义：
+
+                    </p>
+                    <ul>
+                        <li>\((x_1, \dots, x_n)\) ： 输入单词的特征表达， \(x_i\in \mathbb{R}^d\)；</li>
+                        <li>\(d\) (<b>输入通道数</b>) ： 单词特征表达的维度；</li>
+                        <li>\(k\) (<b>卷积核大小</b>) ： 一个卷积的窗口长度 （如图所示，\(k=3\));
+                        </li>
+                        <li>\(m\) (<b>输出通道数</b>) ： 卷积滤波器的个数（由卷积产生的通道数）。
+                        </li>
+                    </ul>
+                    <p>
+                        一个卷积是一个线性层 \(W\in\mathbb{R}^{(k\cdot d)\times m}\)。对于一个\(k\)大小窗口\((x_i, \dots
+                        x_{i+k-1})\)，卷积层把这些拼接到一起的特征向量作为输入：
+                        \[u_i = [x_i, \dots x_{i+k-1}]\in\mathbb{R}^{k\cdot d}\]
+                        然后与卷积层里面的参数进行矩阵相乘：
+                        \[F_i = u_i \times W.\]
+                        卷积是用一个滑动窗口来遍历处理所有输入，并对每个窗口进行相同的线性转换。
+                    </p>
+
+
+                    <h2 id="parameters">参数：卷积核大小，步长，填充，偏置量 <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=to%20each%20window.-,Parameters%3A%20Kernel%20size%2C%20Stride%2C%20Padding%2C%20Bias,-%E2%80%A2%20Kernel%20size"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h2>
+
+                    <h3><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        <b>卷积核</b>大小：看的有多远 <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=Kernel%20size%3A%20How%20far%20to%20look"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h3>
+                    <p>卷积核大小决定了卷积层在每一步观测到的输入元素的个数。对于文本而言，这个值一般在2-5之间。
+                    </p>
+
+                    <center>
+                        <img src="../../resources/lectures/models/cnn/kernel_size-min.png"
+                            style="max-width:80%; margin-bottom:20px;" />
+                    </center>
+
+                    <h3><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        <b>步长</b>：滤波器在每一步移动多远 <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=%E2%80%A2-,Stride,-%3A%20How%20much%20move"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h3>
+                    <p>步长决定了滤波器在每一步中移动的距离。举例来说，步长为1的情况下意味着我们移动滤波器一个输入元素的距离（图像上这个元素是像素，文本里这个元素意味着词语）。
+                    </p>
+
+                    <center>
+                        <img src="../../resources/lectures/models/cnn/stride-min.png"
+                            style="max-width:80%; margin-bottom:20px;" />
+                    </center>
+
+                    <h3><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        <b>填充</b>：在输入元素两端填充全零的特征向量 <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=%E2%80%A2-,Padding,-%3A%20Add%20zero%20vectors"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h3>
+                    <p>填充意味着在输入两端添加全零的特征向量。如果你使用步长大于1，你有可能会需要填充这个操作。</p>
+                    <center>
+                        <img src="../../resources/lectures/models/cnn/padding-min.png"
+                            style="max-width:80%; margin-bottom:20px;" />
+                    </center>
+
+                    <h3><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        <b>偏置</b>：卷积中线性运算的偏置项 <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=%E2%80%A2-,Bias,-%3A%20The%20bias%20term"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h3>
+                    <p>默认情况下，没有偏置，只有矩阵的乘法。
+                    </p>
+
+                    <center>
+                        <img src="../../resources/lectures/models/cnn/bias-min.png"
+                            style="max-width:80%; margin-bottom:20px;" />
+                    </center>
+
+
+                    <h2>
+                        <b>直观原理</b>：每个滤波器提取一个特征 <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=by%20a%20matrix.-,Intuition,-%3A%20Each%20Filter"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h2>
+                    <p>直观地说，卷积中的每个滤波器都提取了一个特征。</p>
+                    <img src="../../resources/lectures/models/cnn/one_filter-min.png"
+                        style="max-width:50%; margin-left:20px; float:right;" />
+                    <h3><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        <b>一个滤波器</b>是一个特征提取器 <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=%E2%80%A2-,One%20filter,-%2D%20one%20feature%20extractor"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h3>
+                    <p>
+                        滤波器将当前窗口中的矢量表征线性地转换为一个单一特征。形式上，对于一个窗口\(u_i = [x_i, \dots x_{i+k-1}]\in\mathbb{R}^{k\cdot
+                        d}\)，滤波器\(f\in\mathbb{R}^{k\cdot d}\)计算点积:
+                        \[F_i^{(f)} = (f, u_i).\]
+                        \(F_i^{(f)}\)是提取的特征，它是由滤波器\(f\)应用到窗口 \((x_i, \dots x_{i+k-1})\)上的结果。
+                    </p>
+
+                    <br><br>
+                    <h3><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        <b>m个滤波器</b>：m个特征提取器 <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=%E2%80%A2-,m%20filters,-%3A%20m%20feature%20extractors"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h3>
+
+                    <div style="display:grid;grid-template-columns: 45% 55%;">
+                        <div>
+                            <img src="../../resources/lectures/models/cnn/several_filters_read.gif"
+                                style="max-width:90%; margin-right:20px; margin-bottom: 20px; float:left;" />
+
+                            <p>
+                                一个滤波器提取一个单一的特征。通常情况下，由于我们想要许多特征，因此我们必须利用多个滤波器抽取特征。如图所示，每个滤波器读取一遍输入文本并提取一个对应的特征。滤波器的数量就是你想得到的输出特征的数量。有了m个滤波器，我们上面讨论的卷积层参数的大小将变成
+                                \((k\cdot d)\times m\)。
+
+                            </p>
+                        </div>
+                        <div>
+                            <img src="../../resources/lectures/models/cnn/several_filters-min.png"
+                                style="max-width:90%; margin-left:20px; float:right;" />
+
+                        </div>
+                    </div>
+                    <br>
+                    <p>
+                        值得注意的是，以上操作都是可以并行的：当我展示一个CNN处理文本的时候，实际上这些计算都可以并行完成。
+                    </p>
+
+                </div>
+
+                <div id="blocks_pooling">
+                    <h1>模型构件：池化 <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=Building%20Blocks%3A%20Pooling"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h1>
+
+                    <p>
+                        卷积操作提取了每个窗口的\(m\)个特征后，<b>池化层</b>“总结”了某些区域的特征。池化层被常常用来减少输入维度, 因此也减少了网络使用的参数数量。
+
+                    </p>
+
+
+                    <h2> 最大池化和平均池化 <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=Max%20and%20Mean%20Pooling"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+
+                    <p>
+
+                        目前卷积网络中最流行的是<b>最大值池化(max-pooling)</b>, 即在每个维度上取最大值，也就是取每个特征的最大值。
+
+                    </p>
+                    <img src="../../resources/lectures/models/cnn/max_pooling-min.png"
+                        style="max-width:100%; margin-bottom:20px;" />
+
+                    <p>
+                        <b>平均池化</b>: 其工作模式和最大值池化非常类似，它计算每个特征在某个维度的均值而非最大值。
+                    </p>
+
+                    <h2 id="k_max_pooling">K-最大池化（K-max Pooling) <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=instead%20of%20maximum.-,k%2Dmax%20Pooling,-k%2Dmax%20pooling"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+
+                    <img src="../../resources/lectures/models/cnn/k_max_pooling-min.png"
+                        style="max-width:60%; margin-left:20px; float:right;" />
+                    <p>
+                        <b>K-最大池化</b>
+                        是最大池化的一个拓展版本，它不是寻找一个沿着某个维度最大值特征，而是选择具有最高值的k个特征。这些特征的都会按照顺序被保留下来。
+                    </p>
+
+                    <p>如果一个网络找到某种模式的次数很重要，那么K-最大池化就很有用。
+                    </p>
+
+                    <h2> 池化与全局池化 <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=found%20some%20pattern.-,Pooling%20and%20Global%20Pooling,-Similarly%20to%20convolution"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+
+                    <p>
+                        与卷积类似是，<b>池化</b>也可以被应用于包含几个元素的窗口内。池化也有步长参数，最常见的方法是对<b>不重叠</b>的窗口使用池化。为此，你必须将步长参数设置为与池化窗口大小相同。如下图所示。
+
+                    </p>
+
+                    <center>
+                        <img src="../../resources/lectures/models/cnn/pooling_with_stride-min.png"
+                            style="max-width:70%; margin-bottom:20px;" />
+                    </center>
+
+                    <p>
+                        <b>池化</b>和<b>全局池化</b>的区别在于，池化是独立应用于每个窗口内来提取特征，
+                        而<b>全局池化</b>是在整个输入上提取特征。对于文本来说，全局池化经常被用来获得一个代表整个文本的单一向量；
+                        这种全局池化被称为<b>最大时间池化</b>，其中 "时间" 轴跨度从第一个输入词语到最后一个词语。
+                    </p>
+
+                    <center>
+                        <img src="../../resources/lectures/models/cnn/pooling_vs_global-min.png"
+                            style="max-width:90%; margin-bottom:20px;" />
+                    </center>
+                    <p>直观地说，每个特征在看到某种模式时都会激活：图像中的视觉模式（线条、纹理、猫爪等）或文本模式(例如，一个短语)。经过池化操作，我们有一个向量，说明输入中出现了哪些模式。
+
+                    </p>
+
+                    <div class="card_with_ico">
+                        <img class="ico" src="../../resources/lectures/ico/analysis_empty.png" width="30px" />
+                        <div class="text_box_green">
+                            <p class="data_text"> 更多细节请参阅<a href="#analysis_interpretability">分析与解释</a>部分.
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div id="blocks_residual">
+                    <h1>模型构件：残差连接 <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=Building%20Blocks%3A%20Residual%20Connections"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h1>
+                    <h3>简而言之: 更简单地训练深层网络！ <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=TL%3BDR%3A%20Train%20Deep%20Networks%20Easily!"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h3>
+
+                    <p>
+                        残差连接可以让深度神经网络训练变得更加容易。为了处理更长的上下文，你需要堆叠大量的网络层。不幸的是，当堆叠大量的层时，
+                        你可能会遇到在深层网络中从上到下传播梯度变得十分困难的问题。为了避免这个问题，我们可以使用<b>残差连接</b>或更复杂的变体<a
+                            href="https://arxiv.org/pdf/1505.00387.pdf" target="_blank">highway连接</a>。
+                    </p>
+                    <img src="../../resources/lectures/lang_models/neural/cnn/residual_highway-min.png"
+                        style="max-width:100%; margin-bottom:20px; " />
+                    <p>残差连接的操作十分简单: 它仅需要把一个网络模块的<b>输入输出相加</b>。通过这样的方式，梯度不仅可以隐式的通过网络模块反向传播，也可以直接通过这个相加的操作传播回去。
+
+                    </p>
+                    <p>
+                        Highway连接与残差连接具有相同的内在动机，但是其使用了门控相加的方式来将一个网络模块输入输出相加到一起，而不是简单的相加。Highway连接十分类似于LSTM中的门控，网络可以学习它可能想要从下到上传递的信息类型（对于LSTM来说，从左到右）。
+
+                    </p>
+                    <div style="display:grid;grid-template-columns: 40% 60%;">
+                        <div>
+                            <p>
+                                看一下带有残差连接的卷积网络的例子。通常情况下，我们把残差连接放在有几个卷积层的网络模块上。一个网络可以有几个这样的网络模块，具体数目根据你的任务决定。你可能需要很多层来获得一个像样的感受野。
+
+                            </p>
+                        </div>
+                        <div><img src="../../resources/lectures/models/cnn/model_with_residual-min.png"
+                                style="max-width:90%; margin-left:20px;float:right;" /></div>
+
+                    </div>
+                </div>
+
+                <br>
+
+                <div id="text_classification">
+                    <h1>特定任务：文本分类 <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=Specific%20Tasks%3A%20Text%20Classification"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h1>
+
+                    <p class="data_text">
+                        <font color="#888">
+                            本部分是<a href="../text_classification.html"
+                                target="_blank">文本分类</a>中卷积模型部分的总结。有关文本分类任务的详细描述，请参阅主课。
+                        </font>
+                    </p>
+
+                    <p>我们现在理解了卷积层和池化层是如何工作的。接下来，让我们一起来修改网络配置结构。在文本分类的例子中：</p>
+                    <div class="green_left_thought" style="font-size:18px;">
+                        <p class="data_text">
+                            我们需要一个网络模型，其能够对于<strong>不同长度</strong>的输入文本均能够产生<strong>固定大小</strong>的特征向量。
+                        </p>
+                    </div>
+
+                    <p>我们需要构建一个卷积模型，其可以将不同长度的文本表示为一个定长向量</p>
+
+
+                    <p>
+                        用于文本分类的基本卷积模型结构如图所示。请注意，在卷积之后，我们使用<b>全局时间池化</b>。
+                        这是一个关键的操作：它允许将文本压缩成一个单一的向量。模型本身可以是不同的，但是在获取到文本特征的过程中必须使用全局池化来把文本输入压缩成一个单一的向量。
+
+                    </p>
+
+
+                    <center>
+                        <img src="../../resources/lectures/text_clf/neural/cnn/model_basic-min.png"
+                            style="max-width:80%; margin-bottom:20px;" />
+                    </center>
+
+                    <h4 style="font-size:18px;"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        <font face="arial">一些带有不同大小卷积核的卷积层
+                        </font> <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=%E2%80%A2-,Several%20Convolutions%20with%20Different%20Kernel%20Sizes,-Instead%20of%20picking"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h4>
+
+                    <p>
+                        除了选择固定大小卷积核的卷积网络，你可以使用几个不同大小的卷积核的卷积层。将每个卷积应用于数据，在每个卷积之后添加非线性操作和全局池化，然后将结果连接起来（如图所示，为了简单起见，非线性操作被省略了），从而得到用于分类任务的数据的向量表示。
+                    </p>
+
+                    <center>
+                        <img src="../../resources/lectures/text_clf/neural/cnn/several_kernel_sizes-min.png"
+                            style="max-width:100%; margin-bottom:20px;" />
+                    </center>
+                    <p>
+                        该想法来自于文章 <a href="https://www.aclweb.org/anthology/D14-1181.pdf" target="_blank">
+                            Convolutional Neural Networks for Sentence Classification</a>，有很多该文章的衍生方法。
+                    </p>
+
+
+                    <h4 style="font-size:18px;"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        <font face="arial">堆叠若干个卷积层和池化层
+                        </font> <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=%E2%80%A2-,Stack%20Several%20Blocks%20Convolution%2BPooling,-Instead%20of%20one"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h4>
+
+
+                    <p>
+                        你可以把几个含有卷积层+池化层的网络模块叠加起来，而不是仅仅使用一层。在堆叠了几个卷积模块之后，你可以应用另一个卷积层配上全局池化层得到文本的向量表示。记住：我们需要对于不同长度的文本输入得到一个固定大小的特征表示，所以在这里我们需要全局池化。
+                    </p>
+                    <p>当你的文本非常长时，这种多层次的卷积就会很有效；例如，如果你的模型是建立在字符级的输入上而不是单词级的输入。
+                    </p>
+
+                    <center>
+                        <img src="../../resources/lectures/text_clf/neural/cnn/several_blocks-min.png"
+                            style="max-width:90%; margin-bottom:20px;" />
+                    </center>
+                    <p>
+                        该想法来自于文章：<a
+                            href="https://papers.nips.cc/paper/5782-character-level-convolutional-networks-for-text-classification.pdf"
+                            target="_blank">
+                            Character-level Convolutional Networks for Text Classification</a>。
+
+                    </p>
+
+
+                </div>
+
+
+                <div id="language_modeling">
+                    <h1>特定任务：语言模型 <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=Specific%20Tasks%3A%20Language%20Modeling"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h1>
+
+                    <p class="data_text">
+                        <font color="#888">
+                            本部分是<a href="../language_modeling.html"
+                                target="_blank">语言建模</a>中卷积模型部分的总结。有关语言建模任务的详细描述，请参阅主课。
+                        </font>
+                    </p>
+
+                    <p>
+                        与用于文本分类的卷积神经网络相比，语言模型有一些不同。在这里，我们将讨论CNN语言模型的一般设计原则；具体架构的详细描述可以在<a
+                            href="../language_modeling.html" target="_blank">语言模型</a>的<a
+                            href="../language_modeling.html#related_papers" target="_blank">相关论文</a>部分找到。
+                    </p>
+
+                    <img src="../../resources/lectures/lang_models/neural/cnn/cnn_main-min.png"
+                        style="max-width:100%; margin-bottom:20px; " />
+
+                    <p>在设计卷积语言模型时，需要注意以下事项:
+                    </p>
+                    <ul>
+                        <li>
+                            <b>防止来自未来词语特征的信息流</b><br>
+                            在预测词语的时候，语言模型往往从左到右依次进行预测，因此必须确保模型只使用以前词语的信息进行未来词语的预测，确保你的CNN除了这些词语之外看不到任何东西。例如，如图所示，你可以通过使用填充将词语向右移动。
+                        </li>
+                        <li>
+                            <b>不要删除位置信息</b>
+                            </font><br>
+
+                            与文本分类不同，位置信息对语言模型非常重要。因此，<b>不要使用池化</b>（在做池化时要非常注意）。
+
+                        </li>
+                        <li>
+                            <b>如果你堆积了很多层，不要忘记残差连接</b>
+                            </font><br>
+                            如果你堆叠很多层网络，可能很难高效地训练一个非常深的网络。为了避免这种情况，请使用残差连接，请看下面的细节。
+                        </li>
+                    </ul>
+
+
+                    <h3 id="receptive_field">
+                        <b>感受野</b>：随着层数增加，感受野会变的非常大 <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=Receptive%20field%3A%20with%20many%20layers%2C%20can%20be%20large"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h3>
+
+                    <img src="../../resources/lectures/lang_models/neural/cnn/receptive_field-min.png"
+                        style="max-width:45%; margin-left:20px;float:right;" />
+                    <p>当使用没有全局池化的卷积模型时，卷积模型将不可避免地有一个固定大小的上下文。这似乎是不可取的：“固定大小的上下文”正是我们不喜欢的n-gram模型的原因。
+
+                    </p>
+                    <p>
+                        然而，如果一个典型的n-gram模型上下文大小为1-4。那么卷积模型中的上下文可以相当长。请看插图：一个网络具有3个卷积层，其卷积核大小为3，其上下文是长度是7个词语。如果你堆叠很多层，你的上下文长度将会变得非常大。
+
+                    </p>
+
+                    <h3>
+                        <b>残差连接</b>：随着网络层数增加，残差连接会变得十分必要 <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=Residual%20Connections%3A%20with%20many%20layers%2C%20you%20will%20need%20them!"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h3>
+
+                    <div style="display:grid;grid-template-columns: 40% 60%;">
+                        <div>
+                            <p>如果你堆积了很多层，你可能会在训练深度网络时遇到麻烦。幸运的是，对于这一点，你可以使用残差连接来解决该问题。
+
+                            </p>
+                            <p> 看看这个带有残差连接的卷积网络的例子。通常情况下，我们把残差连接应用在含有几个卷积网络模块上。一个网络需要若干个这样的网络模块以得到一个像样的感受野。
+
+                            </p>
+                        </div>
+                        <div><img src="../../resources/lectures/lang_models/neural/cnn/cnn_with_residual-min.png"
+                                style="max-width:90%; margin-left:20px;float:right;" /></div>
+
+                    </div>
+
+
+                </div>
+
+
+                <br>
+
+                <!--
+        <div id="machine_translation">
+            <h1>Specific Tasks: Machine Translation</h1>
+
+                <br>
+
+            <div style="border: 0px solid #ccc;border-radius:15px;margin: 10px; padding: 4px;
+         background-color: #f5f5f5;margin-top:-20px;">
+
+                    <div style="display: grid; grid-template-columns: 75% 25%; margin:10px;">
+                        <div>
+                        <div style="margin-top:20px;">
+                            <p style="margin:30px;font-size:30px;">Coming soon!</p>
+
+                            <p style="margin:30px;">This part will appear when we pass the
+                                <a href="../../nlp_course.html#preview_seq2seq_attn">Seq2Seq and Attention</a> lecture of the course.</p>
+                        </div>
+                            </div>
+                        <div>
+                            <center>
+                            <img src="../../resources/lectures/main/preview/pusheen_reads_on_white-min.png"
+                               style="width:80%; padding-top:20px; padding-bottom:20px;border-radius:50%">
+                            </center>
+                        </div>
+                    </div>
+
+                </div>
+
+
+        </div>
+        -->
+
+
+                <div id="analysis_interpretability">
+                    <img height="40" src="../../resources/lectures/ico/analysis_empty.png"
+                        style="float:left; padding-right:20px; " />
+                    <h1>分析与解释 <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=decent%20receptive%20field.-,Analysis%20and%20Interpretability,-What%20do%20Convolutions"
+                            style="font-size:9px;" target="_blank">(英文原文)</a>
+                    </h1>
+
+                    <h2>卷积能学到什么？分析卷积滤波器</h2>
+                    <h3><u>Convolutions in Computer Vision: Visual Patterns</u></h3>
+                    <p>
+                        卷积最初是为图像而开发的，当前对于滤波器捕捉的内容以及不同层的过滤器如何以一个层次化结构捕捉图像中的特征已经有了很好的理解。网络中低层捕捉简单的视觉特征，如线条或圆圈，而最终层可以捕捉整个图片特征，例如动物、人等。
+
+                    </p>
+
+                    <p style="text-align: center;  display: block; margin-left:25px;
+         margin-top:-10px; max-width:100%;">
+                        <img width=90% src="../../resources/lectures/text_clf/analysis/filters_in_images-min.png"
+                            alt="" /><br />
+                        <span style="font-size: small;">
+                            Examples of patterns captured by convolution filters for images.
+                            The examples are from
+                            <a href="https://distill.pub/2019/activation-atlas/" target="_blank">
+                                Activation Atlas from distill.pub</a>.</span>
+                    </p>
+
+                    <h2>文本分类中的卷积 <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=Convolutions%20for%20Text%20Classification"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+
+                    <p class="data_text">
+                        <font color="#888">本部分来自本课程的<a href="../text_classification.html" target="_blank">文本分类</a>。
+                        </font>
+                    </p>
+
+
+                    <p>对于图像来说，滤波器可以捕获对分类很重要的局部视觉特征。对于文本来说，这种局部特征是单词的n-grams。关于卷积如何对文本起作用的主要发现是：
+                    </p>
+                    <ul>
+                        <li>
+                            <b>卷积滤波器被用来作为n-grams检测器</b>
+                            </font><br>
+                            每个滤波器都为一个或几个密切相关的n-grams词语而专用。这些滤波器不是同质的，也就是说，一个滤波器经常可以检测到多个明显不同的n-grams。
+
+                        </li>
+                        <li>
+                            <b>最大池化展现了一种阈值处理行为</b>
+                            </font><br>
+                            在进行预测时，低于某个阈值的数值会被忽略（即与预测无关）。例如，<a href="https://arxiv.org/pdf/1809.08037.pdf"
+                                target="_blank">这篇文章</a>研究平均有40%的被池化的n-grams可以被丢弃，然而不会有任何性能损失。
+                        </li>
+                    </ul>
+
+                    <img width=55% src="../../resources/lectures/text_clf/analysis/look_at_filter-min.png" alt=""
+                        style="float:right; margin-left:20px;" />
+                    <p>理解一个网络捕捉到信息的最简单方法是看哪些特征模式激活了它的神经元。对于卷积，我们选择一个滤波器，并找到那些最能激活这个滤波器的n-grams。
+                    </p>
+
+                    <p>下面是几个最能激活滤波器的top-1 n-gram的例子。对于其中一个滤波器，我们还展示了导致这个滤波器高度激活的其他n-grams例子---你可以看到这些n-grams的含义非常相似。
+                    </p>
+
+
+                    <center>
+                        <img width=75% src="../../resources/lectures/text_clf/analysis/top_ngrams-min.png" alt=""
+                            style="margin-bottom:20px;" />
+                    </center>
+
+                    <p>
+                        更多细节，请看这篇文章: <a href="https://arxiv.org/pdf/1809.08037.pdf" target="_blank">
+                            Understanding Convolutional Neural Networks for Text Classification</a>。
+
+                    </p>
+
+
+                    <h2>语言模型中的卷积 <a
+                            href="https://lena-voita.github.io/nlp_course/models/convolutional.html#:~:text=Convolutions%20for%20Language%20Modeling"
+                            style="font-size:9px;" target="_blank">(英文原文)</a></h2>
+
+                    <p class="data_text">
+                        <font color="#888">
+                            这一部分来自课程的<a href="../language_modeling.html" target="_blank">语言建模</a>的<a
+                                href="../language_modeling.html#research_thinking" target="_blank"></a>研究思考</a>部分。
+                        </font>
+                    </p>
+
+                    <p>
+                        我们来看看EMNLP2016论文 <a href="https://www.aclweb.org/anthology/D16-1123.pdf"
+                            target="_blank">Convolutional
+                            Neural Network
+                            Language Models</a> 中的例子。对于一个简单的卷积式语言模型，作者将开发数据送入模型，并找到最能激活某个滤波器的n-grams。
+
+                    </p>
+                    <img width=100% src="../../resources/lectures/lang_models/research/learned_cnn_patterns-min.png"
+                        alt="" style="margin-top:20px;margin-bottom:20px;" class="center" />
+                    <p>
+                        当一个情感分类的模型学会了挑选与情感相关的相关文字，一个语言模型也可以捕捉到的类似短语。例如，一个卷积核激活了以月份结尾的短语，另一个卷积核激活了以名字结尾的短语；还注意到
+                        卷积核在看到表示“比较”含义的<font class="data_text"><strong>“as … as”</strong></font>相关词语是被激活。
+
+                    </p>
+
+
+                    <!--
+                <div style="border: 0px solid #ccc;border-radius:15px;margin: 10px; padding: 4px;
+             background-color: #f5f5f5;margin-top:-20px;">
+                <div style="display: grid; grid-template-columns: 75% 25%; margin:10px;">
+                            <div>
+                            <div style="margin-top:20px;">
+                                <p style="margin:30px; font-size:30px;">Coming soon!</p>
+
+                                <p style="margin:30px;">This part will appear when we pass the
+                                    <a href="../../nlp_course.html#preview_lang_models">Language Modeling</a> lecture of the course.</p>
+                            </div>
+                                </div>
+                            <div>
+                                <center>
+                                <img src="../../resources/lectures/main/preview/pusheen_draws_on_white-min.png"
+                                   style="width:80%; padding-top:20px; padding-bottom:20px;border-radius:50%">
+                                </center>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    -->
+                </div>
+
+
+            </div>
+
+
+        </div>
+    </div>
+
+
+    </div>
+
+    <footer class="site-footer">
+        <div class="wrapper">
+
+            <div class="footer-col-wrapper">
+                <div class="footer-col">
+                    <p class="text" align="right">&copy; Copyright <font color="#4869df"><strong><a
+                                    href="https://lena-voita.github.io/" target="_blank">Lena Voita</a></strong></font>.
+                        Translated by <font color="#4869df"><strong>MLNLP</strong></font>. All Rights Reserved
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </footer>
+
+
+</body>
+
+</html>

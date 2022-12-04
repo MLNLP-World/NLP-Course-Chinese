@@ -1,0 +1,2261 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Chinese NLP Course | For You</title>
+    <meta name="description"
+        content="Natural Language Processing course with interactive lectures-blogs, research thinking exercises and related papers with summaries. Also a lot of fun inside!">
+
+    <link rel="stylesheet" href="./css/main.css">
+    <link rel="canonical" href="http://lena-voita.github.io/nlp_course.html">
+
+    <!-- diff from head.html begin -->
+    <link rel="mask-icon" href="./resources/lectures/ico/course_logo.png">
+    <link rel="alternate icon" class="js-site-favicon" type="image/png" href="./resources/lectures/ico/course_logo.png">
+    <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="./resources/lectures/ico/course_logo.png">
+    <!-- diff from head.html end -->
+
+    <!--<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>-->
+
+
+</head>
+
+
+<body>
+
+    <header class="site-header">
+
+        <div class="wrapper">
+
+            <div id="title-image" style="display:inline">
+                <img class="site-img" src="./img/ico/logo.jpeg" />
+            </div>
+
+            <div id="title-texts" style="display:inline">
+                <a class="site-title" href="https://github.com/MLNLP-World" target="_blank">MLNLP</a>
+            </div>
+
+            <nav class="site-nav">
+                <a href="#" class="menu-icon">
+                    <svg viewBox="0 0 18 15">
+                        <path fill="#424242"
+                            d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z" />
+                        <path fill="#424242"
+                            d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z" />
+                        <path fill="#424242"
+                            d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z" />
+                    </svg>
+                </a>
+
+                <div class="trigger">
+                    <a class="page-link" href="https://lena-voita.github.io/" target="_blank">原作者：Lena Voita</a>
+                    <a class="page-link" href="https://lena-voita.github.io/nlp_course.html" target="_blank">原始英文版本</a>
+                    <a class="page-link" href="./about.html" target="_blank">关于我们</a>
+                </div>
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <!-- the next two lines are inserted once per page even if there are several shtukovinas,
+ the rest is one-per-shtukovina; read more: https://flickity.metafizzy.co/options.html -->
+    <link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css" media="screen">
+    <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
+
+    <!-- MathJax -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <style>
+        .demo_sidebar {
+            margin: 0;
+            padding: 0;
+            background-color: white;
+
+            position: relative;
+            height: auto;
+            width: 290px;
+        }
+
+        .demo_sidebar_text {
+            font-size: 18px;
+        }
+
+        .demo_sidebar_comment {
+            font-size: 15px;
+            margin-left: 10px;
+            font-family: "Comic Neue", "Arial";
+
+        }
+
+
+        .demo_sidebar a {
+            display: block;
+            color: black;
+            padding: 8px;
+            text-decoration: none;
+
+        }
+
+        .demo_sidebar a li {
+            margin-left: 5px;
+            padding: 0px;
+        }
+
+
+        .demo_sidebar a:hover {
+            box-shadow: 0 3px 6px #6e8f27, 0 1px 1px #6e8f27;
+        }
+
+        .demo_sidebar a:hover:not(.active) {
+            background-color: #f3f3f3;
+        }
+
+        .demo_sidebar .main_components {
+            background-color: #f3f3f3;
+        }
+
+        .demo_sidebar .extra_components {
+            background-color: #eaeaea;
+        }
+
+
+        #demo_sidebar_research_thinking:hover {
+            box-shadow: 0 3px 6px #a68305, 0 1px 1px #a68305;
+
+        }
+
+
+        #demo_sidebar_related_papers:hover {
+            box-shadow: 0 3px 6px #8a4972, 0 1px 1px #8a4972;
+        }
+
+
+        #demo_sidebar_fun:hover {
+            box-shadow: 0 3px 6px #377b94, 0 1px 1px #377b94;
+        }
+    </style>
+
+
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Josefin+Sans&display=swap');
+        @import url("https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap");
+        @import url("https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap");
+
+
+        #main_page_content {
+            margin-left: 300px;
+            padding: 30px;
+            padding-left: 70px;
+            text-align: justify;
+        }
+
+        .sidebar {
+            margin: 0;
+            padding: 0;
+            width: 270px;
+            background-color: #fafafa;
+            position: fixed;
+            height: 100%;
+            overflow: auto;
+            z-index: 1;
+        }
+
+        .sidebar a,
+        .dropdown-btn {
+            display: block;
+            color: black;
+            padding: 8px;
+            text-decoration: none;
+            border-right: 5px solid #b7db67;
+        }
+
+
+        .sidebar a li {
+            margin-left: 10px;
+            padding: 0px;
+        }
+
+        .dropdown-container {
+            display: none;
+            background-color: #f4f4f4;
+        }
+
+        .active_caret .fa-caret-down {
+            color: #b7db67;
+            font-size: 30px;
+        }
+
+        .fa-caret-down {
+            float: right;
+            padding-right: 8px;
+        }
+
+        .sidebar a.active {
+            background-color: #e3e3e3;
+            color: black;
+        }
+
+        .sidebar a:hover {
+            box-shadow: 0 3px 6px #6e8f27, 0 1px 1px #6e8f27;
+        }
+
+        .sidebar a:hover:not(.active) {
+            background-color: #f3f3f3;
+        }
+
+        .sidebar .extra_components {
+            background-color: #eaeaea;
+        }
+
+        #sidebar_analysis {
+            padding: 10px;
+        }
+
+        #sidebar_research_thinking {
+            padding: 10px;
+            border-right: 5px solid #fad400;
+        }
+
+        #sidebar_research_thinking:hover {
+            box-shadow: 0 3px 6px #a68305, 0 1px 1px #a68305;
+
+        }
+
+
+        #sidebar_related_papers {
+            padding: 10px;
+            border-right: 5px solid #d192ba;
+        }
+
+        #sidebar_related_papers:hover {
+            box-shadow: 0 3px 6px #8a4972, 0 1px 1px #8a4972;
+        }
+
+
+        #sidebar_fun {
+            padding: 10px;
+            border-right: 5px solid #6fb7d1;
+        }
+
+        #sidebar_fun:hover {
+            box-shadow: 0 3px 6px #377b94, 0 1px 1px #377b94;
+        }
+
+
+        .sidebar_ico {
+            float: right;
+            height: 20;
+        }
+
+        div.content {
+            margin-left: 200px;
+            padding: 1px 16px;
+            height: 1000px;
+        }
+
+        #sidebar_small {
+            width: 60px;
+        }
+
+
+        @media screen and (max-width: 1000px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            #main_page_content {
+                margin-left: 200px;
+                padding-left: 50px;
+            }
+
+            #for_you_in_sidebar {
+                display: none;
+            }
+
+        }
+
+
+        @media screen and (max-width: 800px) {
+
+            div.content {
+                margin-left: 0;
+            }
+
+            #main_page_content {
+                margin-left: 80px;
+                padding: 15px;
+            }
+
+            #demo_sidebar {}
+        }
+
+
+        .softmax_tau_bokeh {
+            font-size: 16px;
+        }
+
+
+        .card_with_ico {
+            position: relative;
+            padding: 10px;
+            margin: 10px;
+        }
+
+        .card_with_ico p {
+            padding: 10px;
+        }
+
+        .card_with_ico ul {
+            padding: 10px;
+        }
+
+        .card_with_ico .text_box_green {
+            border: 1px solid #d8e8b5;
+            border-radius: 5px;
+            margin-left: 30px;
+        }
+
+        .card_with_ico .text_box_pink {
+            border: 1px solid #dec8d6;
+            border-radius: 5px;
+            margin-left: 30px;
+        }
+
+        .card_with_ico .text_box_yellow {
+            border: 1px solid #f0e4a5;
+            border-radius: 5px;
+            margin-left: 30px;
+        }
+
+        .card_with_ico .ico {
+            float: left;
+            width: 25px;
+        }
+
+
+        .text_box_green {
+            border: 1px solid #d8e8b5;
+            border-radius: 5px;
+            display: table;
+            margin-left: 20px;
+        }
+
+        .text_box_green p {
+            padding: 10px;
+            padding-bottom: 0px;
+        }
+
+
+        .green_left_thought {
+            border-left: 5px solid #b7db67;
+            margin: 10px;
+            margin-left: 20px;
+            padding: 0px;
+            background-color: #fafcf5;
+        }
+
+        .green_left_thought p {
+
+            margin-left: 10px;
+            padding: 5px;
+        }
+
+
+        .box_green_left {
+            border-left: 2px solid #79a123;
+            margin-left: 10px;
+            padding: 10px;
+        }
+
+        .box_green_right {
+            border-right: 2px solid #79a123;
+            margin-right: 10px;
+            padding: 10px;
+        }
+
+        .box_violet_right {
+            border-right: 2px solid #67468f;
+            margin-right: 10px;
+            padding: 10px;
+        }
+
+        .box_pink_left {
+            border-left: 2px solid #7a3160;
+            margin-left: 5px;
+            padding: 10px;
+        }
+
+        .box_yellow_left {
+            border-left: 2px solid #d6b000;
+            margin-left: 5px;
+            padding: 10px;
+        }
+
+        .box_blue_left {
+            border-left: 2px solid #0278a1;
+            margin-left: 5px;
+            padding: 10px;
+        }
+
+        .paper_title {
+            text-align: center;
+            padding: 5px;
+            padding-top: 0px;
+            font-size: 16px;
+
+        }
+
+        .paper_authors {
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        p {
+            text-align: justify;
+        }
+
+
+        .greenCard {
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 1px;
+            margin: 10px 5px;
+            padding: 3px;
+            display: grid;
+            grid-template-rows: auto auto;
+        }
+
+        #thumbnail_green {
+            box-shadow: 0 2px 4px #6e8f27, 0 1px 1px #6e8f27;
+        }
+
+        #thumbnail_green:hover {
+            box-shadow: 0 6px 12px #6e8f27, 0 4px 4px #6e8f27;
+        }
+
+        #thumbnail_violet {
+            box-shadow: 0 2px 4px #655578, 0 1px 1px #655578;
+        }
+
+        #thumbnail_violet:hover {
+            box-shadow: 0 6px 12px #655578, 0 4px 4px #655578;
+        }
+
+        #thumbnail_paper {
+            box-shadow: 0 2px 4px #ab859e, 0 1px 1px #ab859e;
+        }
+
+        #thumbnail_paper:hover {
+            box-shadow: 0 6px 12px #ab859e, 0 4px 4px #ab859e;
+        }
+
+
+        #thumbnail_blue {
+            box-shadow: 0 2px 4px #377b94, 0 1px 1px;
+        }
+
+        #thumbnail_blue:hover {
+            box-shadow: 0 6px 12px #377b94, 0 4px 4px #377b94;
+        }
+
+        .paperCard {
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 1px;
+            margin: 10px 5px;
+            padding: 3px;
+            display: grid;
+            grid-template-rows: auto auto;
+        }
+
+        .paperIntro {
+            display: grid;
+            grid-template-columns: 70% 30%;
+        }
+
+        .showMePaper {
+            box-shadow: 0 2px 4px #a68305, 0 2px 1px #a68305;
+        }
+
+        .showMePaper:hover {
+            box-shadow: 0 3px 6px #ab859e, 0 4px 4px #ab859e;
+        }
+
+
+        .cardContent {
+            padding: 10px;
+        }
+
+        .center {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .conf_name {
+            float: right;
+            font-family: sans-serif;
+            font-size: 13px;
+            margin-bottom: 0px;
+            background-color: #f7edf4;
+            border: 1px solid #d1a1c3;
+            border-radius: 1px;
+            padding: 0px 4px 0px 4px;
+        }
+
+
+        .paper_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #cf99be;
+            border: 1px solid #8c2b6e;
+            border-radius: 50%;
+        }
+
+        .research_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #ffda00;
+            border: 1px solid #998300;
+            border-radius: 50%;
+        }
+
+        .fun_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #68c7e8;
+            border: 1px solid #0278a1;
+            border-radius: 50%;
+        }
+
+        .green_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #b7db67;
+            border: 1px solid #598005;
+            border-radius: 50%;
+        }
+
+        .violet_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #b59fcf;
+            border: 1px solid #67468f;
+            border-radius: 50%;
+        }
+
+        .data_text {
+            font-family: "Comic Neue", "Arial";
+        }
+
+
+        .researchCard {
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 1px;
+            margin: 10px 5px;
+            padding: 3px;
+            display: grid;
+            grid-template-rows: auto auto;
+        }
+
+        .researchIntro {
+            display: grid;
+            grid-template-columns: 70% 30%;
+        }
+
+        #thumbnail_research {
+            box-shadow: 0 2px 4px #a68305, 0 1px 1px #a68305;
+        }
+
+        #thumbnail_research:hover {
+            box-shadow: 0 6px 12px #a68305, 0 4px 4px #a68305;
+        }
+
+        .research_title {
+            text-align: center;
+            padding: 5px;
+            font-size: 18px;
+            font-family: "Comic Neue", "Arial";
+            background-color: #fafaf5;
+
+
+        }
+
+        .research_tag {
+            float: right;
+            font-family: sans-serif;
+            font-size: 13px;
+            margin-bottom: 0px;
+            background-color: #f5f0d5;
+            border: 1px solid #fad400;
+            border-radius: 1px;
+            padding: 0px 4px 0px 4px;
+        }
+
+        .research_question {
+            font-weight: bold;
+            font-size: 18px;
+            background-color: #fff4b3;
+            margin-right: 15px;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
+        .research_summary {
+            padding: 5px;
+            font-size: 18px;
+            font-family: "Comic Neue", "Arial";
+            background-color: #fafaf5;
+            margin-left: 10px;
+        }
+
+
+        .text_table td,
+        .text_table th {
+            text-align: center;
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-top: 2px;
+            padding-bottom: 2px;
+        }
+    </style>
+
+    <!--##################################################-->
+
+    <div>
+        <div class="sidebar" id="sidebar">
+            <a href="javascript:void(0)" id="close_sidebar_btn" onclick="closeNav()"
+                style="text-align:center;font-size:30px;padding:0px;">⇤</a>
+            <a class="active" href="#main_page_content" style="font-weight: bold;">
+                <img height="18" class='sidebar_ico' src="./resources/lectures/ico/course_logo.png"
+                    style="margin-right: 8px;margin-left: 8px;margin-top: 4px;" />
+                NLP Course <font color="#92bf32" id="for_you_in_sidebar">| 专属定制</font></a>
+            <a href="#whats_inside"><b>本课程包含什么？</b></a>
+
+
+            <div class="dropdown-scope">
+                <a class="dropdown-btn active_caret"><b>课程</b>
+                    <i class="fa fa-caret-down"></i>
+                </a>
+                <div class="dropdown-container" style="display:block;">
+                    <a href="#preview_word_emb"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        词嵌入</a>
+                    <a href="#preview_text_clf"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        文本分类</a>
+                    <a href="#preview_lang_models"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        语言模型</a>
+                    <a href="#preview_seq2seq_attn"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        序列到序列与注意力机制</a>
+                    <a href="#preview_transfer"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        迁移学习</a>
+                    <a href="#coming_soon_main_course"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        <font color="#888"> ...未完待续</font>
+                    </a>
+
+                </div>
+            </div>
+
+            <div class="dropdown-scope">
+                <a class="dropdown-btn active_caret"><b>补充资料</b>
+                    <i class="fa fa-caret-down"></i>
+                </a>
+                <div class="dropdown-container" style="display:block;">
+                    <a href="#supplementary"><span style="margin-right:15px;font-size:14px;">&#8226;</span>
+                        卷积网络</a>
+
+                </div>
+            </div>
+            <a href="./change_log.html"><b>更新记录</b></a>
+            <a href="./about.html"><b>关于我们</b></a>
+
+
+        </div>
+
+        <div class="sidebar" id="sidebar_small" style="background-color: #f5f5f5;">
+
+            <a class="active" onclick="openNav()" style="text-align:center;">☰</a>
+            <a href="#main_page_content" style="text-align:center; font-size:20px;color:#7ca81e"> <i
+                    class="fa fa-home"></i></a>
+            <!--<a href="#whats_inside" style="text-align:center; font-size:20px;color:#7ca81e"> <i class="fa fa-search"></i></a>-->
+            <!--<a href="#whats_inside_lectures" id="sidebar_analysis"> <img height="25" src="./resources/lectures/ico/analysis_empty.png"/></a>
+<div class="extra_components">
+    <a href="#whats_inside_research_thinking" id="sidebar_research_thinking"><img height="30" src="./resources/lectures/ico/bulb_empty.png"/></a>
+    <a href="#whats_inside_related_papers" id="sidebar_related_papers"><img height="22" src="./resources/lectures/ico/book_empty.png"/></a>
+  <a href="#whats_inside_fun" id="sidebar_fun"><img height="30" src="./resources/lectures/ico/fun_empty.png" /></a>-->
+            <a href="#lectures" style="text-align:center; font-size:20px;color:#7ca81e"> <i
+                    class="fa fa-list-ul"></i></a>
+        </div>
+
+    </div>
+
+
+    <script>
+        function openNav() {
+            document.getElementById("sidebar").style.display = "block";
+            document.getElementById("sidebar_small").style.display = "none";
+            document.getElementById("close_sidebar_btn").style.display = "block";
+        }
+
+        function closeNav() {
+            document.getElementById("sidebar").style.display = "none";
+            document.getElementById("sidebar_small").style.display = "block";
+            document.getElementById("close_sidebar_btn").style.display = "none";
+        }
+
+    </script>
+
+
+    <script>
+        function onResize() {
+            if (window.innerWidth >= 800) {
+                document.getElementById("sidebar").style.display = "block";
+                document.getElementById("sidebar_small").style.display = "none";
+                document.getElementById("close_sidebar_btn").style.display = "none";
+            } else {
+                document.getElementById("sidebar").style.display = "none";
+                document.getElementById("sidebar_small").style.display = "block";
+
+            }
+        }
+
+        window.onresize = onResize;
+        onResize();
+    </script>
+
+
+    <script>
+        /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
+        var dropdown = document.getElementsByClassName("dropdown-btn");
+        var i;
+
+        for (i = 0; i < dropdown.length; i++) {
+            dropdown[i].addEventListener("click", function (event) {
+                this.classList.toggle("active_caret");
+                var dropdownButton = event.target || event.srcElement;
+                while (dropdownButton.className != "dropdown-scope")
+                    dropdownButton = dropdownButton.parentElement;
+                var dropdownContent = dropdownButton.getElementsByClassName("dropdown-container")[0];
+
+                if (dropdownContent.style.display === "block") {
+                    dropdownContent.style.display = "none";
+                } else {
+                    dropdownContent.style.display = "block";
+                }
+            });
+        }
+    </script>
+
+
+    <div class="wrapper" id="main_page_content">
+
+        <div class="header">
+            <h1>Letter from Lena</font>
+            </h1>
+        </div>
+
+        <div class="main_content">
+            <p>TBD.</p>
+        </div>
+
+        <div class="header">
+            <h1>NLP Course <font color="#92bf32">| 专属定制</font>
+            </h1>
+        </div>
+
+        <div class="main_content">
+
+            <p class="data_text">
+                这是<a href="https://lena-voita.github.io/">Lena Voita</a>从2018年秋季开始在<a
+                    href="https://yandexdataschool.com" target="_blank">Yandex数据分析学院（YSDA）</a>教授的<a
+                    href="https://github.com/yandexdataschool/nlp_course"
+                    target="_blank">自然语言处理课程</a>的延伸。到目前为止，这里可能只涉及部分主题。
+            </p>
+
+            <div style="display: grid;
+    grid-template-columns: auto 290px;">
+
+                <div style="margin-right: 30px;">
+
+
+                    <h3>这种新的课程形式是为了：</h3>
+
+                    <ul>
+                        <li><span style="font-size:18px;"><b>便捷</b></span><br>
+                            <span class="data_text">
+                                便于查找、学习和回顾（包括基础内容和高阶内容）并在实践中尝试。
+                            </span>
+                        </li>
+
+                        <li style="margin-top:10px;"><span style="font-size:18px; "><b>清晰</b></span><br>
+                            <span class="data_text">
+                                每个部分，从前到后，不仅包括讲述的内容，更重要的是讲述和展示的方式，都是我深思熟虑之后的结果。
+                            </span>
+                        </li>
+
+                        <li style="margin-top:10px;"><span style="font-size:18px; "><b>你（专属）</b></span> <br>
+                            <span class="data_text">
+                                我制作这些学习资料，以便你（是的，你！）可以自学。也就是说，你可以按照你自己的速度，学习你喜欢的内容。而我的主要目的是帮助你进入你自己的学习冒险之旅。
+                                <strong>
+                                    <font color="#92bf32">专属定制</font>
+                                </strong>
+                            </span>
+                        </li>
+
+                    </ul>
+
+
+                </div>
+
+
+                <div class="demo_sidebar" style="font-family:helvetica;">
+
+                    <div class="main_components">
+                        <a href="#whats_inside_lectures">
+                            课程博客
+                            <span class="demo_sidebar_comment">包含</span>
+                            <br><span style="padding:5px;" class="demo_sidebar_comment">
+                                交互学习部分 & 练习
+                                <img height="18" src="./resources/lectures/ico/paw_empty.png" class="sidebar_ico" />
+                                <img height="20" src="./resources/lectures/ico/dumpbell_empty.png" class="sidebar_ico"
+                                    style="margin-right:10px;" />
+                            </span>
+                            <br><span style="padding:5px;" class="demo_sidebar_comment">
+                                分析与解释<img height="25" src="./resources/lectures/ico/analysis_empty.png"
+                                    class="sidebar_ico" />
+                            </span>
+                        </a>
+
+                        <a href="#whats_inside_lectures">
+                            研讨会 & 作业
+                            <br><span class="demo_sidebar_comment">资料位于我们的7.7k-☆课程仓库</span>
+                        </a>
+                    </div>
+
+                    <div class="extra_components">
+                        <a href="#whats_inside_research_thinking" id="demo_sidebar_research_thinking">
+                            研究思考
+                            <img height="30" src="./resources/lectures/ico/bulb_empty.png" class="sidebar_ico"
+                                style="margin-top:10px;" />
+                            <br><span class="demo_sidebar_comment">学习提出正确的问题</span>
+                        </a>
+
+                        <a href="#whats_inside_related_papers" id="demo_sidebar_related_papers">
+                            相关论文
+                            <img height="22" src="./resources/lectures/ico/book_empty.png" class="sidebar_ico"
+                                style="margin-top:15px;" />
+                            <br><span class="demo_sidebar_comment">包含总结和解释</span>
+                        </a>
+
+                        <a href="#whats_inside_fun" id="demo_sidebar_fun">
+                            Have Fun!
+                            <img height="35" src="./resources/lectures/ico/fun_empty.png" class="sidebar_ico"
+                                style="margin-top:8px;" />
+                            <br><span class="demo_sidebar_comment">just fun</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <hr style="height:2px; margin-bottom:15px;" color="#92bf32">
+            <p>
+                <span class="data_text">
+                    如果你想要在你的论文、报告等材料中引用这些学习资料（例如：图片），你可以采用下述BibTex：
+                </span>
+            </p>
+
+            <div style="border: 1px solid #ccc;border-radius:15px;margin: 10px; padding: 4px;
+ background-color: #f5f5f5;width:80%;font-family:Courier;font-size:12px;">
+                <div style="margin-left:20px;">
+                    @misc{voita2020nlpCourse,</br>
+                    <div style="margin-left:15px;">
+                        title={ {NLP} {C}ourse {F}or {Y}ou},</br>
+                        url={https://lena-voita.github.io/nlp_course.html},</br>
+                        author={Elena Voita},</br>
+                        year={2020},</br>
+                        month={Sep}</br>
+                    </div>
+                    }
+                </div>
+            </div>
+
+
+            <hr style="height:5px" color="#92bf32">
+
+            <br>
+
+            <div id="whats_inside">
+
+                <h1>本课程包含什么？你的冒险指南</h1>
+
+                <br>
+
+                <div style="border: 0px solid #ccc;border-radius:15px;margin: 10px; padding: 4px;
+ background-color: #f5f5f5;">
+                    <div style="display: grid; grid-template-columns: 45% 55%; margin:10px;" id="whats_inside_lectures">
+
+                        <div style="margin-right: 15px;">
+
+                            <h2 style="margin-bottom:5px;">课程-博客</h2>
+                            <p class="data_text" style="margin-bottom:2px;">
+                                我尽可能使其:</p>
+                            <ul class="data_text">
+                                <li>直观、清晰、具有吸引力；</li>
+                                <li>全面: 完整的课程甚至更多内容；</li>
+                                <li>与时俱进，包含该领域最新内容。</li>
+                            </ul>
+
+
+                            <h3 style="margin-bottom:2px;">福利：</h3>
+                            <ul class="data_text">
+                                <li><a href="#whats_inside_research_thinking">研究思考</a>，</li>
+                                <li><a href="#whats_inside_related_papers">相关论文</a>，</li>
+                                <li><a href="#whats_inside_fun">Have Fun！</a></li>
+                            </ul>
+
+
+                            <h2 style="margin-bottom:2px;">研讨会 & 作业</h2>
+                            <p class="data_text">
+                                对于每个主题，你可以从我们的<a href="https://github.com/yandexdataschool/nlp_course"
+                                    target="_blank">7.7k-☆课程仓库</a>中获得资料。
+                            </p>
+                            <p class="data_text" style="margin-top:-7px;">
+                                从2020年起，我们支持PyTorch和Tensorflow！
+                            </p>
+                        </div>
+
+                        <div>
+                            <!--##############    begin of right part   ####################################-->
+                            <div class="green_circle" style="float:left; margin-left: 10px;"></div>
+                            <div class="box_green_left" style="margin-left: 15px;">
+
+
+                                <div class="greenCard" id="thumbnail_green" style="background-color:white;">
+                                    <div class="cardContent">
+                                        <img height="18" src="./resources/lectures/ico/paw_empty.png"
+                                            style="float:left; padding-right:10px; " />
+                                        <img height="20" src="./resources/lectures/ico/dumpbell_empty.png"
+                                            style="float:left; padding-right:20px; " />
+                                        <h3>交互部分 & 练习</h3>
+                                        <p class="data_text" style="font-size:14px;">
+                                            我经常会让你浏览一些包含可视化过程的“幻灯片”，操作一些东西或只是思考。
+                                        </p>
+                                    </div>
+                                </div>
+
+
+                                <div class="greenCard" id="thumbnail_green" style="background-color:white;">
+                                    <div class="cardContent">
+                                        <img height="30" src="./resources/lectures/ico/analysis_empty.png"
+                                            style="float:left; padding-right:20px; " />
+                                        <h3>分析与解释</h3>
+                                        <p class="data_text" style="font-size:14px;">
+                                            自2020年以来，顶级NLP会议（ACL、EMNLP）都设有"分析和可解释性"Track:这再次印证了分析是NLP不可或缺的一部分。
+                                        </p>
+                                        <p class="data_text" style="font-size:14px;">
+                                            每节课都有一小节是关于"模型、方法内部运作相关结果"的阐述。
+                                        </p>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="green_circle" style="float:left; margin-left: 10px;"></div>
+
+                            <!--#########################   end of right part #########################-->
+
+
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <br>
+
+                <div style="border: 0px solid #ccc;border-radius:15px;margin: 10px; padding: 4px;
+ background-color: #f5f5f5;">
+                    <div style="display: grid; grid-template-columns: 45% 55%; margin:10px;"
+                        id="whats_inside_research_thinking">
+
+                        <div style="margin-right: 15px;">
+
+                            <h2>研究思考</h2>
+                            <p class="data_text">
+                                学会像研究科学家一样思考：</p>
+                            <ul class="data_text">
+                                <li>找到方法中的缺陷，</li>
+                                <li>想想为什么/什么时候什么东西能有所帮助，</li>
+                                <li>提出改进的方法，</li>
+                                <li>学习之前的尝试。</li>
+                            </ul>
+
+                            <p class="data_text">
+                                众所周知，使得学习变得更简单的方法是"先思考"，而非直接提供给你最终答案。即使你的目标不是研究人员，这仍然是一个学习东西的好方法!
+                            </p>
+
+                        </div>
+
+                        <div>
+                            <img height="38" src="./resources/lectures/ico/bulb_empty.png"
+                                style="float:left; padding-right:10px; margin-top:-10px;" />
+                            <div class="box_yellow_left" style="margin-left: 15px;">
+                                <!--##############    begin of research card   ####################################-->
+                                <div class="researchCard" id="thumbnail_research" style="background-color: white;">
+                                    <div class="researchIntro" id="research_meaning_shift">
+
+                                        <div class="cardContent">
+
+                                            <div class="research_title">
+                                                演示: 研究卡片
+                                            </div>
+
+                                            <hr color="#dedeca" style="margin:5px;">
+                                            <span style="font-size:14px;">这里我定义起点：一些你已经知道的东西。</span>
+                                        </div>
+                                        <div>
+                                            <!--<div class="research_tag">neural</div>-->
+
+                                            <img src="./resources/lectures/main/i_saw_cat-min.png" alt=""
+                                                style="margin-top:10px;" class="center" />
+
+                                        </div>
+
+                                    </div>
+                                    <hr color="#dedeca" style="margin:2px; height:1px">
+                                    <div class="cardContent">
+                                        <span style="font-size:14px; ">
+                                            这里我向你抛出问题，思考(一分钟，一天，一周，……)，然后寻找可能的答案。</span>
+                                        <br>
+                                        <span style="font-size:14px;">
+                                            <span class="research_question">？</span>
+                                            为什么会有效？</span>
+                                        <details>
+                                            <summary class="research_summary">
+                                                <span style="font-size:14px;">可能的答案</span>
+                                            </summary>
+                                            <div style="font-size:14px; margin-bottom:10px;">
+                                                这里你将看到一些可能的答案。这部分是一个尝试新方法的动机：通常，这是一个研究项目的开始。
+                                            </div>
+                                        </details>
+
+                                        <span style="font-size:14px;">
+                                            <span class="research_question">？</span>
+                                            我们如何利用这一点来改进这个模型？</span>
+                                        <details>
+                                            <summary class="research_summary">
+                                                <span style="font-size:14px;">现有解决方案</span>
+                                            </summary>
+                                            <div style="font-size:14px">
+                                                在这里，我将总结一些以前的尝试。你不应该想出像这里一样的东西，记住，每篇论文通常需要作者几个月的工作。这是一种思考这些重要事情的习惯：你有几个想法，你去尝试；如果它们不起作用，你就会重新考虑。最终，总会有办法的，这就是论文告诉你的。
+                                            </div>
+                                        </details>
+
+                                    </div>
+                                </div>
+
+                                <!--#########################   end of research card #########################-->
+                            </div>
+                            <div class="research_circle" style="float:left; margin-left: 10px;"></div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <br>
+
+                <div style="border: 0px solid #ccc; border-radius:15px; margin: 10px; padding: 4px;
+ background-color: #f5f5f5;">
+                    <div style="display: grid; grid-template-columns: 45% 55%; margin:10px;"
+                        id="whats_inside_related_papers">
+
+                        <div style="margin-right: 15px;">
+
+                            <h2>相关论文</h2>
+                            <p class="data_text">
+                                探索相关工作：</p>
+                            <ul class="data_text">
+                                <li>
+                                    <u>概览速读</u>：在简要总结中看看关键结果，了解该领域的情况。
+                                </li>
+                                <li>
+                                    <u>更深入一些</u>：对于你更感兴趣的主题，阅读包含图示和解释更长的摘要；
+                                </li>
+                                <li>
+                                    <u>深度阅读</u>：阅读你喜欢的论文。
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <img height="25" src="./resources/lectures/ico/book_empty.png"
+                                style="float:left; padding-right:10px; margin-top:-5px;" />
+                            <div class="box_pink_left" style="margin-left: 15px;margin-top: 15px;">
+                                <!--######### begin of paper card #########################################-->
+                                <div class="paperCard" id="thumbnail_paper" style="background-color: white;">
+                                    <div class="paperIntro">
+
+                                        <div class="cardContent">
+
+                                            <div class="paper_title">
+                                                <a href="./nlp_course/word_embeddings.html#related_papers"
+                                                    target="_blank" class="links">
+                                                    演示：论文卡片
+                                                </a>
+                                            </div>
+
+                                            <div class="paper_authors">
+                                                优秀和酷酷的作者
+                                            </div>
+                                            <hr color="#f2e4ee" style="margin:5px; ">
+                                            <div style="font-size:14px">
+                                                在这里，我用几个句子来解释这篇论文的核心思想和/或它的主要结果。
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div class="conf_name">EMNLP 2019</div>
+                                            <a href="" target="_blank">
+                                                <img src="./resources/lectures/main/pink_lm-min.png" alt=""
+                                                    style="margin-top:30px;" class="center" />
+                                            </a>
+                                        </div>
+
+                                    </div>
+                                    <hr color="#f2e4ee" style="margin:5px; height: 1px;">
+                                    <div class="cardContent">
+                                        <details>
+                                            <summary style="margin-left:10px;">
+                                                <span style="font-size:14px">更多细节:点击(是的，就在这里，现在!)</span>
+                                            </summary>
+
+                                            <div style="font-size:14px">
+                                                <br>
+                                                在这里，我将给出一个较长的总结，并附有插图和解释。我试着向你介绍作者的推理步骤和主要观察结果，并尽量使你可以轻松理解。在你掌握了大意之后，阅读一篇原始的研究论文就容易多了。
+                                            </div>
+
+
+                                        </details>
+                                    </div>
+                                </div>
+
+                                <!--################ end of paper card ##################################-->
+                            </div>
+                            <div class="paper_circle" style="float:left; margin-left: 10px;"></div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <br>
+
+                <div
+                    style="border: 0px solid #ccc; border-radius:15px; margin: 10px; padding: 4px; background-color: #f5f5f5;">
+                    <div style="display: grid; grid-template-columns: 45% 55%; margin:10px;" id="whats_inside_fun">
+
+                        <div style="margin-right: 15px;">
+
+                            <h2>Have Fun！</h2>
+                            <p class="data_text">
+                                生动有趣。
+                                <br><br>
+                                在这里你将看到一些与课程主题相关的NLP游戏。
+                            </p>
+
+                        </div>
+
+                        <div>
+                            <img height="40" src="./resources/lectures/ico/fun_empty.png"
+                                style="float:left; padding-right:10px; margin-top:-10px;" />
+                            <div class="box_blue_left" style="margin-left: 15px;margin-top: 15px;">
+                                <!--######### begin of fun #########################################-->
+                                <div width=100% id="thumbnail_blue" style="background-color:white;
+    border:1px solid #ccc; border-radius:1px;margin:10px 5px;padding:3px;">
+                                    <div class="cardContent">
+                                        <p style="text-align:center;">
+                                            Week 1: <a href="./nlp_course/word_embeddings.html#have_fun"
+                                                target="_blank">Semantic
+                                                Space Surfer</a></p>
+                                        <img width=100% src="./resources/lectures/main/fun_preview-min.png">
+
+                                    </div>
+                                </div>
+                                <!--################ end of fun ##################################-->
+                            </div>
+                            <div class="fun_circle" style="float:left; margin-left: 10px;"></div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <br>
+            <hr style="height:5px" color="#92bf32">
+            <br>
+
+
+            <div id="lectures">
+                <h1>课程</h1>
+
+
+                <div
+                    style="border: 0px solid #ccc;border-radius:15px;margin: 10px; padding: 4px; background-color: #f5f5f5;">
+
+
+                    <div class="greenCard" id="thumbnail_green" style="background-color:white; margin:10px;width:96%">
+                        <div class="cardContent" id="preview_word_emb">
+                            <div style="display: grid; grid-template-columns: 50% 50%; margin:10px;">
+
+                                <div>
+                                    <!--##############    begin of left part   ####################################-->
+                                    <div class="green_circle" style="float:right; margin-right:5px;"></div>
+                                    <div class="box_green_right">
+                                        <div style="margin-right:15px; ">
+
+                                            <h2 style="margin-bottom:5px;background-color:#f6fce8;text-align:center;">
+                                                <a href="./nlp_course/word_embeddings.html" style="color:black">词嵌入</a>
+                                            </h2>
+                                            <ul class="data_text">
+                                                <li>分布式语义</li>
+                                                <li>基于计数的方法</li>
+                                                <li>Word2Vec： <strong>可学习</strong>的表示</li>
+                                                <li>GloVe： 先技术再学习</li>
+                                                <li>评价: 内在 vs 外部</li>
+                                                <li><img height="20" src="./resources/lectures/ico/analysis_empty.png"
+                                                        style="margin-right:10px;" />
+                                                    分析与解释
+                                                </li>
+                                                <li><span style="float: left;">福利： </span>
+                                                    <div class="research_circle" style="margin: 8px; float: left;">
+                                                    </div>
+                                                    <div class="paper_circle" style="margin: 8px; float: left;"></div>
+                                                    <div class="fun_circle" style="margin: 8px; float: left;"></div>
+                                                </li>
+                                            </ul>
+
+                                            <hr color="#e9f5d0" style="margin:5px;">
+
+                                            <h3 style="margin-bottom:2px;">研讨会 & 作业</h3>
+
+                                            <p class="data_text">
+                                                <a href="https://github.com/yandexdataschool/nlp_course/tree/2020/week01_embeddings"
+                                                    target="_blank">第一周</a>：<a
+                                                    href="https://github.com/yandexdataschool/nlp_course"
+                                                    target="_blank">课程仓库</a>。
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                    <div class="green_circle" style="float:right; margin-right:5px;"></div>
+
+                                </div>
+                                <!--#########################   end of left part #########################-->
+
+                                <div>
+
+                                    <div class="carousel carousel_word_emb"
+                                        style="width:100%; margin-left:-5px; margin-right:-5px;"
+                                        data-flickity='{ "imagesLoaded": true, "percentPosition": true, "wrapAround": true, "prevNextButtons": false}'>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/word_emb/word_emb-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/word_emb/one_hot-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/word_emb/count_based-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/word_emb/context_window-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/word_emb/skip_gram-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/word_emb/cbow-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/word_emb/w2v_training_1-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/word_emb/w2v_training_2-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/word_emb/semantic_space-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/word_emb/neighbors-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/word_emb/analogy-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/word_emb/cross_lingual-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <!--
+                                    <div class="carousel-cell" style="width:100%"><center>
+                                      <img src="./resources/lectures/main/preview/word_emb/research_thinking-min.png" style="width:90%">
+                                  </center></div>
+                                    <div class="carousel-cell" style="width:100%"><center>
+                                      <img src="./resources/lectures/main/preview/word_emb/related_papers-min.png" style="width:90%">
+                                  </center></div>-->
+
+                                    </div>
+                                    <p style="text-align: center; font-size:20px;margin-top:30px;"><a
+                                            href="./nlp_course/word_embeddings.html">阅读更多 ⇨</a></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- div for word emb green card-->
+
+                    <script>
+                        var flkty_word_emb = new Flickity('.carousel_word_emb', {
+                            imagesLoaded: true, percentPosition: true,
+                            wrapAround: true, prevNextButtons: false,
+                        });
+
+                        flkty_word_emb.on('staticClick', function (event, pointer, cellElement, cellIndex) {
+                            flkty_word_emb.next();
+                        });
+                    </script>
+
+
+                    <div class="greenCard" id="thumbnail_green" style="background-color:white; margin:10px;width:96%">
+                        <div class="cardContent" id="preview_text_clf">
+                            <div style="display: grid; grid-template-columns: 50% 50%; margin:10px;">
+
+                                <div>
+                                    <!--##############    begin of left part   ####################################-->
+                                    <div class="green_circle" style="float:right; margin-right:5px;"></div>
+                                    <div class="box_green_right">
+                                        <div style="margin-right:15px; ">
+
+                                            <h2 style="margin-bottom:5px;background-color:#f6fce8;text-align:center;">
+                                                <a href="./nlp_course/text_classification.html" style="color:black">
+                                                    文本分类
+                                                </a>
+                                            </h2>
+                                            <ul class="data_text">
+                                                <li>简介和数据集</li>
+                                                <li>通用框架</li>
+                                                <li>经典方法：朴素贝叶斯，最大熵（逻辑斯蒂回归），SVM
+                                                </li>
+                                                <li>神经网络：RNNs和CNNs</li>
+
+                                                <li><img height="20" src="./resources/lectures/ico/analysis_empty.png"
+                                                        style="margin-right:10px;" />
+                                                    分析与解释
+                                                </li>
+                                                <li><span style="float: left;">福利：</span>
+                                                    <div class="research_circle" style="margin: 8px; float: left;">
+                                                    </div>
+                                                    <div class="paper_circle" style="margin: 8px; float: left;"></div>
+                                                    <!--<div class="fun_circle" style="margin: 8px; float: left;"></div>-->
+                                                </li>
+                                            </ul>
+
+                                            <hr color="#e9f5d0" style="margin:5px;">
+
+                                            <h3 style="margin-bottom:2px;">研讨会 & 作业</h3>
+
+                                            <p class="data_text"><a
+                                                    href="https://github.com/yandexdataschool/nlp_course/tree/2020/week02_classification"
+                                                    target="_blank">第二周</a>：<a
+                                                    href="https://github.com/yandexdataschool/nlp_course"
+                                                    target="_blank">课程仓库</a>。
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                    <div class="green_circle" style="float:right; margin-right:5px;"></div>
+
+                                </div>
+                                <!--#########################   end of left part #########################-->
+
+                                <div>
+
+                                    <div class="carousel carousel_text_clf"
+                                        style="width:100%; margin-left:-5px; margin-right:-5px;"
+                                        data-flickity='{ "imagesLoaded": true, "percentPosition": true, "wrapAround": true, "prevNextButtons": false}'>
+
+                                        <!--<div class="carousel-cell" style="width:100%"><center>
+                                          <img src="./resources/lectures/main/preview/pusheen_tea.gif" style="width:50%; margin-top:60px;">
+                                        </center>
+                                    <p style="text-align: center; font-size:20px;">Wait for the release!<br> (September 17-24)</p>
+                                    </div>
+                                    -->
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/text_clf/example_movie_clean2-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/text_clf/general_framework-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/text_clf/generative_discriminative-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/text_clf/nn_clf-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/text_clf/boe-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/text_clf/rnn_simple-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/text_clf/rnn_multi-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/text_clf/rnn_bi-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/text_clf/cnn-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/text_clf/cnn_filter_feature-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/text_clf/cnn_patterns_how-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/text_clf/cnn_patterns-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                    </div>
+                                    <p style="text-align: center; font-size:20px;margin-top:30px;"><a
+                                            href="./nlp_course/text_classification.html">阅读更多 ⇨</a></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- div for lang models green card-->
+
+                    <script>
+                        var flkty_clf = new Flickity('.carousel_text_clf', {
+                            imagesLoaded: true, percentPosition: true,
+                            wrapAround: true, prevNextButtons: false,
+                        });
+
+                        flkty_clf.on('staticClick', function (event, pointer, cellElement, cellIndex) {
+                            flkty_clf.next();
+                        });
+                    </script>
+
+
+                    <div class="greenCard" id="thumbnail_green" style="background-color:white; margin:10px;width:96%">
+                        <div class="cardContent" id="preview_lang_models">
+                            <div style="display: grid; grid-template-columns: 50% 50%; margin:10px;">
+
+                                <div>
+                                    <!--##############    begin of left part   ####################################-->
+                                    <div class="green_circle" style="float:right; margin-right:5px;"></div>
+                                    <div class="box_green_right">
+                                        <div style="margin-right:15px; ">
+
+                                            <h2 style="margin-bottom:5px;background-color:#f6fce8;text-align:center;">
+                                                <a href="./nlp_course/language_modeling.html"
+                                                    style="color:black">语言模型</a>
+                                            </h2>
+                                            <ul class="data_text">
+                                                <li>通用框架</li>
+                                                <li>N元语法语言模型</li>
+                                                <li>神经网络语言模型</li>
+                                                <li>生成策略</li>
+                                                <li>评价语言模型</li>
+                                                <li>使用技巧</li>
+                                                <li><img height="20" src="./resources/lectures/ico/analysis_empty.png"
+                                                        style="margin-right:10px;" />
+                                                    分析与解释
+                                                </li>
+                                                <li><span style="float: left;">福利：</span>
+                                                    <div class="research_circle" style="margin: 8px; float: left;">
+                                                    </div>
+                                                    <div class="paper_circle" style="margin: 8px; float: left;"></div>
+                                                    <div class="fun_circle" style="margin: 8px; float: left;"></div>
+                                                </li>
+                                            </ul>
+
+                                            <hr color="#e9f5d0" style="margin:5px;">
+
+                                            <h3 style="margin-bottom:2px;">研讨会 & 作业</h3>
+
+                                            <p class="data_text"><a
+                                                    href="https://github.com/yandexdataschool/nlp_course/tree/2020/week03_lm"
+                                                    target="_blank">第三周</a>：<a
+                                                    href="https://github.com/yandexdataschool/nlp_course"
+                                                    target="_blank">课程仓库</a>。
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                    <div class="green_circle" style="float:right; margin-right:5px;"></div>
+
+                                </div>
+                                <!--#########################   end of left part #########################-->
+
+                                <div>
+
+                                    <div class="carousel carousel_lang_models"
+                                        style="width:100%; margin-left:-5px; margin-right:-5px;"
+                                        data-flickity='{ "imagesLoaded": true, "percentPosition": true, "wrapAround": true, "prevNextButtons": false}'>
+
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <video width="90%" height="auto" style="margin-top:40px;" loop autoplay
+                                                    muted style="">
+                                                    <source
+                                                        src="./resources/lectures/main/preview/lang_models/lm_generate.mp4"
+                                                        type="video/mp4">
+                                                </video>
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/lang_models/markov_property-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/lang_models/smoothing-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <p style="text-align: center; font-size:20px;">Generate a Text with
+                                                    Ngram
+                                                    LMs<br></p>
+                                                <video width="90%" height="auto" loop autoplay muted style="">
+                                                    <source
+                                                        src="./resources/lectures/main/preview/lang_models/ngram_generation.mp4"
+                                                        type="video/mp4">
+                                                </video>
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <p style="text-align: center; font-size:20px;">Neural Language
+                                                    Models<br>
+                                                </p>
+                                                <video width="90%" height="auto" loop autoplay muted style="">
+                                                    <source
+                                                        src="./resources/lectures/lang_models/neural/nn_lm_prob_idea.mp4"
+                                                        type="video/mp4">
+                                                </video>
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/lang_models/loss-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/lang_models/rnn1-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/lang_models/rnn2-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/lang_models/cnn1-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/lang_models/cnn2-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/lang_models/evaluation-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/lang_models/temperature-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/lang_models/top_k-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/lang_models/top_p_1-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <!--<div class="carousel-cell" style="width:100%"><center>
+                                         <img src="./resources/lectures/main/preview/lang_models/top_p_2-min.png" style="width:90%">
+                                     </center></div>-->
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/lang_models/weight_tying-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+
+                                    </div>
+                                    <p style="text-align: center; font-size:20px;margin-top:30px;"><a
+                                            href="./nlp_course/language_modeling.html">阅读更多 ⇨</a></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- div for lang models green card-->
+
+                    <script>
+                        var flkty_lm = new Flickity('.carousel_lang_models', {
+                            imagesLoaded: true, percentPosition: true,
+                            wrapAround: true, prevNextButtons: false,
+                        });
+
+                        flkty_lm.on('staticClick', function (event, pointer, cellElement, cellIndex) {
+                            flkty_lm.next();
+                        });
+                    </script>
+
+
+                    <div class="greenCard" id="thumbnail_green" style="background-color:white; margin:10px;width:96%">
+                        <div class="cardContent" id="preview_seq2seq_attn">
+                            <div style="display: grid; grid-template-columns: 50% 50%; margin:10px;">
+
+                                <div>
+                                    <!--##############    begin of left part   ####################################-->
+                                    <div class="green_circle" style="float:right; margin-right:5px;"></div>
+                                    <div class="box_green_right">
+                                        <div style="margin-right:15px; ">
+
+                                            <h2 style="margin-bottom:5px;background-color:#f6fce8;text-align:center;">
+                                                <a href="./nlp_course/seq2seq_and_attention.html"
+                                                    style="color:black">序列到序列模型和注意力机制</a>
+                                            </h2>
+                                            <ul class="data_text">
+                                                <li>序列到序列基础 (编码器-解码器，训练，简单模型)</li>
+                                                <li>注意力机制</li>
+                                                <li>Transformer</li>
+                                                <li>子词分割（例如：BPE）</li>
+                                                <li>推断（例如：集束搜索）</li>
+                                                <li><img height="20" src="./resources/lectures/ico/analysis_empty.png"
+                                                        style="margin-right:10px;" />
+                                                    分析与解释
+                                                </li>
+                                                <li><span style="float: left;">福利：</span>
+                                                    <div class="research_circle" style="margin: 8px; float: left;">
+                                                    </div>
+                                                    <div class="paper_circle" style="margin: 8px; float: left;"></div>
+                                                    <!--<div class="fun_circle" style="margin: 8px; float: left;"></div>-->
+                                                </li>
+                                            </ul>
+
+                                            <hr color="#e9f5d0" style="margin:5px;">
+
+                                            <h3 style="margin-bottom:2px;">研讨会 & 作业</h3>
+
+                                            <p class="data_text"><a
+                                                    href="https://github.com/yandexdataschool/nlp_course/tree/2020/week04_seq2seq"
+                                                    target="_blank">第四周</a>：<a
+                                                    href="https://github.com/yandexdataschool/nlp_course"
+                                                    target="_blank">课程仓库</a>。
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                    <div class="green_circle" style="float:right; margin-right:5px;"></div>
+
+                                </div>
+                                <!--#########################   end of left part #########################-->
+
+                                <div>
+
+                                    <div class="carousel carousel_attention"
+                                        style="width:100%; margin-left:-5px; margin-right:-5px;"
+                                        data-flickity='{ "imagesLoaded": true, "percentPosition": true, "wrapAround": true, "prevNextButtons": false}'>
+
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/seq2seq/morda_src_dst-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <video width="90%" height="auto" style="margin-top:40px;" loop autoplay
+                                                    muted style="">
+                                                    <source
+                                                        src="./resources/lectures/main/preview/seq2seq/enc_dec_prob_idea.mp4"
+                                                        type="video/mp4">
+                                                </video>
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/seq2seq/rnn_simple-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/seq2seq/attn1-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/seq2seq/self_attn-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/seq2seq/masked_self_attn-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/seq2seq/multi_head_attn-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/seq2seq/head_positional-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/seq2seq/head_syntactic-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/seq2seq/probing-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/seq2seq/probing_morph-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                    </div>
+                                    <p style="text-align: center; font-size:20px;margin-top:30px;"><a
+                                            href="./nlp_course/seq2seq_and_attention.html">阅读更多 ⇨</a></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- div for seq2seq green card-->
+
+                    <script>
+                        var flkty_attn = new Flickity('.carousel_attention', {
+                            imagesLoaded: true, percentPosition: true,
+                            wrapAround: true, prevNextButtons: false,
+                        });
+
+                        flkty_attn.on('staticClick', function (event, pointer, cellElement, cellIndex) {
+                            flkty_attn.next();
+                        });
+                    </script>
+
+
+                    <div class="greenCard" id="thumbnail_green" style="background-color:white; margin:10px;width:96%">
+                        <div class="cardContent" id="preview_transfer">
+                            <div style="display: grid; grid-template-columns: 50% 50%; margin:10px;">
+
+                                <div>
+                                    <!--##############    begin of left part   ####################################-->
+                                    <div class="green_circle" style="float:right; margin-right:5px;"></div>
+                                    <div class="box_green_right">
+                                        <div style="margin-right:15px; ">
+
+                                            <h2 style="margin-bottom:5px;background-color:#f6fce8;text-align:center;">
+                                                <a href="./nlp_course/transfer_learning.html" style="color:black">
+                                                    迁移学习
+                                                </a>
+                                            </h2>
+                                            <ul class="data_text">
+                                                <li>什么是迁移学习</li>
+                                                <li>词语到语境中的词语</li>
+                                                <li>从替换词嵌入到替换模型</li>
+                                                <li>适配器</li>
+                                                <li><img height="20" src="./resources/lectures/ico/analysis_empty.png"
+                                                        style="margin-right:10px;" />
+                                                    分析与解释
+                                                </li>
+
+                                                <hr color="#e9f5d0" style="margin:5px;">
+
+                                                <h3 style="margin-bottom:2px;">研讨会 & 作业</h3>
+
+                                                <p class="data_text">
+                                                    <a href="https://github.com/yandexdataschool/nlp_course/tree/2020/week05_transfer"
+                                                        target="_blank">第五周</a>和<a
+                                                        href="https://github.com/yandexdataschool/nlp_course/tree/2020/week06_da"
+                                                        target="_blank">第六周</a>：<a
+                                                        href="https://github.com/yandexdataschool/nlp_course"
+                                                        target="_blank">课程仓库</a>。
+                                                </p>
+
+                                        </div>
+                                    </div>
+                                    <div class="green_circle" style="float:right; margin-right:5px;"></div>
+
+                                </div>
+                                <!--#########################   end of left part #########################-->
+
+                                <div>
+
+                                    <div class="carousel carousel_transfer"
+                                        style="width:100%; margin-left:-5px; margin-right:-5px;"
+                                        data-flickity='{ "imagesLoaded": true, "percentPosition": true, "wrapAround": true, "prevNextButtons": false}'>
+
+                                        <!--
+                                          <div class="carousel-cell" style="width:100%"><center>
+                                          <img src="./resources/lectures/main/preview/pusheen_tea.gif" style="width:50%; margin-top:60px;">
+                                          </center>
+                                          <p style="text-align: center; font-size:20px;">Wait for the release!<br>(December 10)</p></div>
+                                    -->
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/transfer/morda-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/transfer/words_to_context-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/transfer/cove-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/transfer/elmo1-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/transfer/elmo2-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/transfer/elmo3-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/transfer/idea2-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/transfer/bert-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/transfer/analysis1-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/transfer/analysis2-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/transfer/analysis3-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+
+                                    </div>
+                                    <p style="text-align: center; font-size:20px;margin-top:30px;"><a
+                                            href="./nlp_course/transfer_learning.html">阅读更多 ⇨</a></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- div for transfer learning green card-->
+
+                    <script>
+                        var flkty_transfer = new Flickity('.carousel_transfer', {
+                            imagesLoaded: true, percentPosition: true,
+                            wrapAround: true, prevNextButtons: false,
+                        });
+
+                        flkty_transfer.on('staticClick', function (event, pointer, cellElement, cellIndex) {
+                            flkty_transfer.next();
+                        });
+                    </script>
+
+
+                    <div style="display: grid; grid-template-columns: 50% 50%; margin:10px;"
+                        id="coming_soon_main_course">
+                        <div style="margin-top:90px;margin-left:40px;">
+                            <font style="font-size:30px;">未完待续...</font>
+                        </div>
+                        <div>
+                            <center>
+                                <img src="./resources/lectures/main/preview/typing.gif"
+                                    style="width:50%; padding-top:50px;padding-bottom:50px;border-radius:50%">
+                            </center>
+                        </div>
+                    </div>
+
+                </div> <!-- div for gray background-->
+
+
+            </div>
+
+
+            <br>
+            <hr style="height:5px" color="#b59fcf">
+            <br>
+
+            <div id="supplementary">
+
+                <h1>补充资料</h1>
+
+                <div
+                    style="border: 0px solid #ccc;border-radius:15px;margin: 10px; padding: 4px; background-color: #f5f5f5;">
+
+
+                    <div class="greenCard" id="thumbnail_violet" style="background-color:white; margin:10px;width:96%">
+                        <div class="cardContent" id="preview_supplementary_cnn">
+                            <div style="display: grid; grid-template-columns: 50% 50%; margin:10px;">
+
+                                <div>
+                                    <!--##############    begin of left part   ####################################-->
+                                    <div class="violet_circle" style="float:right; margin-right:5px;"></div>
+                                    <div class="box_violet_right">
+                                        <div style="margin-right:15px; ">
+
+                                            <h2 style="margin-bottom:5px;background-color:#f8f2ff;text-align:center;">
+                                                <a href="./nlp_course/models/convolutional.html"
+                                                    style="color:black">卷积网络</a>
+                                            </h2>
+                                            <ul class="data_text">
+                                                <li>直觉</li>
+                                                <li>构建模块: 卷积
+                                                </li>
+                                                <li>构建模块: 池化 (max/mean, k-max, global)</li>
+                                                <li>CNNs模型： 文本分类</li>
+                                                <li>CNNs模型：语言模型</li>
+                                                <li><img height="20" src="./resources/lectures/ico/analysis_empty.png"
+                                                        style="margin-right:10px;" />
+                                                    分析与解释
+                                                </li>
+
+                                        </div>
+                                    </div>
+                                    <div class="violet_circle" style="float:right; margin-right:5px;"></div>
+
+                                </div>
+                                <!--#########################   end of left part #########################-->
+
+                                <div>
+
+                                    <div class="carousel carousel_supp_cnn"
+                                        style="width:100%; margin-left:-5px; margin-right:-5px;"
+                                        data-flickity='{ "imagesLoaded": true, "percentPosition": true, "wrapAround": true, "prevNextButtons": false}'>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/cnn/receptive_field-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/cnn/conv1-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/cnn/conv2-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/cnn/kernel_size-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/cnn/stride-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/cnn/cnn_filter_feature-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/cnn/max_pooling-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/cnn/pooling-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/cnn/global_pooling-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/cnn/residual_connection-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+                                        <div class="carousel-cell" style="width:100%">
+                                            <center>
+                                                <img src="./resources/lectures/main/preview/cnn/model_with_residual-min.png"
+                                                    style="width:90%">
+                                            </center>
+                                        </div>
+
+                                        <!--
+                                    <div class="carousel-cell" style="width:100%"><center>
+                                      <img src="./resources/lectures/main/preview/word_emb/research_thinking-min.png" style="width:90%">
+                                  </center></div>
+                                    <div class="carousel-cell" style="width:100%"><center>
+                                      <img src="./resources/lectures/main/preview/word_emb/related_papers-min.png" style="width:90%">
+                                  </center></div>-->
+
+                                    </div>
+                                    <p style="text-align: center; font-size:20px;margin-top:30px;"><a
+                                            href="./nlp_course/models/convolutional.html">阅读更多 ⇨</a></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- div for word emb green card-->
+
+                    <script>
+                        var flkty_supp_cnn = new Flickity('.carousel_supp_cnn', {
+                            imagesLoaded: true, percentPosition: true,
+                            wrapAround: true, prevNextButtons: false,
+                        });
+
+                        flkty_supp_cnn.on('staticClick', function (event, pointer, cellElement, cellIndex) {
+                            flkty_supp_cnn.next();
+                        });
+                    </script>
+
+
+                    <div style="display: grid; grid-template-columns: 50% 50%; margin:10px;"
+                        id="coming_soon_main_course">
+                        <div style="margin-top:90px;margin-left:40px;">
+                            <font style="font-size:30px;">未完待续...</font>
+                        </div>
+                        <div>
+                            <center>
+                                <img src="./resources/lectures/main/preview/typing.gif"
+                                    style="width:50%; padding-top:50px;padding-bottom:50px;border-radius:50%">
+                            </center>
+                        </div>
+                    </div>
+
+                </div> <!-- div for gray background-->
+
+
+            </div>
+
+
+            <!--
+        <img width="50%" src="./resources/lectures/main/test2.png"
+                 style="float:right; margin-left: 25px; max-width:60%"/>
+        -->
+
+
+        </div>
+    </div>
+
+    </div>
+
+    <footer class="site-footer">
+        <div class="wrapper">
+
+            <div class="footer-col-wrapper">
+                <div class="footer-col">
+                    <p class="text" align="right">&copy; Copyright <font color="#4869df"><strong><a
+                                    href="https://lena-voita.github.io/" target="_blank">Lena Voita</a></strong></font>.
+                        Translated by <font color="#4869df"><strong>MLNLP</strong></font>. All Rights Reserved
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </footer>
+
+
+</body>
+
+</html>

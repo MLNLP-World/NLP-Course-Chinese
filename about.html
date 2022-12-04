@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>关于我们</title>
+    <meta name="description"
+        content="Convolutional Neural Networks from building blocks to applications for specific tasks.">
+
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="canonical" href="http://lena-voita.github.io/nlp_course/models/convolutional.html">
+
+    <!-- diff from head.html begin -->
+    <link rel="mask-icon" href="../../resources/lectures/ico/course_logo.png">
+    <link rel="alternate icon" class="js-site-favicon" type="image/png"
+        href="../../resources/lectures/ico/course_logo.png">
+    <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="../../resources/lectures/ico/course_logo.png">
+    <!-- diff from head.html end -->
+
+    <!--<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>-->
+
+
+</head>
+
+
+<!--style>
+p {
+  text-align: justify;
+}
+</style-->
+
+<body>
+
+    <header class="site-header">
+
+        <div class="wrapper">
+
+            <div id="title-image" style="display:inline">
+                <img class="site-img" src="../../img/ico/logo.jpeg" />
+            </div>
+
+            <div id="title-texts" style="display:inline">
+                <a class="site-title" href="https://github.com/MLNLP-World" target="_blank">MLNLP</a>
+            </div>
+
+            <nav class="site-nav">
+                <a href="#" class="menu-icon">
+                    <svg viewBox="0 0 18 15">
+                        <path fill="#424242"
+                            d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z" />
+                        <path fill="#424242"
+                            d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z" />
+                        <path fill="#424242"
+                            d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z" />
+                    </svg>
+                </a>
+
+                <div class="trigger">
+                    <a class="page-link" href="https://lena-voita.github.io/" target="_blank">原作者：Lena Voita</a>
+                    <a class="page-link" href="http://www.mlnlp2022.com/" target="_blank">MLNLP 2022</a>
+                </div>
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <!-- the next two lines are inserted once per page even if there are several shtukovinas,
+ the rest is one-per-shtukovina; read more: https://flickity.metafizzy.co/options.html -->
+    <link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css" media="screen">
+    <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
+
+    <!-- MathJax -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <style>
+        .demo_sidebar {
+            margin: 0;
+            padding: 0;
+            background-color: white;
+
+            position: relative;
+            height: auto;
+            width: 290px;
+        }
+
+        .demo_sidebar_text {
+            font-size: 18px;
+        }
+
+        .demo_sidebar_comment {
+            font-size: 15px;
+            margin-left: 10px;
+            font-family: "Comic Neue", "Arial";
+
+        }
+
+
+        .demo_sidebar a {
+            display: block;
+            color: black;
+            padding: 8px;
+            text-decoration: none;
+
+        }
+
+        .demo_sidebar a li {
+            margin-left: 5px;
+            padding: 0px;
+        }
+
+
+        .demo_sidebar a:hover {
+            box-shadow: 0 3px 6px #6e8f27, 0 1px 1px #6e8f27;
+        }
+
+        .demo_sidebar a:hover:not(.active) {
+            background-color: #f3f3f3;
+        }
+
+        .demo_sidebar .main_components {
+            background-color: #f3f3f3;
+        }
+
+        .demo_sidebar .extra_components {
+            background-color: #eaeaea;
+        }
+
+
+        #demo_sidebar_research_thinking:hover {
+            box-shadow: 0 3px 6px #a68305, 0 1px 1px #a68305;
+
+        }
+
+
+        #demo_sidebar_related_papers:hover {
+            box-shadow: 0 3px 6px #8a4972, 0 1px 1px #8a4972;
+        }
+
+
+        #demo_sidebar_fun:hover {
+            box-shadow: 0 3px 6px #377b94, 0 1px 1px #377b94;
+        }
+    </style>
+
+
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Josefin+Sans&display=swap');
+        @import url("https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap");
+        @import url("https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap");
+
+
+        #main_page_content {
+            margin-left: 300px;
+            padding: 30px;
+            padding-left: 70px;
+            text-align: justify;
+        }
+
+        .sidebar {
+            margin: 0;
+            padding: 0;
+            width: 270px;
+            background-color: #fafafa;
+            position: fixed;
+            height: 100%;
+            overflow: auto;
+            z-index: 1;
+        }
+
+        .sidebar a,
+        .dropdown-btn {
+            display: block;
+            color: black;
+            padding: 8px;
+            text-decoration: none;
+            border-right: 5px solid #b7db67;
+        }
+
+
+        .sidebar a li {
+            margin-left: 10px;
+            padding: 0px;
+        }
+
+        .dropdown-container {
+            display: none;
+            background-color: #f4f4f4;
+        }
+
+        .active_caret .fa-caret-down {
+            color: #b7db67;
+            font-size: 30px;
+        }
+
+        .fa-caret-down {
+            float: right;
+            padding-right: 8px;
+        }
+
+        .sidebar a.active {
+            background-color: #e3e3e3;
+            color: black;
+        }
+
+        .sidebar a:hover {
+            box-shadow: 0 3px 6px #6e8f27, 0 1px 1px #6e8f27;
+        }
+
+        .sidebar a:hover:not(.active) {
+            background-color: #f3f3f3;
+        }
+
+        .sidebar .extra_components {
+            background-color: #eaeaea;
+        }
+
+        #sidebar_analysis {
+            padding: 10px;
+        }
+
+        #sidebar_research_thinking {
+            padding: 10px;
+            border-right: 5px solid #fad400;
+        }
+
+        #sidebar_research_thinking:hover {
+            box-shadow: 0 3px 6px #a68305, 0 1px 1px #a68305;
+
+        }
+
+
+        #sidebar_related_papers {
+            padding: 10px;
+            border-right: 5px solid #d192ba;
+        }
+
+        #sidebar_related_papers:hover {
+            box-shadow: 0 3px 6px #8a4972, 0 1px 1px #8a4972;
+        }
+
+
+        #sidebar_fun {
+            padding: 10px;
+            border-right: 5px solid #6fb7d1;
+        }
+
+        #sidebar_fun:hover {
+            box-shadow: 0 3px 6px #377b94, 0 1px 1px #377b94;
+        }
+
+
+        .sidebar_ico {
+            float: right;
+            height: 20;
+        }
+
+        div.content {
+            margin-left: 200px;
+            padding: 1px 16px;
+            height: 1000px;
+        }
+
+        #sidebar_small {
+            width: 60px;
+        }
+
+
+        @media screen and (max-width: 1000px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            #main_page_content {
+                margin-left: 200px;
+                padding-left: 50px;
+            }
+
+            #for_you_in_sidebar {
+                display: none;
+            }
+
+        }
+
+
+        @media screen and (max-width: 800px) {
+
+            div.content {
+                margin-left: 0;
+            }
+
+            #main_page_content {
+                margin-left: 80px;
+                padding: 15px;
+            }
+
+            #demo_sidebar {}
+        }
+
+
+        .softmax_tau_bokeh {
+            font-size: 16px;
+        }
+
+
+        .card_with_ico {
+            position: relative;
+            padding: 10px;
+            margin: 10px;
+        }
+
+        .card_with_ico p {
+            padding: 10px;
+        }
+
+        .card_with_ico ul {
+            padding: 10px;
+        }
+
+        .card_with_ico .text_box_green {
+            border: 1px solid #d8e8b5;
+            border-radius: 5px;
+            margin-left: 30px;
+        }
+
+        .card_with_ico .text_box_pink {
+            border: 1px solid #dec8d6;
+            border-radius: 5px;
+            margin-left: 30px;
+        }
+
+        .card_with_ico .text_box_yellow {
+            border: 1px solid #f0e4a5;
+            border-radius: 5px;
+            margin-left: 30px;
+        }
+
+        .card_with_ico .ico {
+            float: left;
+            width: 25px;
+        }
+
+
+        .text_box_green {
+            border: 1px solid #d8e8b5;
+            border-radius: 5px;
+            display: table;
+            margin-left: 20px;
+        }
+
+        .text_box_green p {
+            padding: 10px;
+            padding-bottom: 0px;
+        }
+
+
+        .green_left_thought {
+            border-left: 5px solid #b7db67;
+            margin: 10px;
+            margin-left: 20px;
+            padding: 0px;
+            background-color: #fafcf5;
+        }
+
+        .green_left_thought p {
+
+            margin-left: 10px;
+            padding: 5px;
+        }
+
+
+        .box_green_left {
+            border-left: 2px solid #79a123;
+            margin-left: 10px;
+            padding: 10px;
+        }
+
+        .box_green_right {
+            border-right: 2px solid #79a123;
+            margin-right: 10px;
+            padding: 10px;
+        }
+
+        .box_violet_right {
+            border-right: 2px solid #67468f;
+            margin-right: 10px;
+            padding: 10px;
+        }
+
+        .box_pink_left {
+            border-left: 2px solid #7a3160;
+            margin-left: 5px;
+            padding: 10px;
+        }
+
+        .box_yellow_left {
+            border-left: 2px solid #d6b000;
+            margin-left: 5px;
+            padding: 10px;
+        }
+
+        .box_blue_left {
+            border-left: 2px solid #0278a1;
+            margin-left: 5px;
+            padding: 10px;
+        }
+
+        .paper_title {
+            text-align: center;
+            padding: 5px;
+            padding-top: 0px;
+            font-size: 16px;
+
+        }
+
+        .paper_authors {
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        p {
+            text-align: justify;
+        }
+
+
+        .greenCard {
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 1px;
+            margin: 10px 5px;
+            padding: 3px;
+            display: grid;
+            grid-template-rows: auto auto;
+        }
+
+        #thumbnail_green {
+            box-shadow: 0 2px 4px #6e8f27, 0 1px 1px #6e8f27;
+        }
+
+        #thumbnail_green:hover {
+            box-shadow: 0 6px 12px #6e8f27, 0 4px 4px #6e8f27;
+        }
+
+        #thumbnail_violet {
+            box-shadow: 0 2px 4px #655578, 0 1px 1px #655578;
+        }
+
+        #thumbnail_violet:hover {
+            box-shadow: 0 6px 12px #655578, 0 4px 4px #655578;
+        }
+
+        #thumbnail_paper {
+            box-shadow: 0 2px 4px #ab859e, 0 1px 1px #ab859e;
+        }
+
+        #thumbnail_paper:hover {
+            box-shadow: 0 6px 12px #ab859e, 0 4px 4px #ab859e;
+        }
+
+
+        #thumbnail_blue {
+            box-shadow: 0 2px 4px #377b94, 0 1px 1px;
+        }
+
+        #thumbnail_blue:hover {
+            box-shadow: 0 6px 12px #377b94, 0 4px 4px #377b94;
+        }
+
+        .paperCard {
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 1px;
+            margin: 10px 5px;
+            padding: 3px;
+            display: grid;
+            grid-template-rows: auto auto;
+        }
+
+        .paperIntro {
+            display: grid;
+            grid-template-columns: 70% 30%;
+        }
+
+        .showMePaper {
+            box-shadow: 0 2px 4px #a68305, 0 2px 1px #a68305;
+        }
+
+        .showMePaper:hover {
+            box-shadow: 0 3px 6px #ab859e, 0 4px 4px #ab859e;
+        }
+
+
+        .cardContent {
+            padding: 10px;
+        }
+
+        .center {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .conf_name {
+            float: right;
+            font-family: sans-serif;
+            font-size: 13px;
+            margin-bottom: 0px;
+            background-color: #f7edf4;
+            border: 1px solid #d1a1c3;
+            border-radius: 1px;
+            padding: 0px 4px 0px 4px;
+        }
+
+
+        .paper_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #cf99be;
+            border: 1px solid #8c2b6e;
+            border-radius: 50%;
+        }
+
+        .research_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #ffda00;
+            border: 1px solid #998300;
+            border-radius: 50%;
+        }
+
+        .fun_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #68c7e8;
+            border: 1px solid #0278a1;
+            border-radius: 50%;
+        }
+
+        .green_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #b7db67;
+            border: 1px solid #598005;
+            border-radius: 50%;
+        }
+
+        .violet_circle {
+            height: 10px;
+            width: 10px;
+            background-color: #b59fcf;
+            border: 1px solid #67468f;
+            border-radius: 50%;
+        }
+
+        .data_text {
+            font-family: "Comic Neue", "Arial";
+        }
+
+
+        .researchCard {
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 1px;
+            margin: 10px 5px;
+            padding: 3px;
+            display: grid;
+            grid-template-rows: auto auto;
+        }
+
+        .researchIntro {
+            display: grid;
+            grid-template-columns: 70% 30%;
+        }
+
+        #thumbnail_research {
+            box-shadow: 0 2px 4px #a68305, 0 1px 1px #a68305;
+        }
+
+        #thumbnail_research:hover {
+            box-shadow: 0 6px 12px #a68305, 0 4px 4px #a68305;
+        }
+
+        .research_title {
+            text-align: center;
+            padding: 5px;
+            font-size: 18px;
+            font-family: "Comic Neue", "Arial";
+            background-color: #fafaf5;
+
+
+        }
+
+        .research_tag {
+            float: right;
+            font-family: sans-serif;
+            font-size: 13px;
+            margin-bottom: 0px;
+            background-color: #f5f0d5;
+            border: 1px solid #fad400;
+            border-radius: 1px;
+            padding: 0px 4px 0px 4px;
+        }
+
+        .research_question {
+            font-weight: bold;
+            font-size: 18px;
+            background-color: #fff4b3;
+            margin-right: 15px;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
+        .research_summary {
+            padding: 5px;
+            font-size: 18px;
+            font-family: "Comic Neue", "Arial";
+            background-color: #fafaf5;
+            margin-left: 10px;
+        }
+
+
+        .text_table td,
+        .text_table th {
+            text-align: center;
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-top: 2px;
+            padding-bottom: 2px;
+        }
+    </style>
+
+    <!--##################################################-->
+
+    <div>
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar_components">
+                <a href="javascript:void(0)" id="close_sidebar_btn" onclick="closeNav()"
+                    style="text-align:center;font-size:30px;padding:0px;">⇤</a>
+
+                <a class="active" href="../../nlp_course.html" style="font-weight: bold;">
+                    <img height="18" class='sidebar_ico' src="../../resources/lectures/ico/course_logo.png"
+                        style="margin-right: 8px;margin-left: 8px;margin-top: 4px;" />
+                    NLP Course <font color="#92bf32" id="for_you_in_sidebar">| 专属定制</font></a>
+                <a href="#acknowledgement">致谢</a>
+                <a href="#participant">人员</a>
+                <a href="#editor">编辑</a>
+                <a href="#contact">联系</a>
+                <a href="#contributor">贡献者</a>
+
+
+            </div>
+        </div>
+
+
+        <div class="sidebar" id="sidebar_small">
+
+            <a class="active" onclick="openNav()" style="text-align:center;">☰</a>
+            <a href="../nlp_course.html" style="font-weight: bold;">
+                <img height="20" src="../../resources/lectures/ico/course_logo.png"
+                    style="margin-right: 8px;margin-left: 8px;" /></a>
+            <a href="#main_page_content" style="text-align:center; font-size:20px;color:#7ca81e"> <i
+                    class="fa fa-home"></i></a>
+
+            <a href="#analysis_interpretability" id="sidebar_analysis"> <img height="25"
+                    src="../../resources/lectures/ico/analysis_empty.png" /></a>
+
+        </div>
+
+
+        <script>
+            function openNav() {
+                document.getElementById("sidebar").style.display = "block";
+                document.getElementById("sidebar_small").style.display = "none";
+                document.getElementById("close_sidebar_btn").style.display = "block";
+            }
+
+            function closeNav() {
+                document.getElementById("sidebar").style.display = "none";
+                document.getElementById("sidebar_small").style.display = "block";
+                document.getElementById("close_sidebar_btn").style.display = "none";
+            }
+
+        </script>
+
+
+        <script>
+            function onResize() {
+                if (window.innerWidth >= 800) {
+                    document.getElementById("sidebar").style.display = "block";
+                    document.getElementById("sidebar_small").style.display = "none";
+                    document.getElementById("close_sidebar_btn").style.display = "none";
+                } else {
+                    document.getElementById("sidebar").style.display = "none";
+                    document.getElementById("sidebar_small").style.display = "block";
+
+                }
+            }
+
+            window.onresize = onResize;
+            onResize();
+        </script>
+
+        <script>
+            /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
+            var dropdown = document.getElementsByClassName("dropdown-btn");
+            var i;
+
+            for (i = 0; i < dropdown.length; i++) {
+                dropdown[i].addEventListener("click", function (event) {
+                    this.classList.toggle("active_caret");
+                    var dropdownButton = event.target || event.srcElement;
+                    while (dropdownButton.className != "dropdown-scope")
+                        dropdownButton = dropdownButton.parentElement;
+                    var dropdownContent = dropdownButton.getElementsByClassName("dropdown-container")[0];
+
+                    if (dropdownContent.style.display === "block") {
+                        dropdownContent.style.display = "none";
+                    } else {
+                        dropdownContent.style.display = "block";
+                    }
+                });
+            }
+        </script>
+
+
+        <div class="wrapper" id="main_page_content">
+            <div class="header">
+                <h1>关于我们</h1>
+            </div>
+
+
+            <div class="main_content" id="main_content">
+                <div id="acknowledgement">
+                    <h2>致谢</h2>
+                    感谢<a href="https://lena-voita.github.io/">Lena
+                        Voita博士</a>完成如此惊艳生动、精妙绝伦的在线课程，为一众NLP初学者提供了极其宝贵的学习资源，借用《上帝掷骰子吗？：量子物理史话》一书序言，<font
+                        face="STXingkai">
+                        “这个故事更像一个传奇，由一个不起眼的线索开始，曲径通幽，渐渐地落英缤纷，乱花迷眼。正在没头绪处时，突然间峰回路转，天地开阔，如河出伏流，一泻汪洋，但还未来得及一览美景，转眼间却又大起大落，误入白云深处不知归路”
+                    </font>。感谢Lena博士的慷慨授权，使得<a href="https://github.com/MLNLP-World">MLNLP社区</a>有机会将其译为中文，以供国内NLP初学者学习。
+                </div>
+
+
+
+                <br>
+                <div id="participant">
+                    <h2>人员</h2>
+                    本项目得到了MLNLP社区成员的大力支持，每一位参与者都无偿参与到此项目：
+                    <ul>
+                        <li><a href="./nlp_course/word_embeddings.html" target="_blank">词嵌入</a>
+                            翻译：<a href="http://jinjie.one/" target="_blank" style="font-weight: bold;">倪瑾杰</a> &nbsp;
+                            &nbsp; 校对：<a href="https://siviltaram.github.io/" target="_blank"
+                                style="font-weight: bold;">刘乾</a>
+                        </li>
+                        <li><a href="./nlp_course/text_classification.html" target="_blank">文本分类</a> 翻译：<a
+                                href="https://github.com/LightChen233" target="_blank"
+                                style="font-weight: bold;">陈麒光</a>
+                            &nbsp; &nbsp;
+                            校对：<a href="http://xcfeng.net/" target="_blank" style="font-weight: bold;">冯夏冲</a>
+                        </li>
+                        <li><a href="./nlp_course/language_modeling.html" target="_blank">语言模型</a> 翻译：<a
+                                href="https://xiaoyuanyi.github.io/" target="_blank" style="font-weight: bold;">矣晓沅</a>
+                            &nbsp; &nbsp;
+                            校对：<a href="https://cartus.github.io/" target="_blank" style="font-weight: bold;">郭志江</a>
+                        </li>
+                        <li><a href="./nlp_course/seq2seq_and_attention.html" target="_blank">序列到序列与注意力机制</a> 翻译：
+                            <a href="http://xcfeng.net/" target="_blank" style="font-weight: bold;">冯夏冲</a>
+                            &nbsp; &nbsp; 校对：<a href="https://yihengshu.github.io/" target="_blank"
+                                style="font-weight: bold;">舒意恒</a>
+                        </li>
+                        <li><a href="./nlp_course/transfer_learning.html" target="_blank">迁移学习</a> 翻译：<a href=""
+                                target="_blank" style="font-weight: bold;">覃立波</a>
+                            &nbsp; &nbsp; 校对：<a href="https://cartus.github.io/" target="_blank"
+                                style="font-weight: bold;">郭志江</a></li>
+                        <li><a href="./nlp_course/models/convolutional.html" target="_blank">卷积网络</a> 翻译：<a
+                                href="https://sites.google.com/view/yongfei-liu" target="_blank"
+                                style="font-weight: bold;">刘永飞</a>
+                            &nbsp; &nbsp; 校对：<a href="https://edwardzh.github.io/" target="_blank"
+                                style="font-weight: bold;">刘正浩</a></li>
+                    </ul>
+                </div>
+
+                <br>
+                <div id="editor">
+                    <h2>编辑</h2>
+                    <a href="https://lena-voita.github.io/">Lena Voita博士</a>授权，<a
+                        href="https://github.com/MLNLP-World">MLNLP社区</a>组织，<a href="http://xcfeng.net/">冯夏冲</a>总编辑。
+                </div>
+
+
+
+                <br>
+                <div id="contact">
+                    <h2>联系</h2>
+                    因译者能力有限，译文难免存在错误、不妥之处。如您发现问题，可在Github项目页面提交Issue，或发送邮件至<a
+                        href="mailto:fengxiachong_hit@163.com">冯夏冲</a>，我们将立即修正，并将您添加到贡献者列表。
+                </div>
+
+
+                <br>
+                <div id="contributor">
+                    <h2>贡献者（持续更新）</h2>
+                    <ul>
+                        <li>
+                            （示例）姓名：改进内容
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+
+
+        </div>
+
+        <footer class="site-footer">
+            <div class="wrapper">
+
+                <div class="footer-col-wrapper">
+                    <div class="footer-col">
+                        <p class="text" align="right">&copy; Copyright <font color="#4869df"><strong><a
+                                        href="https://lena-voita.github.io/" target="_blank">Lena Voita</a></strong>
+                            </font>.
+                            Translated by <font color="#4869df"><strong>MLNLP</strong></font>. All Rights Reserved
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </footer>
+
+
+</body>
+
+</html>
