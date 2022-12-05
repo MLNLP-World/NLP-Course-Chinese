@@ -1063,7 +1063,7 @@
 
                     <p>
                         <!--How can we estimate the probability of a sentence?-->
-                        让我们看看简单的概率论所有帮助。想象我们有一个装有不同颜色的球的篮子。从这个篮子里选出一个特定颜色（比如绿色）的球的概率就是绿色球出现在篮子里的频率。
+                        让我们用简单的概率论知识来帮助理解。想象我们有一个装有不同颜色的球的篮子。从这个篮子里选出一个特定颜色（比如绿色）的球的概率就是绿色球出现在篮子里的频率。
 
                     </p>
 
@@ -1228,9 +1228,7 @@
 
                                     </p>
                                 </div>
-                                Formally, n-gram models assume that
 
-                                For example,
                                 形式化地 ，n元语法模型假设
                                 \[P(y_t|y_1, \dots, y_{t-1}) = P(y_t|y_{t-n+1}, \dots, y_{t-1}).\]
                                 例如,
@@ -1350,7 +1348,7 @@
                             style="font-size:9px;" target="_blank">(英文原文)</a></h4>
                     <p>
                         避免这种情况的最简单方法就是<b>假装</b> 我们<b>至少见过一次</b>
-                        所有的n元语法：只需在所有计数中加1！或者，可以添加一个小\(\delta\)\(\delta\)，而不是1：
+                        所有的n元语法：只需在所有计数中加1！或者，可以添加一个小\(\delta\)，而不是1：
                     </p>
                     <center>
                         <img width="45%" src="../resources/lectures/lang_models/ngram/laplace-min.png" />
@@ -1742,7 +1740,7 @@
                     您可能注意到这些例子并不通顺：可以清楚地看到，该模型不使用长上下文，只依赖于几个token。<b>无法使用长上下文</b>是n-gram模型的主要缺点。
 
 
-                <p>现在，我们采用相同的模型，但执行贪心解码：在每一步中，我们选择概率最高的token。我们使用了上面示例中的两个token长度前缀（对于每个例子，输入到模型的前缀有下划线）。
+                <p>现在，我们采用相同的模型，但执行贪心解码：在每一步中，我们选择概率最高的token。我们使用了上面示例中的两个token长的前缀（对于每个例子，输入到模型的前缀有下划线）。
 
                 </p><br>
 
@@ -1752,7 +1750,7 @@
                     <div class="text_box_green">
 
                         <p class="data_text">
-                            <u>如何观察：</u> 观察同一个模型使用贪心解码生成的示例。你喜欢这些文字吗？你会如何描述他们？
+                            <u>如何观察：</u> 观察同一个模型使用贪心解码生成的示例。你喜欢这些文字吗？你会如何描述它们？
 
                         </p>
                     </div>
@@ -2054,7 +2052,7 @@
 
                 <br><br>
 
-                <p>我们能看到这些贪心解码出的问问：</p>
+                <p>我们能看到这些贪心解码出的问题：</p>
                 <ul>
                     <li>更短 - 句子结束符 <font face="courier">_eos_</font> 有很高的概率;
                     </li>
@@ -2082,10 +2080,10 @@
                 在<a href="#general">我们的通用的从左到右语言建模框架</a>中, token序列的概率为:
                 \[P(y_1, y_2, \dots, y_n)=P(y_1)\cdot P(y_2|y_1)\cdot P(y_3|y_1, y_2)\cdot\dots\cdot P(y_n|y_1,
                 \dots, y_{n-1})=
-                \prod \limits_{t=1}^n P(y_t|y_{\mbox{<}t}).\] 让我们再次回顾剩下的事情。 </p>
+                \prod \limits_{t=1}^n P(y_t|y_{\mbox{<}t}).\] 我们再回顾一下还有哪些事没做。 </p>
 
                     <div class="green_left_thought">
-                        <p class="data_text" style="font-size:18px;"><u>我们需要做</u>:
+                        <p class="data_text" style="font-size:18px;"><u>我们需要</u>:
                             定义如何计算条件概率 \(P(y_t|y_1, \dots, y_{t-1})\).</p>
                     </div>
 
@@ -2121,7 +2119,7 @@
                             style="font-size:9px;" target="_blank">(英文原文)</a>
                     </h3>
                     <p>
-                        我们可以把神经语言模型看作神经网络分类器。他们将文本的前缀分类为<b>|V|</b>类，类别则是词汇表中的token。
+                        我们可以把神经语言模型看作神经网络分类器。它们将文本的前缀分类为<b>|V|</b>类，类别则是词汇表中的token。
                     </p>
 
 
@@ -2369,14 +2367,14 @@
 
 
                                 <h3 id="receptive_field">
-                                    <b>感受野</b>: 当使用很多层是能变得很大 <a
+                                    <b>感受野</b>: 层数越多，感受野越多 <a
                                         href="https://lena-voita.github.io/nlp_course/language_modeling.html#:~:text=Receptive%20field%3A%20with%20many%20layers%2C%20can%20be%20large"
                                         style="font-size:9px;" target="_blank">(英文原文)</a>
                                 </h3>
 
                                 <img src="../resources/lectures/lang_models/neural/cnn/receptive_field-min.png"
                                     style="max-width:45%; margin-left:20px;float:right;" />
-                                <p>当使用没有全局池化的卷积模型时，您的模型会不可避免地具有固定大小的上下文。这似乎是我们喜欢的：固定大小的上下文正是我们在n-gram模型中的遇到的问题。
+                                <p>当使用没有全局池化的卷积模型时，您的模型会不可避免地具有固定大小的上下文。这不是我们想要的：固定大小的上下文正是我们在n-gram模型中的遇到的问题。
 
                                 </p>
                                 <p>
@@ -2425,8 +2423,8 @@
                                         <p class="data_text">
 
                                             除了提取特征并将其传递到下一层之外，我们还可以了解对每个token需要传递哪些特征，哪些不需要。更多细节见这篇<a
-                                                href="#papers_architectures">论文摘要</a><br><br>。
-                                            P.S. 里面也包含为了获得好的结果你需要用CNN覆盖的上下文大小。
+                                                href="#papers_architectures">论文摘要</a>。<br><br>P.S.
+                                            里面也包含为了获得好的结果你需要用CNN覆盖的上下文大小。
                                         </p>
                                     </div>
                                 </div>
@@ -2804,7 +2802,7 @@
 
             <br><br>
 
-            <h2 id="generation_strategies_temperature">带温度的采样 <a
+            <h2 id="generation_strategies_temperature">带温度参数的采样 <a
                     href="https://lena-voita.github.io/nlp_course/language_modeling.html#:~:text=Sampling%20with%20temperature"
                     style="font-size:9px;" target="_blank">(英文原文)</a>
             </h2>
@@ -2844,7 +2842,7 @@
                         <u>如何观察：</u> 在右侧框中修改温度参数并观察概率分布如何变化。注意最有可能的类别（绿色）和其他类别之间的差异变化。
                     </p>
                     <ul class="data_text" style="padding-left:15px; padding-right:15px;">
-                        <li>当温度接近0是发生了什么？
+                        <li>当温度接近0时发生了什么？
                         </li>
                         <li>当温度很高时发生了什么？
                         </li>
@@ -3283,9 +3281,7 @@
                 <div class="text_box_green">
 
                     <p class="data_text">
-                        <u>如何观察：</u> Look at the samples with the temperature 0.2.
-                        How are these samples are different from
-                        the previous ones? Try to characterize both coherence and diversity.
+                        <u>如何观察：</u>
                         看看<strong>温度为0.2</strong>生成的样例。这些样例和前面的那些有什么不同？试着描述它们的连贯性和多样性。
 
                         <br><br>
@@ -3570,14 +3566,14 @@
             <br>
             <p>
 
-                这里我们遇到了另一个问题：样例缺乏多样性。你可能注意到了讨厌的的<span class="data_text"><strong> "the hotel is located in the heart of
+                这里我们遇到了另一个问题：样例缺乏多样性。你可能注意到了讨厌的<span class="data_text"><strong> "the hotel is located in the heart of
                         the city .</strong></span>
                 _eos_" 这句话—感觉有一半的样例都生成了这句话！还要注意第一个例子中重复的短语<span class="data_text"><strong>"of the new
                         version"</strong></span>——效果不好的模型陷入了一个循环。
 
             </p>
 
-            <p>总结一下我们的发现，使用温度可以改变采样质量，但一致性和多样性的其中之一会以牺牲另一者为代价收到影响。
+            <p>总结一下我们的发现，使用温度可以改变采样质量，但一致性和多样性的其中之一会以牺牲另一者为代价受到影响。
             </p>
 
 
@@ -4250,7 +4246,7 @@
                     style="font-size:9px;" target="_blank">(英文原文)</a></h1>
 
             <div class="green_left_thought" style="font-size:18px;">
-                <p class="data_text"><u>太长不看： </u> 当阅读一段新文本时，模型有多“惊讶”？
+                <p class="data_text"><u>太长不看：</u> 当阅读一段新文本时，模型有多“惊讶”？
                 </p>
             </div>
 
@@ -4270,8 +4266,7 @@
             </center>
 
             <p>
-                就像好的物理世界模型必须与真实世界很好地吻合一样，好的语言模型也必须与<b>真实文本</b>
-                .很好地吻合。这是评估的主要思想：如果我们给一个模型的文本某种程度上接近模型所期望的，那么它就是一个好的模型。
+                就像好的物理世界模型必须与真实世界很好地吻合一样，好的语言模型也必须与<b>真实文本</b>很好地吻合。这是评估的主要思想：如果我们给一个模型的文本某种程度上接近模型所期望的，那么它就是一个好的模型。
 
             </p>
 
@@ -4382,10 +4377,7 @@
                 <img class="ico" width="40" src="../resources/lectures/ico/book_empty.png" />
                 <div class="text_box_pink">
                     <p class="data_text">
-                        Weight tying has an effect similar to the regularizer which forces a
-                        model to give high probability not only to the target token
-                        but also to the words close to the target in the embedding space.
-                        More details are here.
+
                         权重绑定的效果类似于正则化项，可以迫使模型不仅对目标token，而且对嵌入空间中靠近接近的词的token也给出高概率。<a
                             href="#paper_weight_tying">更多细节请看这里。</a>
                     </p>
@@ -4434,7 +4426,7 @@
 
                 <div class="text_box_green">
                     <p class="data_text">
-                        Why do you think the model leaned these things?
+
                         请看<a href="https://arxiv.org/abs/1506.02078" target="_blank">Visualizing and Understanding
                             Recurrent Networks</a>一文中的例子。<br>
                         你认为模型为什么会倾向于这些内容？
@@ -4630,7 +4622,7 @@
                     <li>看看可能的答案——之前回答/解决这个问题的尝试。
                         <br>
                         <u>重要提示：</u>
-                        你<strong>不应该</strong>提出和这里完全一样的东西—记住，每篇论文通常需要花费作者几个月的工作。思考这些事情是一种有用的习惯！科学家所需要的盛夏的就是时间：用来不断地尝试-失败-思考，直到成功。
+                        你<strong>不应该</strong>提出和这里完全一样的东西—记住，每篇论文通常需要花费作者几个月的工作。思考这些事情是一种有用的习惯！科学家所需要的剩下的就是时间：用来不断地尝试-失败-思考，直到成功。
 
                     </li>
                 </ul>
@@ -4664,7 +4656,7 @@
 
                             <hr color="#dedeca" style="margin:5px;">
                             <a href="./text_classification.html#analysis_interpretability"
-                                target="_blank">正如我们在前面的教程中中所看到的</a>，训练来进行情绪分析的CNN过滤器到了非常可解释且信息丰富的情感“线索”
+                                target="_blank">正如我们在前面的教程中所看到的</a>，训练来进行情绪分析的CNN过滤器到了可解释且信息丰富的情感“线索”
                             （例如，<font class="data_text"><strong>poorly designed junk</strong></font>, <font
                                 class="data_text"><strong>still working perfect</strong></font>, <font
                                 class="data_text"><strong>a mediocre product</strong></font>等）。
@@ -4692,7 +4684,7 @@
                             <h2>太长不看: 模型学到了对手头任务有用的模式</h2>
                             <p>
                                 让我们用一个简单的卷积模型来看看这篇<a href="https://www.aclweb.org/anthology/D16-1123.pdf"
-                                    target="_blank">This EMNLP
+                                    target="_blank">EMNLP
                                     2016</a>论文中的例子。与我们在前面的教程中中对文本分类模型所做的类似，作者将开发数集据输入给模型，并找到最能激活特定过滤器的n-grams。
 
                             </p>
@@ -4864,7 +4856,7 @@
 
 
                             <h2>效果: 类似于权重绑定</h2>
-                            <p>作者从理论上表明，优化带正则项的新的训练目标的效果类似于对输入和输出单词嵌入使用相同的参数进（“权重绑定”）。
+                            <p>作者从理论上表明，优化带正则项的新的训练目标的效果类似于对输入和输出单词嵌入使用相同的参数（“权重绑定”）。
                             </p>
 
                             <h2>权重绑定的优点</h2>
@@ -4902,7 +4894,7 @@
 
             <div class="paper_circle" style="float:left;"></div>
             <h2 style="margin-top:-10px; float: left; padding-left:10px; padding-right:10px; color:#7a3160">
-                Model Architectures</h2>
+                模型架构</h2>
             <div class="box_pink_left" id="papers_architectures">
 
                 <!--##################################################-->
@@ -4950,17 +4942,15 @@
                             <img src="../resources/lectures/lang_models/papers/glu_paper-min.png" alt="" width=40%
                                 style="margin-left:20px;float:right;" />
                             <p>
-                                除了提取特征并将其传递到下一层之外，还需要了解对这一token我们需要传递哪些特征需要，哪些不需要。为此，卷积用来提取提取\(2d\) 维的特征：
+                                除了提取特征并将其传递到下一层之外，还需要了解对这一token我们需要传递哪些特征需要，哪些不需要。为此，卷积用来提取\(2d\) 维的特征：
                             </p>
                             <ul>
                                 <li>\(d\) <b>维内容特征</b><br>
                                     这是主要特征—用于从输入中抽取信息。
                                 </li>
                                 <li>\(d\) <b>维门控特征</b><br>
-                                    门控特征用于屏蔽内容特征。它们被传递给
-                                    The gate features are used to mask out content features.
-                                    They are passed to the sigmoid function - it transforms the features into
-                                    "gate values" from 0 to 1.
+                                    门控特征用于屏蔽内容特征。它们被传递给sigmoid函数，将特征转换为从0到1的“门值”。
+
                                 </li>
                             </ul>
 
@@ -4973,11 +4963,7 @@
 
 
                             <h2>质量和上下文大小</h2>
-                            <p>The figure below shows model quality depending on context size (context size
-                                is the CNN receptive field; it is evaluated as we saw
-                                here). All in all, if you stack
-                                the number of layers sufficient to cover about 40 tokens, your model
-                                will be quite good.
+                            <p>
                                 下图显示了模型质量依赖于上下文大小（上下文大小是CNN的感受野；评估和我们在这部分的一样）。总而言之，如果你堆叠的层数足以覆盖约40个token，那你的模型就相当不错了。
 
 
@@ -5009,6 +4995,20 @@
 
 
             </div>
+
+
+            <!--##################################################-->
+
+            <div class="cardContent">
+                <a href="#analysis_contrastive"></a>
+            </div>
+
+
+            <!--##################################################-->
+
+
+
+
             <div class="paper_circle" style="float:left;"></div>
 
             <!--##################################################-->
@@ -5020,6 +5020,10 @@
             <!--##################################################-->
             <!--##################################################-->
             <!--##################################################-->
+
+
+            <!-- </div>
+    </div> -->
 
             <div class="paper_circle" style="float:left;"></div>
             <h2 style="margin-top:-10px; float: left; padding-left:10px; padding-right:10px; color:#7a3160">
@@ -5047,6 +5051,7 @@
                             <a href="#analysis_contrastive">如前我们前面看到的</a>，对比评估可用于检查一个模型是否符合语法，例如通过测试主谓一致性。
                             但我们怎么知道模型是学习了语法还是仅仅学习了搭配/语义呢？作者提出了一个非常有趣的方法来找出答案：让我们用一个没有意义的句子，来看看模型是否产生了正确的屈折变化。
 
+
                         </div>
 
                         <div>
@@ -5056,6 +5061,7 @@
                                     style="margin-top:20px;" class="center" />
                             </a>
                         </div>
+
 
                     </div>
                     <hr color="#f2e4ee" style="margin:5px">
@@ -5067,9 +5073,11 @@
                             <p>
 
                                 为了区分一个模型确实学会了语法一致或只是搭配的情况，作者不仅测试了“正常”的例子，还测试了那些没有意义的例子。
-                                例如，在句子<font class="data_text"><strong>“The colorless green <font color="#79a123">ideas
+                                例如，在句子<font class="data_text"><strong>“The colorless green <font color="#79a123">
+                                            ideas
                                         </font>
-                                        I ate with the chair <font color="#79a123">sleep</font> furiously ?”</strong>
+                                        I ate with the chair <font color="#79a123">sleep</font> furiously
+                                        ?”</strong>
                                 </font>中，模型是否能预测正确的一致性？
 
                             </p>
@@ -5120,6 +5128,8 @@
                         </details>
                     </div>
                 </div>
+
+                <!-- </div> -->
 
                 <!--##################################################-->
 
@@ -5208,7 +5218,8 @@
                                 (2) The children went outside to...
                             </p>
                             <p>
-                                在第一个例子中,后续部分可能非常不同，但在第二个例子中，大约90%的参与者都建议<font class="data_text"><strong>play</strong>
+                                在第一个例子中,后续部分可能非常不同，但在第二个例子中，大约90%的参与者都建议<font class="data_text">
+                                    <strong>play</strong>
                                 </font>这个词。
 
                             </p>
@@ -5248,7 +5259,7 @@
                                 width=30% style="margin-top:20px;margin-left:20px;float:right;" />
                             <h2>结果</h2>
                             <ul>
-                                <li>可计算语言模型可以很好地预测人类阅读每个单词所需;
+                                <li>可计算语言模型可以很好地预测人类阅读每个单词所需的时间;
 
                                 </li>
                                 <li>阅读时间和可预测性之间的函数关系现在知道了：对数关系（即，单词的对数概率和阅读时间之间的关系是（近）线性的——如右图所示）。
@@ -5590,7 +5601,7 @@
                 </p>
             </legend>
             <p class="data_text">
-                通常，我们希望像词嵌入能像人类一样推理。但我们可以试试相反的思路：试着把像词嵌入一样思考。
+                通常，我们希望像词嵌入能像人类一样推理。但我们可以试试相反的思路：试着像词嵌入一样思考。
 
 
             </p>
