@@ -52,13 +52,13 @@
 ## <img src="./img/ico/readme_ico/notes.png" width="25" /> 内容
 | ID	|           章节           |                                           	英文原文                                           |                                                   中文翻译                                                 |                                            	翻译者                                            |                                        校对者                                           | 
 |:---:|:---------------------------:|:-------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------:|
-| 1	|         Homepage  	         |                 [nlp_course](https://lena-voita.github.io/nlp_course.html) 	                  |                                                    [Homepage](https://mlnlp-world.github.io/NLP-Course-Chinese/index.html)                                                  |   <a href="https://github.com/xcfcode">  <img src="./img/ico/readme_profile/xiachong.png"  width="50" /></a>    | <a href="https://github.com/yizhen20133868">  <img src="./img/ico/readme_profile/libo.png"  width="50" /></a> | 
-| 2	|      Word Embeddings	       |     [word_embeddings]( https://lena-voita.github.io/nlp_course/word_embeddings.html)   	      |  [word_embeddings](https://mlnlp-world.github.io/NLP-Course-Chinese/nlp_course/word_embeddings.html) |    <a href="https://github.com/Psycoy">  <img src="./img/ico/readme_profile/jinjie.png"  width="50" /></a>	     |   <a href="https://github.com/SivilTaram">  <img src="./img/ico/readme_profile/qian.png"  width="50" /></a>   | 
-| 3	|    Text Classification	     |  [text_classification](https://mlnlp-world.github.io/NLP-Course-Chinese/nlp_course/text_classification.html)  	   |   [text_classification](https://mlnlp-world.github.io/NLP-Course-Chinese/nlp_course/text_classification.html) | <a href="https://github.com/LightChen233">  <img src="./img/ico/readme_profile/qiguang.png"  width="50" /></a>	 |  <a href="https://github.com/xcfcode">  <img src="./img/ico/readme_profile/xiachong.png"  width="50" /></a>   | 
-| 4	|     Language Modeling	      |    [language_modeling](https://lena-voita.github.io/nlp_course/language_modeling.html)  	     | [language_modeling](https://mlnlp-world.github.io/NLP-Course-Chinese/nlp_course/language_modeling.html) | <a href="https://xiaoyuanyi.github.io/">  <img src="./img/ico/readme_profile/xiaoyuan.png"  width="50" /></a>	  |   <a href="https://github.com/Cartus">  <img src="./img/ico/readme_profile/zhijiang.png"  width="50" /></a>   | 
-| 5	| Seq2seq and Attention	      |[seq2seq_and_attention](https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html)  	 |  [seq2seq_and_attention](https://mlnlp-world.github.io/NLP-Course-Chinese/nlp_course/seq2seq_and_attention.html) |   <a href="https://github.com/xcfcode">  <img src="./img/ico/readme_profile/xiachong.png"  width="50" /></a>	   |    <a href="https://github.com/yhshu">  <img src="./img/ico/readme_profile/yiheng.png"  width="50" /></a>     | 
-| 6	|     Transfer Learning	      |    [transfer_learning](https://lena-voita.github.io/nlp_course/transfer_learning.html)   	    | [transfer_learning](https://mlnlp-world.github.io/NLP-Course-Chinese/nlp_course/transfer_learning.html) | <a href="https://github.com/yizhen20133868">  <img src="./img/ico/readme_profile/libo.png"  width="50" /></a>	  |   <a href="https://github.com/Cartus">  <img src="./img/ico/readme_profile/zhijiang.png"  width="50" /></a>   | 
-| 7	|   Convolutional Networks	   |     [convolutional](https://lena-voita.github.io/nlp_course/models/convolutional.html)  	     |[convolutional](https://mlnlp-world.github.io/NLP-Course-Chinese/nlp_course/models/convolutional.html) |  <a href="https://github.com/youngfly11">  <img src="./img/ico/readme_profile/yongfei.png"  width="50" /></a>	  | <a href="">  <img src="./img/ico/readme_profile/zhenghao.png"  width="50" /></a> | 
+| 1	|         Homepage  	         |                 [nlp_course](https://lena-voita.github.io/nlp_course.html) 	                  |                                                    [Homepage](https://mlnlp-world.github.io/NLP-Course-Chinese/index.html)                                                  |   <a href="http://xcfeng.net/">  <img src="./img/ico/readme_profile/xiachong.png"  width="50" /></a>    | <a href="https://github.com/yizhen20133868">  <img src="./img/ico/readme_profile/libo.png"  width="50" /></a> | 
+| 2	|      Word Embeddings	       |     [word_embeddings]( https://lena-voita.github.io/nlp_course/word_embeddings.html)   	      |  [word_embeddings](https://mlnlp-world.github.io/NLP-Course-Chinese/nlp_course/word_embeddings.html) |    <a href="http://jinjie.one/">  <img src="./img/ico/readme_profile/jinjie.png"  width="50" /></a>	     |   <a href="https://siviltaram.github.io/">  <img src="./img/ico/readme_profile/qian.png"  width="50" /></a>   | 
+| 3	|    Text Classification	     |  [text_classification](https://mlnlp-world.github.io/NLP-Course-Chinese/nlp_course/text_classification.html)  	   |   [text_classification](https://mlnlp-world.github.io/NLP-Course-Chinese/nlp_course/text_classification.html) | <a href="https://github.com/LightChen233">  <img src="./img/ico/readme_profile/qiguang.png"  width="50" /></a>	 |  <a href="http://xcfeng.net/">  <img src="./img/ico/readme_profile/xiachong.png"  width="50" /></a>   | 
+| 4	|     Language Modeling	      |    [language_modeling](https://lena-voita.github.io/nlp_course/language_modeling.html)  	     | [language_modeling](https://mlnlp-world.github.io/NLP-Course-Chinese/nlp_course/language_modeling.html) | <a href="https://xiaoyuanyi.github.io/">  <img src="./img/ico/readme_profile/xiaoyuan.png"  width="50" /></a>	  |   <a href="https://cartus.github.io/">  <img src="./img/ico/readme_profile/zhijiang.png"  width="50" /></a>   | 
+| 5	| Seq2seq and Attention	      |[seq2seq_and_attention](https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html)  	 |  [seq2seq_and_attention](https://mlnlp-world.github.io/NLP-Course-Chinese/nlp_course/seq2seq_and_attention.html) |   <a href="http://xcfeng.net/">  <img src="./img/ico/readme_profile/xiachong.png"  width="50" /></a>	   |    <a href="https://yihengshu.github.io/">  <img src="./img/ico/readme_profile/yiheng.png"  width="50" /></a>     | 
+| 6	|     Transfer Learning	      |    [transfer_learning](https://lena-voita.github.io/nlp_course/transfer_learning.html)   	    | [transfer_learning](https://mlnlp-world.github.io/NLP-Course-Chinese/nlp_course/transfer_learning.html) | <a href="https://github.com/yizhen20133868">  <img src="./img/ico/readme_profile/libo.png"  width="50" /></a>	  |   <a href="https://cartus.github.io/">  <img src="./img/ico/readme_profile/zhijiang.png"  width="50" /></a>   | 
+| 7	|   Convolutional Networks	   |     [convolutional](https://lena-voita.github.io/nlp_course/models/convolutional.html)  	     |[convolutional](https://mlnlp-world.github.io/NLP-Course-Chinese/nlp_course/models/convolutional.html) |  <a href="https://sites.google.com/view/yongfei-liu">  <img src="./img/ico/readme_profile/yongfei.png"  width="50" /></a>	  | <a href="https://edwardzh.github.io/">  <img src="./img/ico/readme_profile/zhenghao.png"  width="50" /></a> | 
 
 
 ## <img src="./img/ico/readme_ico/intro.png" width="25" />致谢 Lena Voita 博士
@@ -70,28 +70,28 @@
 
 感谢以下同学对本项目进行组织与指导
 
-<a href="">  <img src="./img/ico/readme_profile/xiachong.png"  width="50" /></a> 
-<a href="">  <img src="./img/ico/readme_profile/jinjie.png"  width="50" /></a> 
-<a href="">  <img src="./img/ico/readme_profile/qian.png"  width="50" /></a> 
-<a href="">  <img src="./img/ico/readme_profile/qiguang.png"  width="50" /></a> 
-<a href="">  <img src="./img/ico/readme_profile/xiaoyuan.png"  width="50" /></a> 
-<a href="">  <img src="./img/ico/readme_profile/yiheng.png"  width="50" /></a> 
-<a href="">  <img src="./img/ico/readme_profile/yongfei.png"  width="50" /></a> 
-<a href="">  <img src="./img/ico/readme_profile/zhenghao.png"  width="50" /></a> 
-<a href="">  <img src="./img/ico/readme_profile/zhijiang.png"  width="50" /></a> 
-<a href="">  <img src="./img/ico/readme_profile/libo.png"  width="50" /></a> 
+<a href="http://xcfeng.net/">  <img src="./img/ico/readme_profile/xiachong.png"  width="50" /></a> 
+<a href="http://jinjie.one/">  <img src="./img/ico/readme_profile/jinjie.png"  width="50" /></a> 
+<a href="https://siviltaram.github.io/">  <img src="./img/ico/readme_profile/qian.png"  width="50" /></a> 
+<a href="https://github.com/LightChen233">  <img src="./img/ico/readme_profile/qiguang.png"  width="50" /></a> 
+<a href="https://xiaoyuanyi.github.io/">  <img src="./img/ico/readme_profile/xiaoyuan.png"  width="50" /></a> 
+<a href="https://yihengshu.github.io/">  <img src="./img/ico/readme_profile/yiheng.png"  width="50" /></a> 
+<a href="https://sites.google.com/view/yongfei-liu">  <img src="./img/ico/readme_profile/yongfei.png"  width="50" /></a> 
+<a href="https://edwardzh.github.io/">  <img src="./img/ico/readme_profile/zhenghao.png"  width="50" /></a> 
+<a href="https://cartus.github.io/">  <img src="./img/ico/readme_profile/zhijiang.png"  width="50" /></a> 
+<a href="https://github.com/yizhen20133868">  <img src="./img/ico/readme_profile/libo.png"  width="50" /></a> 
 
 ## <img src="./img/ico/readme_ico/heart.png" width="25" />贡献者列表
 
 感谢以下同学对本项目的支持与贡献（排名不分先后）
 
-<a href="">  <img src="./img/ico/readme_profile/xiachong.png"  width="50" /></a> 
-<a href="">  <img src="./img/ico/readme_profile/jinjie.png"  width="50" /></a> 
-<a href="">  <img src="./img/ico/readme_profile/qian.png"  width="50" /></a> 
-<a href="">  <img src="./img/ico/readme_profile/qiguang.png"  width="50" /></a> 
-<a href="">  <img src="./img/ico/readme_profile/xiaoyuan.png"  width="50" /></a> 
-<a href="">  <img src="./img/ico/readme_profile/yiheng.png"  width="50" /></a> 
-<a href="">  <img src="./img/ico/readme_profile/yongfei.png"  width="50" /></a> 
-<a href="">  <img src="./img/ico/readme_profile/zhenghao.png"  width="50" /></a> 
-<a href="">  <img src="./img/ico/readme_profile/zhijiang.png"  width="50" /></a> 
-<a href="">  <img src="./img/ico/readme_profile/libo.png"  width="50" /></a> 
+<a href="http://xcfeng.net/">  <img src="./img/ico/readme_profile/xiachong.png"  width="50" /></a> 
+<a href="http://jinjie.one/">  <img src="./img/ico/readme_profile/jinjie.png"  width="50" /></a> 
+<a href="https://siviltaram.github.io/">  <img src="./img/ico/readme_profile/qian.png"  width="50" /></a> 
+<a href="https://github.com/LightChen233">  <img src="./img/ico/readme_profile/qiguang.png"  width="50" /></a> 
+<a href="https://xiaoyuanyi.github.io/">  <img src="./img/ico/readme_profile/xiaoyuan.png"  width="50" /></a> 
+<a href="https://yihengshu.github.io/">  <img src="./img/ico/readme_profile/yiheng.png"  width="50" /></a> 
+<a href="https://sites.google.com/view/yongfei-liu">  <img src="./img/ico/readme_profile/yongfei.png"  width="50" /></a> 
+<a href="https://edwardzh.github.io/">  <img src="./img/ico/readme_profile/zhenghao.png"  width="50" /></a> 
+<a href="https://cartus.github.io/">  <img src="./img/ico/readme_profile/zhijiang.png"  width="50" /></a> 
+<a href="https://github.com/yizhen20133868">  <img src="./img/ico/readme_profile/libo.png"  width="50" /></a> 
