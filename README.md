@@ -59,12 +59,21 @@
 
 感谢以下同学对本项目进行组织与指导
 
-<a href=""> <img src="./img/ico/readme_profile/xiachong.png"  width="50" >  </a> 
+<a href="">  <img src="./img/ico/readme_profile/jinjie.png"  width="50" /></a> 
+<a href="">  <img src="./img/ico/readme_profile/libo.png"  width="50" /></a> 
+<a href="">  <img src="./img/ico/readme_profile/qian.png"  width="50" /></a> 
+<a href="">  <img src="./img/ico/readme_profile/qiguang.png"  width="50" /></a> 
+<a href="">  <img src="./img/ico/readme_profile/xiachong.png"  width="50" /></a> 
+<a href="">  <img src="./img/ico/readme_profile/xiaoyuan.png"  width="50" /></a> 
+<a href="">  <img src="./img/ico/readme_profile/yiheng.png"  width="50" /></a> 
+<a href="">  <img src="./img/ico/readme_profile/yongfei.png"  width="50" /></a> 
+<a href="">  <img src="./img/ico/readme_profile/zhenghao.png"  width="50" /></a> 
+<a href="">  <img src="./img/ico/readme_profile/zhijiang.png"  width="50" /></a> 
 
 
 ## <img src="./img/ico/readme_ico/heart.png" width="25" />贡献者列表
 
-感谢以下同学对本项目的支持与贡献
+感谢以下同学对本项目的支持与贡献（排名不分先后）
 
 <a href="">  <img src="./img/ico/readme_profile/jinjie.png"  width="50" /></a> 
 <a href="">  <img src="./img/ico/readme_profile/libo.png"  width="50" /></a> 
