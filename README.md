@@ -51,7 +51,7 @@
 ### 欢迎贡献
 由于我们的水平有限，如有疏漏，还望谅解，欢迎任何的PR及issue讨论。
 
-## <img src="./img/ico/readme_ico/notes.png" width="25" /> 内容
+## <img src="./img/ico/readme_ico/notes.png" width="25" />内容
 | ID	|           章节           |                                           	英文原文                                           |                                                   中文翻译                                                 |                                            	翻译者                                            |                                        校对者                                           | 
 |:---:|:---------------------------:|:-------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------:|
 | 1	|         Homepage  	         |                 [nlp_course](https://lena-voita.github.io/nlp_course.html) 	                  |                                                    [Homepage](https://mlnlp-world.github.io/NLP-Course-Chinese/index.html)                                                  |   <a href="http://xcfeng.net/">  <img src="./img/ico/readme_profile/xiachong.png"  width="50" /></a>    | <a href="https://github.com/yizhen20133868">  <img src="./img/ico/readme_profile/libo.png"  width="50" /></a> | 
