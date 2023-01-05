@@ -57,7 +57,7 @@
 
 ## <img src="./img/ico/readme_ico/organizer.png" width="25" />组织者列表
 
-感谢以下同学对本项目进行组织与指导
+感谢以下同学对本项目进行组织与指导（排名不分先后）
 
 <a href="">  <img src="./img/ico/readme_profile/jinjie.png"  width="50" /></a> 
 <a href="">  <img src="./img/ico/readme_profile/libo.png"  width="50" /></a> 
