@@ -27,6 +27,8 @@
 <div align="center">
 <p align="center">
   <a href="#项目动机">项目动机</a>/
+  <a href="#内容">内容</a>/
+  <a href="#致谢">致谢</a>/
   <a href="#组织者列表">组织者列表</a>/
   <a href="#贡献者列表">贡献者列表</a>
 </p>
@@ -61,7 +63,7 @@
 | 7	|   Convolutional Networks	   |     [convolutional](https://lena-voita.github.io/nlp_course/models/convolutional.html)  	     |[convolutional](https://mlnlp-world.github.io/NLP-Course-Chinese/nlp_course/models/convolutional.html) |  <a href="https://sites.google.com/view/yongfei-liu">  <img src="./img/ico/readme_profile/yongfei.png"  width="50" /></a>	  | <a href="https://edwardzh.github.io/">  <img src="./img/ico/readme_profile/zhenghao.png"  width="50" /></a> | 
 
 
-## <img src="./img/ico/readme_ico/intro.png" width="25" />致谢 Lena Voita 博士
+## <img src="./img/ico/readme_ico/intro.png" width="25" />致谢
 
 感谢 [Lena Voita](https://lena-voita.github.io/) 博士完成如此惊艳生动、精妙绝伦的在线课程，为一众NLP初学者提供了极其宝贵的学习资源，借用《上帝掷骰子吗？：量子物理史话》一书序言， **“这个故事更像一个传奇，由一个不起眼的线索开始，曲径通幽，渐渐地落英缤纷，乱花迷眼。正在没头绪处时，突然间峰回路转，天地开阔，如河出伏流，一泻汪洋，但还未来得及一览美景，转眼间却又大起大落，误入白云深处不知归路”**。感谢 [Lena Voita](https://lena-voita.github.io/) 博士的慷慨授权，使得MLNLP社区有机会将其译为中文，以供国内NLP初学者学习。
 
