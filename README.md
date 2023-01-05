@@ -42,7 +42,7 @@
 
 
 <p align="center">
-<h3 align="center"><b><a href="https://mlnlp-world.github.io/NLP-Course-Chinese/">☞ NLP Course | 专属定制</a></b></h3>
+<h3 align="center"><b><a href="https://mlnlp-world.github.io/NLP-Course-Chinese/" target="_blank">☞ NLP Course | 专属定制</a></b></h3>
 </p>
 
 
