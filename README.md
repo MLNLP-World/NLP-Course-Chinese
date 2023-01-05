@@ -39,7 +39,7 @@
 自然语言处理（NLP）被誉为人工智能皇冠上的明珠👑，在近些年取得了长足的进步，其中一些成果，例如ChatGPT，也成功火爆出圈，获得了各界人士的关注，这都依赖于多种NLP技术的蓬勃发展与强力加持。
 在这一背景下，不论是初学者，亦或是高级研究者，均迫切的希望学习、巩固、提升自己的NLP知识。
 在各种学习资料“百花齐放”的时代， [Lena Voita](https://lena-voita.github.io/) 博士的 [NLP Course | For You](https://lena-voita.github.io/nlp_course.html) 更是吸引了众多人的眼球，其精美的动图极大的降低了NLP各个知识点的学习难度。
-因此，MLNLP社区在 [Lena Voita](https://lena-voita.github.io/) 博士的支持下，集合<a href="#贡献者列表">多位志愿者</a>的力量将其翻译为中文版本，以供国内同学学习，
+因此，MLNLP社区在 [Lena Voita](https://lena-voita.github.io/) 博士的支持下，集合<a href="#贡献者列表">多位老师同学</a>的力量将其翻译为中文版本，以供国内同学学习，
 希望能对大家有所帮助。
 
 
